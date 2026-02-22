@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIVA Health Epic",
+  "description": "Schema für Epic Work Items in AIVA Health",
+  "type": "object",
+  "required": ["id", "title", "labels", "milestone", "businessValue", "scope"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^EPIC-\\d{3}$",
+      "description": "Epic-ID im Format EPIC-XXX"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Epic-Titel"
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "epic" },
+      "description": "GitHub Labels (muss 'epic' enthalten)"
+    },
+    "milestone": {
+      "type": "string",
+      "description": "GitHub Milestone (z.B. 'v0.2.0 — AIVA Care')"
+    },
+    "businessValue": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Business Value Beschreibung"
+    },
+    "strategicGoals": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Strategische Ziele"
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "must": { "type": "array", "items": { "type": "string" } },
+        "should": { "type": "array", "items": { "type": "string" } },
+        "could": { "type": "array", "items": { "type": "string" } },
+        "wont": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["must"]
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "target": { "type": "string" },
+          "method": { "type": "string" }
+        },
+        "required": ["name", "target"]
+      }
+    },
+    "dsgvo": {
+      "type": "object",
+      "properties": {
+        "healthData": { "type": "boolean" },
+        "consentRequired": { "type": "boolean" },
+        "auditTrail": { "type": "boolean" }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "properties": {
+        "phase": { "type": "string" },
+        "start": { "type": "string", "format": "date" },
+        "end": { "type": "string", "format": "date" }
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Child Feature IDs"
+    }
+  }
+}

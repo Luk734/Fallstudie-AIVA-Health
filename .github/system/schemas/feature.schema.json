@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIVA Health Feature",
+  "description": "Schema für Feature Work Items in AIVA Health",
+  "type": "object",
+  "required": ["id", "title", "parentEpic", "labels", "acceptanceCriteria"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^FEAT-\\d{3}$",
+      "description": "Feature-ID im Format FEAT-XXX"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Feature-Titel"
+    },
+    "parentEpic": {
+      "type": "string",
+      "pattern": "^EPIC-\\d{3}$",
+      "description": "Referenz zum Parent Epic"
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "feature" },
+      "description": "GitHub Labels (muss 'feature' enthalten)"
+    },
+    "milestone": {
+      "type": "string",
+      "description": "GitHub Milestone"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detaillierte Feature-Beschreibung"
+    },
+    "businessValue": {
+      "type": "string",
+      "description": "Persona-bezogener Nutzen"
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string", "enum": ["open", "done"] }
+        },
+        "required": ["id", "description"]
+      },
+      "minItems": 1
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["S", "M", "L", "XL"],
+      "description": "Geschätzte Komplexität"
+    },
+    "dsgvo": {
+      "type": "object",
+      "properties": {
+        "consentRequired": { "type": "boolean" },
+        "healthData": { "type": "boolean" },
+        "auditTrail": { "type": "boolean" }
+      }
+    },
+    "stories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Child User Story IDs"
+    }
+  }
+}

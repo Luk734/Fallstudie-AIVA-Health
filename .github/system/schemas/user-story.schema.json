@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIVA Health User Story",
+  "description": "Schema für User Story Work Items in AIVA Health",
+  "type": "object",
+  "required": ["id", "title", "parentFeature", "labels", "persona", "story", "acceptanceCriteria"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^US-\\d{3}$",
+      "description": "Story-ID im Format US-XXX"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Story-Titel im Format: Als <Persona>, möchte ich <Aktion>"
+    },
+    "parentFeature": {
+      "type": "string",
+      "pattern": "^FEAT-\\d{3}$",
+      "description": "Referenz zum Parent Feature"
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "user-story" }
+    },
+    "persona": {
+      "type": "string",
+      "enum": ["laura", "thomas"],
+      "description": "Zugeordnete Persona"
+    },
+    "story": {
+      "type": "object",
+      "properties": {
+        "as": { "type": "string", "description": "Als [Persona]" },
+        "iWant": { "type": "string", "description": "möchte ich [Aktion]" },
+        "soThat": { "type": "string", "description": "damit [Nutzen]" }
+      },
+      "required": ["as", "iWant", "soThat"]
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario": { "type": "string" },
+          "given": { "type": "string" },
+          "when": { "type": "string" },
+          "then": { "type": "string" }
+        },
+        "required": ["scenario", "given", "when", "then"]
+      },
+      "minItems": 1
+    },
+    "storyPoints": {
+      "type": "integer",
+      "enum": [1, 2, 3, 5, 8, 13],
+      "description": "Fibonacci Story Points"
+    },
+    "dsgvo": {
+      "type": "object",
+      "properties": {
+        "personalData": { "type": "boolean" },
+        "consentRequired": { "type": "boolean" },
+        "article9HealthData": { "type": "boolean" }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Child Task IDs"
+    }
+  }
+}

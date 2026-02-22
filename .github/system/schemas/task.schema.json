@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AIVA Health Task",
+  "description": "Schema für Task Work Items in AIVA Health",
+  "type": "object",
+  "required": ["id", "title", "parentStory", "labels", "type"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TASK-\\d{3}$",
+      "description": "Task-ID im Format TASK-XXX"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Task-Titel"
+    },
+    "parentStory": {
+      "type": "string",
+      "pattern": "^US-\\d{3}$",
+      "description": "Referenz zur Parent User Story"
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "task" }
+    },
+    "type": {
+      "type": "string",
+      "enum": ["dev", "test", "design", "docs", "infra"],
+      "description": "Task-Typ"
+    },
+    "description": {
+      "type": "string",
+      "description": "Technische Beschreibung"
+    },
+    "affectedFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Betroffene Dateipfade"
+    },
+    "estimatedHours": {
+      "type": "number",
+      "minimum": 0.5,
+      "maximum": 4,
+      "description": "Geschätzter Zeitaufwand (1-4 Stunden)"
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["XS", "S", "M"],
+      "description": "Task-Komplexität"
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "blockedBy": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "blocks": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "definitionOfDone": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "criterion": { "type": "string" },
+          "done": { "type": "boolean" }
+        },
+        "required": ["criterion"]
+      }
+    }
+  }
+}
