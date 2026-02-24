@@ -1,0 +1,249 @@
+================================================================================
+            FRAGENKATALOG: ERSTES STAKEHOLDER-MEETING
+================================================================================
+
+Projekt:  AIVA Health - KI-basierter digitaler Gesundheitsassistent
+Datum:    24. Februar 2026
+Ziel:     Anforderungserhebung, Datenverfuegbarkeit, Entwicklungsform, Prototyp-Scope
+
+================================================================================
+1. PROJEKTVISION UND ZIELE
+================================================================================
+
+1.1 Was ist die primaere Vision fuer AIVA Health?
+    Notizen: _______________________________________________________________
+
+1.2 Welche konkreten Probleme soll der Assistent fuer Nutzer loesen?
+    Notizen: _______________________________________________________________
+
+1.3 Wer sind die primaeren Zielgruppen (Patienten, Aerzte, Angehoerige)?
+    Notizen: _______________________________________________________________
+
+1.4 Gibt es bereits einen Pitch oder eine Praesentation des Konzepts?
+    Notizen: _______________________________________________________________
+
+1.5 Welche Erfolgskriterien definieren einen erfolgreichen Prototyp?
+    Notizen: _______________________________________________________________
+
+================================================================================
+2. VORHANDENE DATEN UND DATENQUELLEN
+================================================================================
+
+--- 2.1 Datenquellen ---
+
+2.1.1 Welche Datenquellen sollen angebunden werden? (Wearables, ePA, manuell)
+      Notizen: _______________________________________________________________
+
+2.1.2 Gibt es bereits Testdaten oder Beispiel-Datensaetze?
+      Notizen: _______________________________________________________________
+
+2.1.3 In welchem Format liegen vorhandene Daten vor? (JSON, HL7 FHIR, CSV)
+      Notizen: _______________________________________________________________
+
+2.1.4 Sind die Daten anonymisiert/pseudonymisiert nutzbar?
+      Notizen: _______________________________________________________________
+
+2.1.5 Welche Wearable-Hersteller? (Apple Health, Fitbit, Garmin, etc.)
+      Notizen: _______________________________________________________________
+
+--- 2.2 ePA-Integration ---
+
+2.2.1 Wie weit ist die ePA-Anbindung geplant? (Lesend, schreibend, bidirektional)
+      Notizen: _______________________________________________________________
+
+2.2.2 Gibt es Zugang zu einer ePA-Sandbox/Testumgebung?
+      Notizen: _______________________________________________________________
+
+2.2.3 Welche ePA-Daten sind relevant? (Befunde, Medikation, Impfungen, Arztbriefe)
+      Notizen: _______________________________________________________________
+
+--- 2.3 Datenqualitaet ---
+
+2.3.1 Wie ist die erwartete Datenqualitaet der Quellen?
+      Notizen: _______________________________________________________________
+
+2.3.2 Gibt es bekannte Luecken oder Inkonsistenzen?
+      Notizen: _______________________________________________________________
+
+2.3.3 Wie haeufig werden Daten aktualisiert (Echtzeit, taeglich, ad-hoc)?
+      Notizen: _______________________________________________________________
+
+================================================================================
+3. ENTWICKLUNGSFORM UND TECHNOLOGIE
+================================================================================
+
+--- 3.1 Plattform ---
+
+3.1.1 Welche Plattform(en)? (Web, iOS, Android, Desktop)
+      Notizen: _______________________________________________________________
+
+3.1.2 Native vs. Cross-Platform-Entwicklung?
+      Notizen: _______________________________________________________________
+
+3.1.3 Wird Offline-Faehigkeit benoetigt?
+      Notizen: _______________________________________________________________
+
+--- 3.2 Technologie-Stack ---
+
+3.2.1 Gibt es Vorgaben fuer den Tech-Stack? (Frontend, Backend, Datenbank)
+      Notizen: _______________________________________________________________
+
+3.2.2 Welche KI/ML-Frameworks? (OpenAI, lokale LLMs, eigene Modelle)
+      Notizen: _______________________________________________________________
+
+3.2.3 Cloud-basiert oder On-Premise?
+      Notizen: _______________________________________________________________
+
+3.2.4 Bestehende Systeme, an die angeknuepft werden muss?
+      Notizen: _______________________________________________________________
+
+--- 3.3 Architektur ---
+
+3.3.1 Monolithisch oder Microservices?
+      Notizen: _______________________________________________________________
+
+3.3.2 Welche APIs? (REST, GraphQL)
+      Notizen: _______________________________________________________________
+
+3.3.3 Anforderungen an Skalierbarkeit?
+      Notizen: _______________________________________________________________
+
+================================================================================
+4. PROTOTYP-ANFORDERUNGEN (SCOPE)
+================================================================================
+
+--- 4.1 Funktionale Anforderungen ---
+
+4.1.1 Welche Features sind fuer den MVP zwingend erforderlich?
+      Notizen: _______________________________________________________________
+
+4.1.2 Welche Features sind "Nice-to-have" fuer spaetere Iterationen?
+      Notizen: _______________________________________________________________
+
+4.1.3 Soll der Prototyp klickbar oder funktional sein?
+      Notizen: _______________________________________________________________
+
+--- 4.2 AIVA Module - Priorisierung (1=hoechste, 4=niedrigste) ---
+
+[ ] AIVA Care   - Terminmanagement, Arztsuche, Erinnerungen
+    Prioritaet: ___  |  Im Prototyp? [ ] Ja  [ ] Nein
+
+[ ] AIVA Coach  - KI-Empfehlungen, Vitalwerte, Wearable-Integration
+    Prioritaet: ___  |  Im Prototyp? [ ] Ja  [ ] Nein
+
+[ ] AIVA Labs   - Befund-Digitalisierung, Medikationsplan, Interaktionspruefung
+    Prioritaet: ___  |  Im Prototyp? [ ] Ja  [ ] Nein
+
+[ ] AIVA Family - Familienkonto, Kinderprofil, Berechtigungen
+    Prioritaet: ___  |  Im Prototyp? [ ] Ja  [ ] Nein
+
+--- 4.3 KI-Funktionalitaet ---
+
+4.3.1 Welche KI-Features sind fuer den Prototyp vorgesehen?
+      Notizen: _______________________________________________________________
+
+4.3.2 Soll der Assistent natuerliche Sprache verstehen (NLU)?
+      Notizen: _______________________________________________________________
+
+4.3.3 Empfehlungen geben oder nur informieren?
+      Notizen: _______________________________________________________________
+
+4.3.4 Umgang mit medizinischer Haftung? (Disclaimer, keine Diagnose)
+      Notizen: _______________________________________________________________
+
+================================================================================
+5. NUTZER UND PERSONAS
+================================================================================
+
+5.1 Gibt es bereits definierte Personas?
+    Notizen: _______________________________________________________________
+
+5.2 Welche Altersgruppen sollen adressiert werden?
+    Notizen: _______________________________________________________________
+
+5.3 Accessibility-Anforderungen? (Sehbehinderte, aeltere Nutzer)
+    Notizen: _______________________________________________________________
+
+5.4 Mehrere Sprachen unterstuetzen?
+    Notizen: _______________________________________________________________
+
+5.5 Wie technikaffin ist die Zielgruppe?
+    Notizen: _______________________________________________________________
+
+================================================================================
+6. DSGVO UND COMPLIANCE (KRITISCH BEI GESUNDHEITSDATEN!)
+================================================================================
+
+6.1 Wer ist der Verantwortliche im Sinne der DSGVO?
+    Notizen: _______________________________________________________________
+
+6.2 Wo sollen Gesundheitsdaten gespeichert werden? (EU-Rechtsraum?)
+    Notizen: _______________________________________________________________
+
+6.3 Rechtsgrundlage fuer Verarbeitung? (Einwilligung, Vertrag)
+    Notizen: _______________________________________________________________
+
+6.4 Datenschutz-Folgenabschaetzung (DSFA) erforderlich/vorhanden?
+    Notizen: _______________________________________________________________
+
+6.5 Wie lange Daten aufbewahren? (Loeschkonzept)
+    Notizen: _______________________________________________________________
+
+6.6 Anforderungen nach Patientendaten-Schutz-Gesetz (PDSG)?
+    Notizen: _______________________________________________________________
+
+6.7 App als Medizinprodukt (MDR) zulassen?
+    Notizen: _______________________________________________________________
+
+================================================================================
+7. TIMELINE UND RESSOURCEN
+================================================================================
+
+7.1 Bis wann soll der Prototyp fertig sein?
+    Notizen: _______________________________________________________________
+
+7.2 Feste Deadlines (z.B. Praesentationstermin DHBW)?
+    Notizen: _______________________________________________________________
+
+7.3 Verfuegbare Ressourcen? (Team, Budget, Infrastruktur)
+    Notizen: _______________________________________________________________
+
+7.4 Geplante Reviews/Meilensteine?
+    Notizen: _______________________________________________________________
+
+7.5 Wie soll Prototyp praesentiert werden? (Demo, Video, Mockup)
+    Notizen: _______________________________________________________________
+
+================================================================================
+8. OFFENE PUNKTE UND NAECHSTE SCHRITTE
+================================================================================
+
+Offener Punkt                    | Verantwortlich      | Deadline
+---------------------------------|---------------------|------------------
+                                 |                     |
+                                 |                     |
+                                 |                     |
+
+================================================================================
+NOTIZEN AUS DEM MEETING
+================================================================================
+
+
+
+
+
+================================================================================
+ZUSAMMENFASSUNG DER ENTSCHEIDUNGEN
+================================================================================
+
+Primaere Zielgruppe:  ________________________________________________________
+Plattform:            ________________________________________________________
+Tech-Stack:           ________________________________________________________
+MVP-Module:           ________________________________________________________
+KI-Ansatz:            ________________________________________________________
+Timeline:             ________________________________________________________
+Naechster Meilenstein: ________________________________________________________
+
+================================================================================
+Erstellt von: Orchestrator Agent | AIVA Health Fallstudie
+================================================================================
