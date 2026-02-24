@@ -1,4 +1,4 @@
----
+﻿---
 description: 'Erstellt Design-Spezifikationen und UI-Components mit strikter AIVA Health Design System-Konformität. Accessibility-First für alle Personas.'
 tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'oraios/serena/*', 'digitarald.agent-memory/memory', 'todo']
 ---
@@ -6,11 +6,11 @@ tools: ['execute', 'read', 'edit', 'search', 'web', 'agent', 'oraios/serena/*', 
 # UX Designer Agent
 
 **Extends**:
-- [Layer 0: Foundation](system/layers/00-foundation.md) - Tools, Claude Config, Projektkontext
-- [Layer 1: Domain Knowledge](system/layers/01-domain-knowledge.md) - Bounded Contexts, Personas
-- [Layer 2: Process & Workflow](system/layers/02-process-workflow.md) - Multi-Agent Coordination
-- [Layer 3a: Development](system/layers/03-specialization/development.md) - UI-Patterns, Design Tokens
-- [Layer 3d: MVP & Prototype](system/layers/03-specialization/mvp-prototype.md) - **Load when MVP-Mode** (Low-Fidelity First, Rapid Prototyping)
+- [Layer 0: Foundation](../system/layers/00-foundation.md) - Tools, Claude Config, Projektkontext
+- [Layer 1: Domain Knowledge](../system/layers/01-domain-knowledge.md) - Bounded Contexts, Personas
+- [Layer 2: Process & Workflow](../system/layers/02-process-workflow.md) - Multi-Agent Coordination
+- [Layer 3a: Development](../system/layers/03-specialization/development.md) - UI-Patterns, Design Tokens
+- [Layer 3d: MVP & Prototype](../system/layers/03-specialization/mvp-prototype.md) - **Load when MVP-Mode** (Low-Fidelity First, Rapid Prototyping)
 
 **Version**: v1.0.0
 **Claude Config**: Temperature 0.25, Max Tokens 5000, Thinking Mode Disabled
@@ -77,7 +77,7 @@ Shared:       HealthDataConsent, AuditInfoBanner, EmergencyContactCard
 
 ## AIVA Health Design System Compliance (MANDATORY)
 
-**ALLE UI-Implementierungen MÜSSEN [Convention 18: AIVA Health Design System](conventions/other/18-design-system.md) folgen:**
+**ALLE UI-Implementierungen MÜSSEN [Convention 18: AIVA Health Design System](../conventions/other/18-design-system.md) folgen:**
 
 ### Pflicht-Regeln
 
@@ -175,7 +175,7 @@ Erstellt eine strukturierte Design-Spezifikation.
 - Desktop (> 1024px): [Beschreibung]
 ```
 
-**Referenz**: [Command: Design Spec](commands/design-spec.md)
+**Referenz**: [Command: Design Spec](../commands/design-spec.md)
 
 ### /Prototype
 Erstellt interaktive Code-Prototypen.
@@ -188,7 +188,7 @@ Erstellt interaktive Code-Prototypen.
 5. Responsive Verhalten implementieren
 6. Prototype dokumentieren
 
-**Referenz**: [Command: Prototype](commands/prototype.md)
+**Referenz**: [Command: Prototype](../commands/prototype.md)
 
 ---
 

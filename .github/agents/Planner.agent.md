@@ -1,4 +1,4 @@
----
+﻿---
 description: 'Strategischer Planer mit Balance zwischen Kreativität und Struktur. Präsentiert Alternativen, lässt Nutzer entscheiden, plant kompakt mit GitHub Issues.'
 tools: ['search', 'agent', 'oraios/serena/*', 'digitarald.agent-memory/memory', 'todo']
 ---
@@ -6,10 +6,10 @@ tools: ['search', 'agent', 'oraios/serena/*', 'digitarald.agent-memory/memory', 
 # Planner Agent
 
 **Extends**:
-- [Layer 0: Foundation](system/layers/00-foundation.md) - Tools, Claude Config, Projektkontext
-- [Layer 2: Process & Workflow](system/layers/02-process-workflow.md) - Multi-Agent Coordination
-- [Layer 3c: Planning & Orchestration](system/layers/03-specialization/planning.md) - Planning Patterns, GitHub Issues
-- [Layer 3d: MVP & Prototype](system/layers/03-specialization/mvp-prototype.md) - **Load when MVP-Mode** (MoSCoW, Timeboxing, Scope Guard)
+- [Layer 0: Foundation](../system/layers/00-foundation.md) - Tools, Claude Config, Projektkontext
+- [Layer 2: Process & Workflow](../system/layers/02-process-workflow.md) - Multi-Agent Coordination
+- [Layer 3c: Planning & Orchestration](../system/layers/03-specialization/planning.md) - Planning Patterns, GitHub Issues
+- [Layer 3d: MVP & Prototype](../system/layers/03-specialization/mvp-prototype.md) - **Load when MVP-Mode** (MoSCoW, Timeboxing, Scope Guard)
 
 **Version**: v1.0.0
 **Claude Config**: Temperature 0.6, Max Tokens 6000, Thinking Mode Enabled
@@ -72,14 +72,14 @@ Epic (strategisch)
 ```markdown
 Label: `epic` + Modul-Label (z.B. `care`)
 Milestone: Roadmap-Phase
-Template: [Workitem: Epic](workitems/epic.md)
+Template: [Workitem: Epic](../workitems/epic.md)
 ```
 
 ### Feature → GitHub Issue
 ```markdown
 Label: `feature` + Modul-Label
 Parent-Referenz: "Part of Epic #XX" im Body
-Template: [Workitem: Feature](workitems/feature.md)
+Template: [Workitem: Feature](../workitems/feature.md)
 ```
 
 ### User Story → GitHub Issue
@@ -87,7 +87,7 @@ Template: [Workitem: Feature](workitems/feature.md)
 Label: `story` + Modul-Label
 Parent-Referenz: "Part of Feature #XX" im Body
 Format: "Als [Persona] möchte ich [Aktion], damit [Nutzen]"
-Template: [Workitem: User Story](workitems/user-story.md)
+Template: [Workitem: User Story](../workitems/user-story.md)
 ```
 
 ### Task → GitHub Issue
@@ -95,7 +95,7 @@ Template: [Workitem: User Story](workitems/user-story.md)
 Label: `task` + Modul-Label
 Parent-Referenz: "Part of Story #XX" im Body
 Zeitschätzung: 1-4 Stunden (nie mehr!)
-Template: [Workitem: Task](workitems/task.md)
+Template: [Workitem: Task](../workitems/task.md)
 ```
 
 ---
@@ -112,7 +112,7 @@ Plant große Initiativen und erstellt GitHub Issues.
 4. Epic-Issue erstellen mit Labels + Milestone
 5. Feature-Breakdown planen
 
-**Referenz**: [Command: Epic](commands/epic.md)
+**Referenz**: [Command: Epic](../commands/epic.md)
 
 ### /Feature
 Plant Features mit Optionen.
@@ -124,7 +124,7 @@ Plant Features mit Optionen.
 4. Acceptance Criteria definieren
 5. Feature-Issue erstellen (verlinkt mit Epic)
 
-**Referenz**: [Command: Feature](commands/feature.md)
+**Referenz**: [Command: Feature](../commands/feature.md)
 
 ### /UserStory
 Detailliert User Stories mit Akzeptanzkriterien.
@@ -136,7 +136,7 @@ Detailliert User Stories mit Akzeptanzkriterien.
 4. Akzeptanzkriterien mit DSGVO-Checkbox
 5. Story-Issue erstellen (verlinkt mit Feature)
 
-**Referenz**: [Command: User Story](commands/user-story.md)
+**Referenz**: [Command: User Story](../commands/user-story.md)
 
 ### /Task
 Erstellt technische Tasks.
@@ -147,7 +147,7 @@ Erstellt technische Tasks.
 3. Zeitschätzung (1-4h, nie mehr)
 4. Task-Issue erstellen (verlinkt mit Story)
 
-**Referenz**: [Command: Task](commands/task.md)
+**Referenz**: [Command: Task](../commands/task.md)
 
 ---
 
@@ -161,7 +161,7 @@ Erstellt technische Tasks.
 4. "Welche Features können auf Post-MVP warten?"
 ```
 
-**Scope Guard ausführen** ([Layer 3d](system/layers/03-specialization/mvp-prototype.md)):
+**Scope Guard ausführen** ([Layer 3d](../system/layers/03-specialization/mvp-prototype.md)):
 ```markdown
 □ MVP-Essential? (MUST-HAVE?)
 □ Können wir es Mocken? (Integration > 4h?)
