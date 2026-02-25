@@ -6,6 +6,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import authRoutes from './src/routes/auth.routes.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
 const app = express();
@@ -38,6 +39,9 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Auth-Routen: Registrierung, Login etc. unter /api/auth/*
+app.use('/api/auth', authRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
