@@ -393,7 +393,41 @@ KAUF (5-10%)
 
 ---
 
-## 10. Referenzen & Quellen
+## 10. Technischer Stack (Stand 25.02.2026)
+
+> Vollständige Dokumentation: [context/architecture.md](context/architecture.md)
+
+### Plattform-Strategie
+
+| Phase | Plattform | Technologie |
+|---|---|---|
+| **Phase 1 (MVP)** | Web-App | React + Node.js + PostgreSQL |
+| **Phase 2** | iOS & Android | Expo (React Native) |
+
+### Tech-Stack (MVP)
+
+| Schicht | Technologie | Version |
+|---|---|---|
+| Frontend | React + Vite | 18 / 5 |
+| HTTP | Axios | ^1.0 |
+| Backend | Node.js + Express | 20 LTS / ^4.18 |
+| Auth | JWT (bcrypt + jsonwebtoken) | — |
+| Datenbank | PostgreSQL + Prisma ORM | 15 / ^5.0 |
+| Prozessmanager | PM2 | ^5.0 |
+| Webserver | Nginx + Let's Encrypt | 1.24+ |
+| Hosting | BWCloud (DHBW) | Single VM |
+| KI (MVP) | Mock (statisch) | — |
+| KI (Post-MVP) | OpenAI API (GPT-4o) | — |
+
+### MVP-Scope
+
+- **AIVA Care** + **AIVA Labs** — vollständig funktional
+- **AIVA Coach** + **AIVA Family** — sichtbar als Shell, keine Funktion
+- Zeitrahmen: 1 Monat | Team: 2 Entwickler + 1 Designer
+
+---
+
+## 11. Referenzen & Quellen
 
 - Osterwalder, A., Pigneur, Y., Bernarda, G., & Smith, A. (2014). *Value Proposition Design*. Wiley.
 - DHBW Stuttgart – Fallstudie Bima 20026

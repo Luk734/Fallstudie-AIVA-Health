@@ -92,13 +92,13 @@
 
 Bitte priorisieren (1 = hoechste Prioritaet, 4 = niedrigste):
 
-- [ ] **AIVA Care** - Terminmanagement, Arztsuche, Erinnerungen  
+- [x] **AIVA Care** - Terminmanagement, Arztsuche, Erinnerungen  
   Prioritaet: ___ | Im Prototyp? Ja/Nein
 
 - [ ] **AIVA Coach** - KI-Empfehlungen, Vitalwerte, Wearable-Integration  
   Prioritaet: ___ | Im Prototyp? Ja/Nein
 
-- [ ] **AIVA Labs** - Befund-Digitalisierung, Medikationsplan, Interaktionspruefung  
+- [x] **AIVA Labs** - Befund-Digitalisierung, Medikationsplan, Interaktionspruefung  
   Prioritaet: ___ | Im Prototyp? Ja/Nein
 
 - [ ] **AIVA Family** - Familienkonto, Kinderprofil, Berechtigungen  

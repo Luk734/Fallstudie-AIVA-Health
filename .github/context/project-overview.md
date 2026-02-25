@@ -90,3 +90,4 @@ Doctolib, Wearable-Hersteller (Apple, Samsung, Fitbit, Garmin), ePA/Krankenkasse
 - [Module](modules.md) — Die 4 AIVA-Module (Care, Coach, Labs, Family)
 - [Security & Compliance](security.md) — DSGVO, Datenschutz, Integrationen
 - [Roadmap](roadmap.md) — Traction-Ziele und Entwicklungsplan
+- [Architektur & Tech-Stack](architecture.md) — Technischer Stack, Deployment, MVP-Scope
