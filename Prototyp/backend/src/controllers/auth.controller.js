@@ -157,3 +157,51 @@ export async function login(req, res) {
     return res.status(500).json({ error: 'Interner Serverfehler.' });
   }
 }
+
+// ─── GET /api/auth/me ─────────────────────────────────────────────────────
+// Gibt die Daten des aktuell eingeloggten Users zurück.
+//
+// Diese Route ist GESCHÜTZT — sie wird nur erreicht, wenn die
+// authenticateToken-Middleware den Token erfolgreich geprüft hat.
+//
+// Die Middleware hat req.user befüllt, z.B.:
+//   req.user = { userId: 3, email: "julian@example.com", iat: ..., exp: ... }
+//
+// Ablauf:
+//   1. req.user.userId lesen (von der Middleware gesetzt)
+//   2. User aus der DB laden (aktuellste Daten, nicht aus dem Token!)
+//   3. User-Daten zurückgeben (OHNE passwordHash)
+
+export async function getMe(req, res) {
+  try {
+    // ── Schritt 1: userId aus req.user lesen ────────────────────────────
+    // req.user wurde von authenticateToken gesetzt (nicht vom Client!)
+    // Der Client kann diesen Wert nicht fälschen — er steckt im signierten Token.
+    const { userId } = req.user;
+
+    // ── Schritt 2: User aus DB laden ────────────────────────────────────
+    // Wir laden frisch aus der DB, statt den Token-Inhalt zu vertrauen.
+    // Warum? Der User könnte z.B. die E-Mail geändert haben seit dem Login.
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        // passwordHash: false → wird NICHT mitgeschickt (Sicherheit!)
+      },
+    });
+
+    if (!user) {
+      // Sollte nicht vorkommen (Token war gültig, User wurde gelöscht)
+      return res.status(404).json({ error: 'User nicht gefunden.' });
+    }
+
+    // ── Schritt 3: Antwort ───────────────────────────────────────────────
+    return res.status(200).json({ user });
+  } catch (error) {
+    console.error('[getMe] Fehler:', error);
+    return res.status(500).json({ error: 'Interner Serverfehler.' });
+  }
+}
