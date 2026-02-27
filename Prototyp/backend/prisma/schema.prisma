@@ -17,13 +17,26 @@ datasource db {
 // Tabelle: users
 // Speichert alle Nutzerkonten. Passwort wird als bcrypt-Hash abgelegt,
 // nie als Klartext!
+//
+// US-05: Profil-Felder ergänzt.
+//   - firstName, lastName, birthDate, gender, avatarUrl
+//   - Alle mit "?" → nullable, damit Register (nur Email+PW) weiter funktioniert
+//   - Pflicht-Validierung (z.B. Vorname) passiert im Controller, nicht in der DB
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+
+  // ── Profil-Felder (US-05) ──────────────────────────────────
+  firstName    String?   @map("first_name")   // Vorname (Pflicht im Controller)
+  lastName     String?   @map("last_name")    // Nachname (optional)
+  birthDate    DateTime? @map("birth_date")   // Geburtsdatum (für Vorsorge-Empfehlungen)
+  gender       String?                         // "male" | "female" | "diverse" | "unspecified"
+  avatarUrl    String?   @map("avatar_url")   // MVP: Platzhalter-Avatar
+
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   @@map("users")
 }
