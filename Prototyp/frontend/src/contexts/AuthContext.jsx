@@ -123,10 +123,25 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('aiva_user');
   }
 
+  // ── updateUser(): User-Daten aktualisieren (US-05) ──────────────────────────
+  // Wird nach dem Profil-Speichern aufgerufen.
+  // Aktualisiert die User-Daten im React-State UND im localStorage,
+  // damit alle Komponenten (z.B. Dashboard) sofort den neuen Namen sehen.
+  //
+  // Wir mergen (= zusammenführen) die neuen mit den alten Daten:
+  //   { ...user }       → alle bisherigen Felder behalten (email, id, ...)
+  //   { ...newUserData } → neue/geänderte Felder überschreiben (firstName, ...)
+  // Der Spread-Operator "..." kopiert alle Eigenschaften eines Objekts.
+  function updateUser(newUserData) {
+    const merged = { ...user, ...newUserData };
+    setUser(merged);
+    localStorage.setItem('aiva_user', JSON.stringify(merged));
+  }
+
   // ── Context-Wert zusammenstellen ───────────────────────────────────────────
   // Dieses Objekt ist das, was alle Kindkomponenten mit useAuth() abrufen.
   // isLoading wird von PrivateRoute genutzt um den Spinner anzuzeigen.
-  const value = { user, token, isLoading, login, logout };
+  const value = { user, token, isLoading, login, logout, updateUser };
 
   return (
     <AuthContext.Provider value={value}>

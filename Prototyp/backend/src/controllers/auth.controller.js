@@ -80,6 +80,9 @@ export async function register(req, res) {
       user: {
         id: user.id,
         email: user.email,
+        firstName: user.firstName,   // US-05: Profil-Felder mitliefern
+        lastName: user.lastName,
+        avatarUrl: user.avatarUrl,
         createdAt: user.createdAt,
       },
     });
@@ -149,6 +152,9 @@ export async function login(req, res) {
       user: {
         id: user.id,
         email: user.email,
+        firstName: user.firstName,   // US-05: Profil-Felder mitliefern
+        lastName: user.lastName,
+        avatarUrl: user.avatarUrl,
         createdAt: user.createdAt,
       },
     });
@@ -187,6 +193,11 @@ export async function getMe(req, res) {
       select: {
         id: true,
         email: true,
+        firstName: true,    // US-05: Profil-Felder auch bei /me zurückgeben
+        lastName: true,     // damit AuthContext nach Page-Reload alles hat
+        birthDate: true,
+        gender: true,
+        avatarUrl: true,
         createdAt: true,
         updatedAt: true,
         // passwordHash: false → wird NICHT mitgeschickt (Sicherheit!)
