@@ -15,3 +15,5 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 *.log
+
+/src/generated/prisma
