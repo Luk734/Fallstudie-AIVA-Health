@@ -5,11 +5,14 @@
 // d.h. alle Pfade hier sind relativ zu "/api/auth".
 
 import { Router } from 'express';
-import { register } from '../controllers/auth.controller.js';
+import { register, login } from '../controllers/auth.controller.js';
 
 const router = Router();
 
 // POST /api/auth/register → register-Funktion im Controller
 router.post('/register', register);
+
+// POST /api/auth/login → login-Funktion im Controller
+router.post('/login', login);
 
 export default router;

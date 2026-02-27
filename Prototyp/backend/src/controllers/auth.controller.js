@@ -88,3 +88,72 @@ export async function register(req, res) {
     return res.status(500).json({ error: 'Interner Serverfehler.' });
   }
 }
+
+// ─── POST /api/auth/login ─────────────────────────────────────────────────
+// Ablauf:
+//   1. E-Mail + Passwort aus dem Request-Body lesen
+//   2. User in DB suchen (nach E-Mail)
+//   3. bcrypt.compare(): Passwort gegen gespeicherten Hash prüfen
+//   4. JWT-Token erstellen und zurückschicken
+//
+// SECURITY: Wir sagen bei Fehler immer "E-Mail oder Passwort falsch" —
+// nie ob die E-Mail existiert oder nicht. So erfährt ein Angreifer
+// nichts über registrierte Nutzer.
+
+export async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    // ── Schritt 1: Felder vorhanden? ────────────────────────────────────
+    if (!email || !password) {
+      return res.status(400).json({
+        error: 'E-Mail und Passwort sind erforderlich.',
+      });
+    }
+
+    // ── Schritt 2: User in DB suchen ────────────────────────────────────
+    // findUnique sucht genau einen Eintrag anhand des einzigartigen Feldes "email"
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    // User nicht gefunden? Gleiche Fehlermeldung wie bei falschem Passwort!
+    if (!user) {
+      return res.status(401).json({
+        error: 'E-Mail oder Passwort falsch.',
+      });
+    }
+
+    // ── Schritt 3: Passwort prüfen ───────────────────────────────────────
+    // bcrypt.compare() hasht das eingegebene Passwort mit dem Salt aus
+    // user.passwordHash und vergleicht das Ergebnis.
+    // Gibt true zurück wenn gleich, false wenn nicht.
+    const passwortStimmt = await bcrypt.compare(password, user.passwordHash);
+
+    if (!passwortStimmt) {
+      return res.status(401).json({
+        error: 'E-Mail oder Passwort falsch.',
+      });
+    }
+
+    // ── Schritt 4: JWT erstellen ─────────────────────────────────────────
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+
+    return res.status(200).json({
+      message: 'Login erfolgreich!',
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error('[login] Fehler:', error);
+    return res.status(500).json({ error: 'Interner Serverfehler.' });
+  }
+}
