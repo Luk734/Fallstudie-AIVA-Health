@@ -15,6 +15,14 @@
 //   Nur Variablen mit dem Präfix VITE_ werden ins Frontend eingebaut.
 //   Das Backend hat eine eigene .env mit Secrets (JWT_SECRET etc.) —
 //   die ist nie im Browser sichtbar.
+//
+// US-07 Consent-Prüfung:
+//   Die Consent-Prüfung passiert NICHT mehr hier in der LoginPage!
+//   Sie wurde in den AuthContext (login() + checkConsents()) und
+//   den PrivateRoute (hasConsents-Check) verschoben.
+//   So werden ALLE User geprüft — auch die mit gespeichertem Token.
+//   Die LoginPage leitet nach dem Login einfach zu /dashboard weiter,
+//   und PrivateRoute entscheidet ob der User zu /consent umgeleitet wird.
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -64,8 +72,14 @@ export default function LoginPage() {
 
       // ── Erfolg: login() aufrufen ─────────────────────────────────────────
       // login() speichert Token + User in Context UND localStorage.
-      // Danach leitet navigate() zu /dashboard weiter.
-      login(data.token, data.user);
+      // login() ist jetzt async und prüft intern auch die Consents
+      // (über checkConsents im AuthContext).
+      //
+      // Nach dem Login leiten wir einfach zu /dashboard weiter.
+      // Falls der User keine Consents hat, wird PrivateRoute ihn
+      // automatisch zu /consent umleiten — das passiert zentral,
+      // egal ob der User sich einloggt oder einen gespeicherten Token hat.
+      await login(data.token, data.user);
       navigate('/dashboard');
     } catch {
       // Netzwerk-Fehler (Backend nicht erreichbar)

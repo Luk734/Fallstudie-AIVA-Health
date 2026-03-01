@@ -57,6 +57,13 @@ export default function DashboardPage() {
               )}
               Profil
             </button>
+            {/* Datenschutz-Button: öffnet die Consent-Verwaltung (US-08) */}
+            <button
+              onClick={() => navigate('/datenschutz')}
+              className="dashboard-privacy-btn"
+            >
+              🔒 Datenschutz
+            </button>
             <button onClick={handleLogout} className="dashboard-logout-btn">
               Ausloggen
             </button>

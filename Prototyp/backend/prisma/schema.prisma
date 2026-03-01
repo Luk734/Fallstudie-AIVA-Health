@@ -38,5 +38,54 @@ model User {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
+  // ── Relation zu Consents (US-07) ───────────────────────────
+  // Ein User kann mehrere Consent-Einträge haben (1:N).
+  // Prisma braucht diese Zeile, um die Beziehung in beide Richtungen
+  // navigierbar zu machen (z.B. user.consents in Queries).
+  consents     Consent[]
+
   @@map("users")
+}
+
+// ─── EPIC-01 / US-07: DSGVO-Einwilligungen ───────────────────
+// Tabelle: consents
+// Speichert jede einzelne Einwilligung separat mit Zeitstempel.
+// Das ist DSGVO-konform: Wir können für jede Einwilligung nachweisen
+// WANN sie erteilt (oder verweigert) wurde.
+//
+// consentType: Welche Art von Einwilligung?
+//   "terms"       → Nutzungsbedingungen & Datenschutz (Pflicht)
+//   "health_data" → Verarbeitung von Gesundheitsdaten (Pflicht)
+//   "analytics"   → Anonymisierte Daten für Verbesserung (Optional)
+//
+// granted: true = eingewilligt, false = abgelehnt
+// grantedAt: Zeitstempel der Einwilligung (DSGVO-Nachweispflicht)
+//
+// @@unique([userId, consentType]):
+//   Ein User kann pro consentType nur EINEN Eintrag haben.
+//   Dadurch wird verhindert, dass versehentlich doppelte Einträge entstehen.
+//   Bei erneutem Speichern wird der bestehende Eintrag aktualisiert (upsert).
+
+model Consent {
+  id          Int      @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  // userId verweist auf die id in der User-Tabelle.
+  // onDelete: Cascade → wenn der User gelöscht wird, werden auch
+  // seine Consents automatisch mitgelöscht.
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Consent-Daten ──────────────────────────────────────────
+  consentType String   @map("consent_type")   // "terms" | "health_data" | "analytics"
+  granted     Boolean  @default(false)         // true = eingewilligt
+  grantedAt   DateTime @default(now()) @map("granted_at")  // Zeitstempel
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // ── Unique Constraint ──────────────────────────────────────
+  // Pro User darf es nur EINEN Eintrag pro consentType geben.
+  @@unique([userId, consentType])
+  @@map("consents")
 }
