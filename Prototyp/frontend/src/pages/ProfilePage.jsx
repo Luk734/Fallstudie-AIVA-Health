@@ -270,7 +270,7 @@ export default function ProfilePage() {
           {/* ── Geschlecht (optional) ────────────────────────────────────── */}
           {/* <select> = Dropdown-Menü. Jede <option> ist ein Eintrag.       */}
           {/* Der value von <select> bestimmt welche Option ausgewählt ist.   */}
-          <label className="profile-label">Geschlecht</label>
+          <label className="profile-label">Geschlecht #GIG</label>
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}

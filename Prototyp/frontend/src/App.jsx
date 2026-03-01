@@ -7,17 +7,21 @@
 // Routes + Route: Definieren welche Komponente bei welcher URL angezeigt wird.
 //
 // Struktur:
-//   /           → Weiterleitung zu /dashboard (oder /login wenn ausgeloggt)
-//   /login      → LoginPage (öffentlich)
-//   /dashboard  → DashboardPage (geschützt durch PrivateRoute)
-//   /profile    → ProfilePage (geschützt durch PrivateRoute) ← NEU (US-05)
+//   /              → Weiterleitung zu /dashboard (oder /login wenn ausgeloggt)
+//   /login         → LoginPage (öffentlich)
+//   /consent       → ConsentPage (geschützt, DSGVO-Einwilligungen, US-07)
+//   /dashboard     → DashboardPage (geschützt durch PrivateRoute)
+//   /profile       → ProfilePage (geschützt durch PrivateRoute, US-05)
+//   /datenschutz   → PrivacySettingsPage (geschützt, Consent-Verwaltung, US-08)
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import LoginPage from './pages/LoginPage';
+import ConsentPage from './pages/ConsentPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
+import PrivacySettingsPage from './pages/PrivacySettingsPage';
 
 export default function App() {
   return (
@@ -31,6 +35,18 @@ export default function App() {
 
           {/* Öffentliche Route: Login-Seite */}
           <Route path="/login" element={<LoginPage />} />
+
+          {/* Geschützte Route: DSGVO-Einwilligungen (US-07) */}
+          {/* Wird im Onboarding nach der Registrierung angezeigt. */}
+          {/* Pflicht-Station: Ohne Einwilligungen geht es nicht weiter. */}
+          <Route
+            path="/consent"
+            element={
+              <PrivateRoute>
+                <ConsentPage />
+              </PrivateRoute>
+            }
+          />
 
           {/* Geschützte Route: Dashboard */}
           <Route
@@ -50,6 +66,17 @@ export default function App() {
             element={
               <PrivateRoute>
                 <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Geschützte Route: Datenschutz-Einstellungen (US-08) */}
+          {/* Hier kann der User seine Einwilligungen einsehen/widerrufen */}
+          <Route
+            path="/datenschutz"
+            element={
+              <PrivateRoute>
+                <PrivacySettingsPage />
               </PrivateRoute>
             }
           />

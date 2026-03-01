@@ -1,0 +1,237 @@
+/* src/pages/PrivacySettingsPage.css — Datenschutz-Einstellungen (US-08)
+ *
+ * Design konsistent mit dem Rest der App.
+ * Consent-Karten zeigen Status-Farben:
+ *   - Grün (erteilt) / Rot (widerrufen) über einen farbigen Punkt
+ *   - Optionale Consents haben einen Toggle-Button
+ */
+
+.privacy-page {
+  min-height: 100vh;
+  background-color: #f0f4f8;
+  font-family: system-ui, sans-serif;
+  padding: 2rem 1rem;
+}
+
+.privacy-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.privacy-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.privacy-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  color: #1e293b;
+}
+
+.privacy-subtitle {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ── Meldungen ───────────────────────────────────────────────────────────── */
+
+.privacy-error {
+  background-color: #fff0f0;
+  border: 1px solid #ffcccc;
+  color: #c00;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.privacy-success {
+  background-color: #f0fff4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* ── Consent-Liste ───────────────────────────────────────────────────────── */
+
+.privacy-consent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Einzelne Consent-Karte ──────────────────────────────────────────────── */
+
+.privacy-consent-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  border-left: 4px solid #e2e8f0;
+}
+
+/* Farbiger linker Rand je nach Status */
+.privacy-consent-card.granted {
+  border-left-color: #22c55e;
+}
+
+.privacy-consent-card.revoked {
+  border-left-color: #ef4444;
+}
+
+/* ── Kopfzeile: Label + Badge ────────────────────────────────────────────── */
+
+.privacy-consent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.privacy-consent-label {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.privacy-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.privacy-badge-required {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.privacy-badge-optional {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* ── Beschreibung ────────────────────────────────────────────────────────── */
+
+.privacy-consent-desc {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ── Status-Anzeige (Punkt + Text) ───────────────────────────────────────── */
+
+.privacy-consent-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.privacy-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.privacy-status-dot.active {
+  background-color: #22c55e;
+}
+
+.privacy-status-dot.inactive {
+  background-color: #ef4444;
+}
+
+.privacy-status-text {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* ── Toggle-Buttons ──────────────────────────────────────────────────────── */
+
+.privacy-toggle-btn {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* "Widerrufen"-Button: rot */
+.privacy-toggle-revoke {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.privacy-toggle-revoke:hover {
+  background-color: #fee2e2;
+}
+
+/* "Erteilen"-Button: grün */
+.privacy-toggle-grant {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.privacy-toggle-grant:hover {
+  background-color: #dcfce7;
+}
+
+/* ── Hinweis für Pflicht-Consents ────────────────────────────────────────── */
+
+.privacy-consent-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── Zurück-Button ───────────────────────────────────────────────────────── */
+
+.privacy-back-btn {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.privacy-back-btn:hover {
+  background-color: #eff6ff;
+}
+
+/* ── Lade-Anzeige ────────────────────────────────────────────────────────── */
+
+.privacy-loading {
+  text-align: center;
+  color: #64748b;
+  font-size: 1rem;
+  padding: 4rem 0;
+}
