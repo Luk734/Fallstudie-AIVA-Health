@@ -1,0 +1,56 @@
+/* src/styles/components/care/AppointmentList.css — Termin-Liste (US-13, TASK-51)
+ *
+ * Layout für die Termin-Übersichtsseite:
+ *   - Tab-Navigation (Anstehend / Verlauf)
+ *   - Karten-Liste mit vertikalem Stack
+ *   - Zentrierter Loading-State
+ */
+
+/* ── Tab-Navigation ────────────────────────────────────────────────────── */
+.appointment-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  border-bottom: 2px solid var(--color-slate-200);
+  padding-bottom: var(--space-1);
+}
+
+/* Tab-Button: Ghost-Basis + Unterstrich bei aktiv */
+.appointment-tabs__tab {
+  position: relative;
+  padding-bottom: var(--space-2) !important;
+  color: var(--color-slate-500) !important;
+  font-weight: var(--font-weight-medium) !important;
+  transition: color var(--transition-fast);
+}
+
+/* Aktiver Tab: Care-Blau + Unterstrich */
+.appointment-tabs__tab--active {
+  color: var(--color-care) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+.appointment-tabs__tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-care);
+  border-radius: var(--radius-full);
+}
+
+/* ── Karten-Liste ──────────────────────────────────────────────────────── */
+.appointment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Loading-Center ────────────────────────────────────────────────────── */
+.appointment-content__center {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}

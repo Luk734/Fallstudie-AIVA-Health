@@ -44,6 +44,10 @@ model User {
   // navigierbar zu machen (z.B. user.consents in Queries).
   consents     Consent[]
 
+  // ── Relation zu Appointments (US-13) ───────────────────────
+  // Ein User kann beliebig viele Termine haben (1:N).
+  appointments Appointment[]
+
   @@map("users")
 }
 
@@ -88,4 +92,39 @@ model Consent {
   // Pro User darf es nur EINEN Eintrag pro consentType geben.
   @@unique([userId, consentType])
   @@map("consents")
+}
+
+// ─── EPIC-02 / US-13: Arzttermine ────────────────────────────────────────
+// Tabelle: appointments
+// Speichert alle Termine eines Nutzers (Arztbesuche, Vorsorge etc.).
+//
+// status-Werte:
+//   "scheduled"  → geplant, noch nicht stattgefunden
+//   "completed"  → wahrgenommen / erledigt
+//   "cancelled"  → abgesagt (Soft-Delete statt echtem Löschen → DSGVO-konform)
+//
+// datetime: Kombiniertes Datum+Uhrzeit des Termins.
+//   → Im Frontend wird daraus z.B. "15. März 2026 · 10:30 Uhr" angezeigt.
+//
+// notes: Optionales Feld für eigene Notizen zum Termin.
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Termin-Daten ───────────────────────────────────────────
+  title     String                              // z.B. "Zahnarzt-Kontrolle"
+  doctor    String                              // Arztname, z.B. "Dr. Müller"
+  location  String                              // Praxis/Adresse
+  datetime  DateTime                            // Datum + Uhrzeit des Termins
+  notes     String?                             // Optionale Notizen
+  status    String   @default("scheduled")      // "scheduled" | "completed" | "cancelled"
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("appointments")
 }

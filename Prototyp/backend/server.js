@@ -9,6 +9,7 @@ import cors from 'cors';
 import authRoutes from './src/routes/auth.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 import consentRoutes from './src/routes/consent.routes.js';
+import appointmentRoutes from './src/routes/appointment.routes.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
 const app = express();
@@ -52,6 +53,10 @@ app.use('/api/users', userRoutes);
 // Consent-Routen: DSGVO-Einwilligungen unter /api/consents/* (US-07)
 // POST = Einwilligungen speichern, GET = Einwilligungen abrufen
 app.use('/api/consents', consentRoutes);
+
+// Appointment-Routen: Termin-Verwaltung unter /api/appointments/* (US-13)
+// GET = Termine abrufen (alle + upcoming für Dashboard)
+app.use('/api/appointments', appointmentRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
