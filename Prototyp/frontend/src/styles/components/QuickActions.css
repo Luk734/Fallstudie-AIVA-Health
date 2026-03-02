@@ -1,60 +1,64 @@
-/* src/styles/components/QuickActions.css — Schnellzugriff-Buttons (US-10, US-11 Tokens) */
-/*
- * Zwei prominente Buttons mit Modul-Akzentfarben aus Design Tokens.
+/* src/styles/components/QuickActions.css — Schnellzugriff-Buttons (US-10, US-11 Tokens, US-12 Refactor)
+ *
+ * US-12 Refactor:
+ *   ENTFERNT (jetzt in Button-Komponente):
+ *     .quick-actions__btn Basis (padding, border-radius, font-weight, cursor, transition)
+ *     Hardcodierte Hover-Farben (#15803d, #1d4ed8) → jetzt filter:brightness()
+ *
+ *   BEHALTEN:
+ *     .quick-actions → Layout (flex + gap)
+ *     .quick-action--coach/care → Modul-spezifische Farben (Override auf .btn)
+ *     .quick-action__icon → Emoji-Größe
+ *     Responsive Media Query
  */
+
+/* ── Layout: Zwei Buttons nebeneinander ────────────────────────────────── */
 
 .quick-actions {
   display: flex;
   gap: var(--space-3);
 }
 
-.quick-actions__btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border: none;
-  border-radius: var(--radius-lg);
-  font-weight: var(--font-semibold);
-  font-size: var(--font-base);
-  color: white;
-  cursor: pointer;
-  transition: background-color var(--transition-normal), transform var(--transition-fast);
-}
+/* ── Icon innerhalb der Buttons ────────────────────────────────────────── */
 
-.quick-actions__btn:hover {
-  transform: scale(0.98);
-}
-
-.quick-actions__btn:active {
-  transform: scale(0.96);
-}
-
-.quick-actions__btn-icon {
+.quick-action__icon {
   font-size: var(--font-lg);
 }
 
-/* ── Coach-Variante: Grün ──────────────────────────────────────────────── */
+/* ── Modul-Farben: Überschreiben die Button-Variante ───────────────────── */
+/* Button rendert .btn .btn--primary → wir überschreiben die Hintergrundfarbe. */
+/* filter:brightness(0.85) erzeugt den Hover-Effekt ohne Hardcodes.           */
 
-.quick-actions__btn--coach {
+.quick-action--coach {
   background-color: var(--color-coach);
+  border-color: var(--color-coach);
 }
 
-.quick-actions__btn--coach:hover {
-  background-color: #15803d;     /* Coach-Dark (kein eigener Token nötig) */
+.quick-action--coach:hover {
+  background-color: var(--color-coach);
+  border-color: var(--color-coach);
+  filter: brightness(0.85);
 }
 
-/* ── Care-Variante: Blau ───────────────────────────────────────────────── */
-
-.quick-actions__btn--care {
+.quick-action--care {
   background-color: var(--color-care);
+  border-color: var(--color-care);
 }
 
-.quick-actions__btn--care:hover {
-  background-color: #1d4ed8;     /* Care-Dark */
+.quick-action--care:hover {
+  background-color: var(--color-care);
+  border-color: var(--color-care);
+  filter: brightness(0.85);
 }
+
+/* ── Drücken-Effekt: Leichtes Schrumpfen ───────────────────────────────── */
+
+.quick-action--coach:active,
+.quick-action--care:active {
+  transform: scale(0.96);
+}
+
+/* ── Responsive: Untereinander bei kleinem Bildschirm ──────────────────── */
 
 @media (max-width: 400px) {
   .quick-actions {

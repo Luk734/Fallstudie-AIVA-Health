@@ -1,37 +1,18 @@
-/* src/styles/components/SummaryCard.css — Übersichtskarte (US-10, US-11 Tokens) */
-/*
- * Weißer Hintergrund + farbiger Akzent-Rand links.
- * Varianten: --care (Blau), --coach (Grün), --labs (Violett)
- * Alle Werte kommen aus Design Tokens (tokens.css).
+/* src/styles/components/SummaryCard.css — Übersichtskarte (US-10, US-11 Tokens, US-12 Refactor)
+ *
+ * US-12 Refactor:
+ *   ENTFERNT (jetzt in UI-Komponenten):
+ *     .summary-card Basis (bg, border-radius, padding, shadow, border-left, hover) → Card
+ *     .summary-card--care/coach/labs (Akzent-Ränder) → Card accent="care/coach/labs"
+ *     .summary-card__action (Button-Styling) → Button variant="secondary" size="sm"
+ *
+ *   BEHALTEN (seiten-spezifisch):
+ *     .summary-card__header → Icon + Titel Layout
+ *     .summary-card__icon → Emoji-Größe
+ *     .summary-card__title → Uppercase-Label
+ *     .summary-card__body → Content-Styling
+ *     .summary-card__footer → Trennlinie vor dem Button
  */
-
-.summary-card {
-  background-color: var(--color-bg-card);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  box-shadow: var(--shadow-md);
-  border-left: 4px solid var(--color-care);
-  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
-}
-
-.summary-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-1px);
-}
-
-/* ── Farbvarianten: Linker Akzentrand ──────────────────────────────────── */
-
-.summary-card--care {
-  border-left-color: var(--color-care);
-}
-
-.summary-card--coach {
-  border-left-color: var(--color-coach);
-}
-
-.summary-card--labs {
-  border-left-color: var(--color-labs);
-}
 
 /* ── Kopfzeile: Icon + Titel ───────────────────────────────────────────── */
 
@@ -73,27 +54,10 @@
   color: var(--color-slate-900);
 }
 
-/* ── Footer mit Action-Button ──────────────────────────────────────────── */
+/* ── Footer: Trennlinie vor dem Action-Button ──────────────────────────── */
 
 .summary-card__footer {
   margin-top: var(--space-3);
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-slate-100);
-}
-
-.summary-card__action {
-  padding: var(--space-2) var(--space-4);
-  background-color: var(--color-slate-50);
-  color: var(--color-primary);
-  border: 1px solid var(--color-slate-200);
-  border-radius: var(--radius-md);
-  font-weight: var(--font-semibold);
-  font-size: var(--font-sm);
-  cursor: pointer;
-  transition: background-color var(--transition-normal), border-color var(--transition-normal);
-}
-
-.summary-card__action:hover {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-slate-300);
 }

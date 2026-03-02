@@ -1,4 +1,4 @@
-// src/pages/LoginPage.jsx — Login-Formular
+// src/pages/LoginPage.jsx — Login-Formular (US-12: migriert auf UI-Komponenten)
 //
 // Diese Seite ist öffentlich zugänglich (kein Token nötig).
 // Sie zeigt ein Formular mit E-Mail + Passwort und sendet es an das Backend.
@@ -23,10 +23,22 @@
 //   So werden ALLE User geprüft — auch die mit gespeichertem Token.
 //   Die LoginPage leitet nach dem Login einfach zu /dashboard weiter,
 //   und PrivateRoute entscheidet ob der User zu /consent umgeleitet wird.
+//
+// US-12 Migration:
+//   Alle alten proprietären Klassen (login-button, login-input, login-error)
+//   wurden durch die zentralen UI-Komponenten ersetzt:
+//   - .login-button → <Button variant="primary" fullWidth>
+//   - .login-input + .login-label → <Input label="..." />
+//   - .login-error → <Alert variant="error">
+//   - .login-card → <Card padding="lg" shadow="lg">
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Alert from '../../components/ui/Alert';
+import Card from '../../components/ui/Card';
 import '../../styles/pages/auth/LoginPage.css';
 
 // Liest VITE_API_URL aus frontend/.env
@@ -91,47 +103,61 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      <div className="login-card">
+      {/* ── Card: Ersetzt .login-card ──────────────────────────────── */}
+      {/* padding="lg" = 32px (großzügig für Login-Formulare)           */}
+      {/* shadow="lg" = prominenter Schatten (Login steht allein)       */}
+      <Card padding="lg" shadow="lg" className="login-card">
         <h1 className="login-title">🩺 AIVA Health</h1>
         <h2 className="login-subtitle">Einloggen</h2>
 
-        {/* Fehlermeldung — wird nur angezeigt wenn error nicht leer ist */}
-        {error && (
-          <div className="login-error">
-            ⚠️ {error}
-          </div>
-        )}
+        {/* ── Alert: Ersetzt .login-error ──────────────────────────── */}
+        {/* Vorher: <div className="login-error">⚠️ {error}</div>      */}
+        {/* Jetzt: <Alert variant="error"> — Icon kommt automatisch.   */}
+        {error && <Alert variant="error">{error}</Alert>}
 
         <form onSubmit={handleSubmit} className="login-form">
-          <label className="login-label">E-Mail</label>
-          <input
+          {/* ── Input: Ersetzt .login-label + .login-input ─────────── */}
+          {/* Vorher waren Label und Input getrennte HTML-Elemente.     */}
+          {/* Jetzt fasst <Input> beides zusammen + hat Accessibility   */}
+          {/* (htmlFor/id-Verknüpfung automatisch via useId).          */}
+          <Input
+            label="E-Mail"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="deine@email.com"
             required
-            className="login-input"
           />
 
-          <label className="login-label">Passwort</label>
-          <input
+          <Input
+            label="Passwort"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
             required
-            className="login-input"
           />
 
-          <button type="submit" disabled={loading} className="login-button">
+          {/* ── Button: Ersetzt .login-button ──────────────────────── */}
+          {/* Vorher: <button className="login-button" disabled={loading}> */}
+          {/* Jetzt: <Button variant="primary" fullWidth loading={loading}> */}
+          {/* fullWidth = width: 100% (Button über gesamte Formularbreite) */}
+          {/* loading = disabled + opacity-Reduktion                     */}
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            loading={loading}
+            className="login-submit"
+          >
             {loading ? 'Wird eingeloggt...' : 'Einloggen'}
-          </button>
+          </Button>
         </form>
 
         <p className="login-hint">
           Test-Account: <code>julian@example.com</code> / <code>sicher123</code>
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

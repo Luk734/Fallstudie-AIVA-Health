@@ -1,0 +1,102 @@
+/* src/styles/components/ui/Alert.css — Alert Design System (US-12, TASK-47)
+ *
+ * ARCHITEKTUR:
+ *   Ersetzt die 7 identischen Alert-Definitionen aus:
+ *     - .login-error (LoginPage.css)
+ *     - .consent-error (ConsentPage.css)
+ *     - .profile-error + .profile-success (ProfilePage.css)
+ *     - .privacy-error + .privacy-success (PrivacySettingsPage.css)
+ *     - .consent-info (ConsentPage.css)
+ *   → ~42 Zeilen duplizierter CSS-Code eliminiert.
+ *
+ * VARIANTEN:
+ *   error   → Rot (Fehlermeldung)
+ *   success → Grün (Erfolgsmeldung)
+ *   info    → Blau (Information, Hinweis)
+ *   warning → Gelb/Amber (Warnung)
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * BASIS — Gemeinsame Styles aller Alerts
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.alert {
+  display: flex;                      /* Icon und Text nebeneinander */
+  align-items: flex-start;            /* Icon oben bündig mit erstem Text */
+  gap: var(--space-2);                /* 8px Abstand zwischen Icon und Text */
+  padding: var(--space-3) var(--space-4);  /* 12px 16px */
+  border-radius: var(--radius-md);    /* 8px Abrundung */
+  margin-bottom: var(--space-4);      /* 16px Abstand nach unten */
+  border: 1px solid transparent;      /* Basis-Rahmen (Farbe kommt über Variante) */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * ICON — Emoji-Indikator links
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.alert__icon {
+  flex-shrink: 0;                     /* Icon soll nicht schrumpfen */
+  font-size: var(--font-base);        /* 16px — gleiche Größe wie Text */
+  line-height: var(--leading-normal); /* Gleiche Zeilenhöhe wie Text */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * INHALT — Meldungstext rechts
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.alert__content {
+  font-size: var(--font-sm);          /* 14px — etwas kleiner als Fließtext */
+  line-height: var(--leading-normal); /* 1.5 — gut lesbar */
+  flex: 1;                            /* Nimmt restlichen Platz ein */
+}
+
+/* ── Links innerhalb von Alerts ────────────────────────────────────────── */
+.alert__content a {
+  font-weight: var(--font-semibold);
+  text-decoration: underline;
+}
+
+/* ── Absätze innerhalb von Alerts ──────────────────────────────────────── */
+.alert__content p {
+  margin: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * VARIANTEN — Farbkombinationen
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * Jede Variante definiert: Hintergrundfarbe, Rahmenfarbe, Textfarbe.
+ * Die Farben kommen alle aus tokens.css (Design Tokens).
+ */
+
+/* ── Error: Roter Hintergrund + roter Text ─────────────────────────────── */
+.alert--error {
+  background-color: var(--color-red-light);     /* #FEF2F2 */
+  border-color: var(--color-red-200);           /* #FECACA */
+  color: var(--color-red-dark);                  /* #DC2626 */
+}
+
+/* ── Success: Grüner Hintergrund + grüner Text ────────────────────────── */
+.alert--success {
+  background-color: var(--color-green-light);   /* #ECFDF5 */
+  border-color: var(--color-green-200);         /* #BBF7D0 */
+  color: var(--color-green-800);                 /* #166534 */
+}
+
+/* ── Info: Blauer Hintergrund + blauer Text ────────────────────────────── */
+.alert--info {
+  background-color: var(--color-blue-50);       /* #EFF6FF */
+  border-color: var(--color-blue-200);          /* #BFDBFE */
+  color: var(--color-blue-800);                  /* #1E40AF */
+}
+
+/* ── Warning: Gelber/Amber Hintergrund + dunkler Text ──────────────────── */
+.alert--warning {
+  background-color: var(--color-amber-50);      /* #FFFBEB */
+  border-color: var(--color-amber-200);         /* #FDE68A */
+  color: var(--color-amber-800);                 /* #92400E */
+}

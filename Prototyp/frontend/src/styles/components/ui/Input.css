@@ -1,0 +1,115 @@
+/* src/styles/components/ui/Input.css — Input Design System (US-12, TASK-43)
+ *
+ * ARCHITEKTUR:
+ *   Ersetzt die duplizierten Styles aus:
+ *     - .login-label + .login-input (LoginPage.css)
+ *     - .profile-label + .profile-input + .profile-required (ProfilePage.css)
+ *   Die Styles waren zu ~90% identisch — jetzt gibt es sie nur noch EINMAL.
+ *
+ * AUFBAU:
+ *   .input-group                — Wrapper-Container (flex column)
+ *   .input-group__label         — Beschriftung über dem Feld
+ *   .input-group__required      — Rotes Sternchen für Pflichtfelder
+ *   .input-group__field         — Das eigentliche Eingabefeld
+ *   .input-group__error         — Fehlermeldung unter dem Feld
+ *   .input-group--error         — Modifier: Roter Rahmen bei Validierungsfehler
+ *
+ * ACCESSIBILITY (WCAG 2.1 AA):
+ *   - Touch-Target: min-height 44px via padding
+ *   - Fokus-Ring: deutlich sichtbar mit Indigo box-shadow
+ *   - Fehlerzustand: Roter Rahmen + Text (nicht nur Farbe → auch für Farbenblinde)
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * WRAPPER — Umschließt Label + Input + Fehlermeldung
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);               /* 4px Abstand zwischen Label und Input */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * LABEL — Beschriftung über dem Eingabefeld
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.input-group__label {
+  font-size: var(--font-sm);          /* 14px — etwas kleiner als Fließtext */
+  font-weight: var(--font-semibold);  /* 600 — deutlich sichtbar */
+  color: var(--color-slate-800);      /* Fast-Schwarz — gut lesbar */
+}
+
+/* ── Pflichtfeld-Sternchen ─────────────────────────────────────────────── */
+/* Das rote * zeigt visuell an: "Dieses Feld muss ausgefüllt werden."      */
+.input-group__required {
+  color: var(--color-red);            /* Rotes Sternchen */
+  margin-left: var(--space-1);        /* 4px Abstand zum Label-Text */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * EINGABEFELD — Das <input>-Element
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.input-group__field {
+  /* ── Innenabstand: Genug Platz für Text + Touch-Target ─────────────── */
+  padding: 0.65rem 0.875rem;          /* ~10px 14px — ergibt ca. 44px Höhe */
+
+  /* ── Rahmen: Dezenter grauer Rand ──────────────────────────────────── */
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-md);    /* 8px Abrundung */
+
+  /* ── Typografie ─────────────────────────────────────────────────────── */
+  font-size: var(--font-base);        /* 16px — verhindert iOS-Zoom! */
+  font-family: inherit;               /* Gleiche Schriftart wie der Rest der App */
+  color: var(--color-slate-800);      /* Dunkler Text für gute Lesbarkeit */
+  background-color: var(--color-bg-card);  /* Weißer Hintergrund */
+
+  /* ── Animation: Sanfter Übergang beim Fokussieren ──────────────────── */
+  outline: none;                      /* Browser-Default-Outline entfernen */
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+/* ── Fokus-State: Indigo-Rahmen + leichter Schatten ────────────────────── */
+/* Zeigt dem User deutlich: "Du bist gerade in diesem Feld."               */
+.input-group__field:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);  /* Sanfter Indigo-Glow */
+}
+
+/* ── Placeholder: Dezenter Hinweistext ─────────────────────────────────── */
+.input-group__field::placeholder {
+  color: var(--color-slate-400);      /* Heller als normaler Text */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * FEHLERZUSTAND — Roter Rahmen + Fehlermeldung
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * Wird aktiviert wenn die .input-group--error Klasse gesetzt ist.
+ * Wichtig: Wir zeigen den Fehler nicht NUR durch Farbe (das wäre schlecht
+ * für farbenblinde Nutzer), sondern auch durch Text unter dem Feld.
+ */
+
+/* ── Roter Rahmen beim Input ───────────────────────────────────────────── */
+.input-group--error .input-group__field {
+  border-color: var(--color-red);
+}
+
+.input-group--error .input-group__field:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);  /* Roter Glow statt Indigo */
+}
+
+/* ── Fehlermeldung unter dem Input ─────────────────────────────────────── */
+.input-group__error {
+  margin: 0;
+  font-size: var(--font-xs);         /* 12px — klein aber lesbar */
+  color: var(--color-red-dark);       /* Dunkles Rot für Kontrast */
+  line-height: var(--leading-normal);
+}

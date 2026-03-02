@@ -1,0 +1,189 @@
+/* src/styles/components/ui/Button.css — Button Design System (US-12, TASK-42)
+ *
+ * ARCHITEKTUR:
+ *   Diese Datei definiert ALLE Button-Styles der App zentral.
+ *   Vorher hatten wir:
+ *     - .login-button (LoginPage.css)
+ *     - .consent-submit-btn (ConsentPage.css)
+ *     - .profile-save-btn + .profile-skip-btn (ProfilePage.css)
+ *     - .privacy-toggle-btn + .privacy-back-btn (PrivacySettingsPage.css)
+ *     - .dashboard-profile-hint__btn (DashboardPage.css)
+ *   → ~100 Zeilen duplizierter CSS-Code!
+ *
+ * NAMENSKONVENTION (BEM-inspiriert):
+ *   .btn           → Block (Basis-Styles)
+ *   .btn--primary  → Modifier (Variante)
+ *   .btn--sm       → Modifier (Größe)
+ *
+ * TOUCH-TARGET (WCAG 2.1 AA):
+ *   Alle Buttons haben min-height: var(--min-touch-target) = 44px.
+ *   Das stellt sicher, dass auch Nutzer mit eingeschränkter Motorik
+ *   (z.B. Thomas Wagner, 68 Jahre) den Button problemlos treffen.
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * BASIS-STYLES — Gelten für ALLE Buttons
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * Hier setzen wir die universellen Eigenschaften zurück und definieren
+ * gemeinsame Defaults. Jeder Button erbt diese Styles.
+ */
+.btn {
+  /* ── Reset: Browser-Defaults entfernen ──────────────────────────────── */
+  border: none;                     /* Standardmäßig kein Rahmen */
+  background: none;                 /* Kein Hintergrund */
+  cursor: pointer;                  /* Zeigt an: "hier kann man klicken" */
+  font-family: inherit;             /* Schriftart vom Body erben */
+  text-decoration: none;            /* Kein Unterstrich (falls als Link) */
+
+  /* ── Layout ─────────────────────────────────────────────────────────── */
+  display: inline-flex;             /* Inline-Flex: Text + Icon nebeneinander */
+  align-items: center;              /* Vertikal zentriert */
+  justify-content: center;          /* Horizontal zentriert */
+  gap: var(--space-2);              /* Abstand zwischen Icon und Text (8px) */
+
+  /* ── Typografie ─────────────────────────────────────────────────────── */
+  font-weight: var(--font-semibold);  /* 600: Etwas dicker als normal */
+  line-height: 1;                     /* Kein zusätzlicher Zeilenabstand */
+
+  /* ── Form ───────────────────────────────────────────────────────────── */
+  border-radius: var(--radius-md);  /* Abgerundete Ecken (8px) */
+
+  /* ── Animation ──────────────────────────────────────────────────────── */
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    opacity var(--transition-normal);
+}
+
+/* ── Fokus-Ring: Sichtbar für Tastatur-Nutzer (Accessibility) ──────────── */
+/* :focus-visible wird NUR bei Tastatur-Navigation angezeigt,               */
+/* NICHT bei Maus-Klicks. Das ist benutzerfreundlicher als :focus.          */
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Disabled: Button ist deaktiviert ──────────────────────────────────── */
+.btn:disabled {
+  opacity: 0.6;                       /* Visuell "ausgegraut" */
+  cursor: not-allowed;                /* Verbots-Cursor */
+  pointer-events: none;               /* Klicks komplett ignorieren */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * GRÖSSEN — sm, md, lg
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * Jede Größe definiert padding + font-size + min-height.
+ * min-height stellt sicher, dass der Touch-Target IMMER ≥ 44px ist.
+ */
+
+/* ── Small: Für Inline-Aktionen, Badges, Card-Buttons ─────────────────── */
+.btn--sm {
+  padding: var(--space-2) var(--space-4);      /* 8px 16px */
+  font-size: var(--font-sm);                    /* 14px */
+  min-height: var(--min-touch-target);          /* 44px WCAG */
+}
+
+/* ── Medium: Standard für die meisten Buttons ──────────────────────────── */
+.btn--md {
+  padding: var(--space-3) var(--space-5);      /* 12px 20px */
+  font-size: var(--font-base);                  /* 16px */
+  min-height: var(--min-touch-target);          /* 44px WCAG */
+}
+
+/* ── Large: Für primäre Formular-Aktionen (Login, Speichern) ───────────── */
+.btn--lg {
+  padding: var(--space-3) var(--space-6);      /* 12px 24px */
+  font-size: var(--font-lg);                    /* 18px */
+  min-height: 48px;                             /* Etwas größer als WCAG-Minimum */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * VARIANTEN — primary, secondary, ghost, danger, success
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
+/* ── Primary: Hauptaktion (Login, Speichern, Weiter) ───────────────────── */
+/* Indigo-Hintergrund mit weißem Text. Wird am häufigsten verwendet.       */
+.btn--primary {
+  background-color: var(--color-primary);       /* #4F46E5 Indigo */
+  color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);  /* #3730A3 dunkleres Indigo */
+}
+
+/* ── Secondary: Sekundäre Aktion (Abbrechen, Überspringen, Zurück) ────── */
+/* Transparenter Hintergrund mit farbigem Rahmen und Text.                 */
+.btn--secondary {
+  background-color: var(--color-bg-card);       /* Weiß */
+  color: var(--color-primary);                   /* Indigo-Text */
+  border: 1px solid var(--color-blue-200);      /* Heller blauer Rahmen */
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-blue-50);       /* Ganz leichtes Blau */
+  border-color: var(--color-blue-300);
+}
+
+/* ── Ghost: Unauffällige Aktion (Überspringen, "mehr anzeigen") ────────── */
+/* Kein Hintergrund, kein Rahmen — nur Text. Hover zeigt leichten Hintergrund. */
+.btn--ghost {
+  background-color: transparent;
+  color: var(--color-slate-500);                /* Dezentes Grau */
+  border: 1px solid var(--color-slate-200);     /* Sehr dezenter Rahmen */
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background-color: var(--color-slate-50);      /* Ganz leichter Hintergrund */
+  color: var(--color-slate-700);
+}
+
+/* ── Danger: Destruktive Aktion (Widerrufen, Löschen) ─────────────────── */
+/* Roter Hintergrund (hell) mit rotem Text. Warnt den User visuell.        */
+.btn--danger {
+  background-color: var(--color-red-light);     /* Helles Rot */
+  color: var(--color-red-dark);                  /* Dunkles Rot */
+  border: 1px solid var(--color-red-200);       /* Roter Rahmen */
+}
+
+.btn--danger:hover:not(:disabled) {
+  background-color: var(--color-red-200);       /* Etwas kräftigeres Rot */
+}
+
+/* ── Success: Positive Aktion (Erteilen, Bestätigen) ───────────────────── */
+/* Grüner Hintergrund (hell) mit grünem Text.                              */
+.btn--success {
+  background-color: var(--color-green-light);   /* Helles Grün */
+  color: var(--color-green-800);                 /* Dunkles Grün */
+  border: 1px solid var(--color-green-200);     /* Grüner Rahmen */
+}
+
+.btn--success:hover:not(:disabled) {
+  background-color: var(--color-green-200);     /* Etwas kräftigeres Grün */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * MODIFIER — Zusätzliche Optionen
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
+/* ── Full-Width: Button auf volle Breite ───────────────────────────────── */
+.btn--full-width {
+  width: 100%;
+}
+
+/* ── Loading: Lade-Zustand ─────────────────────────────────────────────── */
+.btn--loading {
+  opacity: 0.7;
+  cursor: wait;                  /* Sanduhr-Cursor statt Verbot */
+}

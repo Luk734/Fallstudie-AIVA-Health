@@ -1,57 +1,25 @@
-/* src/styles/pages/core/PrivacySettingsPage.css — Datenschutz (US-08, US-11 Tokens) */
-
-.privacy-page {
-  min-height: 100vh;
-  background-color: var(--color-bg-app);
-  padding: var(--space-8) var(--space-4);
-}
-
-.privacy-container {
-  max-width: var(--max-width-page);
-  margin: 0 auto;
-}
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
-
-.privacy-header {
-  text-align: center;
-  margin-bottom: var(--space-8);
-}
-
-.privacy-title {
-  margin: 0 0 var(--space-2);
-  font-size: var(--font-2xl);
-  color: var(--color-slate-800);
-}
-
-.privacy-subtitle {
-  margin: 0;
-  color: var(--color-slate-500);
-  font-size: var(--font-base);
-  line-height: var(--leading-relaxed);
-}
-
-/* ── Meldungen ───────────────────────────────────────────────────────────── */
-
-.privacy-error {
-  background-color: var(--color-red-light);
-  border: 1px solid var(--color-red-200);
-  color: var(--color-red-dark);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-4);
-  font-size: var(--font-sm);
-}
-
-.privacy-success {
-  background-color: var(--color-green-light);
-  border: 1px solid var(--color-green-200);
-  color: var(--color-green-800);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-4);
-  font-size: var(--font-sm);
-}
+/* src/styles/pages/core/PrivacySettingsPage.css — Datenschutz (US-08, US-11 Tokens, US-12 Migration)
+ *
+ * US-12 Migration:
+ *   ENTFERNT (jetzt in UI-Komponenten):
+ *     .privacy-page, .privacy-container → PageContainer
+ *     .privacy-header, .privacy-title, .privacy-subtitle → PageHeader
+ *     .privacy-error, .privacy-success → Alert
+ *     .privacy-badge, .privacy-badge-required, .privacy-badge-optional → Badge
+ *     .privacy-consent-card background/padding/shadow → Card
+ *     .privacy-toggle-btn, .privacy-toggle-revoke, .privacy-toggle-grant → Button
+ *     .privacy-back-btn → Button secondary
+ *     .privacy-loading → Spinner
+ *
+ *   BEHALTEN (seiten-spezifisch):
+ *     .privacy-consent-list → Karten-Layout (flex + gap)
+ *     .privacy-consent-card.granted/.revoked → border-left accent override
+ *     .privacy-consent-header, -label, -desc → Karten-Innenlayout
+ *     .privacy-consent-status, .privacy-status-dot → Status-Anzeige
+ *     .privacy-consent-hint → Pflicht-Hinweis
+ *     .privacy-back-btn → margin-top Override
+ *     .privacy-loading-container → Spinner-Centering
+ */
 
 /* ── Consent-Liste ───────────────────────────────────────────────────────── */
 
@@ -61,25 +29,7 @@
   gap: var(--space-4);
 }
 
-/* ── Einzelne Consent-Karte ──────────────────────────────────────────────── */
-
-.privacy-consent-card {
-  background-color: var(--color-bg-card);
-  padding: var(--space-6);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  border-left: 4px solid var(--color-slate-200);
-}
-
-.privacy-consent-card.granted {
-  border-left-color: var(--color-green);
-}
-
-.privacy-consent-card.revoked {
-  border-left-color: var(--color-red);
-}
-
-/* ── Kopfzeile: Label + Badge ────────────────────────────────────────────── */
+/* ── Consent-Karte: Innenlayout (Card liefert padding/shadow/bg/accent) ─── */
 
 .privacy-consent-header {
   display: flex;
@@ -95,30 +45,6 @@
   font-weight: var(--font-semibold);
   color: var(--color-slate-800);
 }
-
-.privacy-badge {
-  font-size: var(--font-xs);
-  font-weight: var(--font-bold);
-  padding: 0.15rem var(--space-2);
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.privacy-badge-required {
-  background-color: var(--color-red-light);
-  color: var(--color-red-dark);
-  border: 1px solid var(--color-red-200);
-}
-
-.privacy-badge-optional {
-  background-color: var(--color-green-light);
-  color: var(--color-coach);
-  border: 1px solid var(--color-green-200);
-}
-
-/* ── Beschreibung ────────────────────────────────────────────────────────── */
 
 .privacy-consent-desc {
   margin: 0 0 var(--space-3);
@@ -156,38 +82,6 @@
   color: var(--color-slate-500);
 }
 
-/* ── Toggle-Buttons ──────────────────────────────────────────────────────── */
-
-.privacy-toggle-btn {
-  padding: var(--space-2) var(--space-5);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-sm);
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-  transition: background-color var(--transition-normal);
-}
-
-.privacy-toggle-revoke {
-  background-color: var(--color-red-light);
-  color: var(--color-red-dark);
-  border: 1px solid var(--color-red-200);
-}
-
-.privacy-toggle-revoke:hover {
-  background-color: var(--color-red-200);
-}
-
-.privacy-toggle-grant {
-  background-color: var(--color-green-light);
-  color: var(--color-coach);
-  border: 1px solid var(--color-green-200);
-}
-
-.privacy-toggle-grant:hover {
-  background-color: var(--color-green-200);
-}
-
 /* ── Hinweis für Pflicht-Consents ────────────────────────────────────────── */
 
 .privacy-consent-hint {
@@ -197,31 +91,18 @@
   font-style: italic;
 }
 
-/* ── Zurück-Button ───────────────────────────────────────────────────────── */
+/* ── Zurück-Button: nur margin-top (Button-Komponente liefert den Rest) ─── */
 
 .privacy-back-btn {
   margin-top: var(--space-8);
-  padding: var(--space-3) var(--space-6);
-  background-color: var(--color-bg-card);
-  color: var(--color-primary);
-  border: 1px solid var(--color-blue-200);
-  border-radius: var(--radius-md);
-  font-size: var(--font-base);
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-  transition: background-color var(--transition-normal);
   width: 100%;
 }
 
-.privacy-back-btn:hover {
-  background-color: var(--color-blue-50);
-}
+/* ── Ladeanzeige ─────────────────────────────────────────────────────────── */
 
-/* ── Lade-Anzeige ────────────────────────────────────────────────────────── */
-
-.privacy-loading {
-  text-align: center;
-  color: var(--color-slate-500);
-  font-size: var(--font-base);
+.privacy-loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: var(--space-16) 0;
 }

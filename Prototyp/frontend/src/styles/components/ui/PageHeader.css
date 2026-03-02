@@ -1,0 +1,42 @@
+/* src/styles/components/ui/PageHeader.css — Seiten-Header (US-12, Bonus)
+ *
+ * ARCHITEKTUR:
+ *   Ersetzt die 3 identischen Header-Blöcke aus:
+ *     - .consent-header + .consent-title + .consent-subtitle (ConsentPage.css)
+ *     - .profile-header + .profile-title + .profile-subtitle (ProfilePage.css)
+ *     - .privacy-header + .privacy-title + .privacy-subtitle (PrivacySettingsPage.css)
+ *   CSS war zu ~95% identisch.
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * CONTAINER — Zentrierter Header-Block
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.page-header {
+  text-align: center;
+  margin-bottom: var(--space-8);        /* 32px Abstand zum nächsten Element */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * TITEL — Große Überschrift (h1)
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.page-header__title {
+  margin: 0 0 var(--space-2);           /* Kein margin-top, 8px nach unten */
+  font-size: var(--font-2xl);           /* 24px */
+  color: var(--color-slate-800);        /* Fast-Schwarz */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * UNTERTITEL — Erklärungstext
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.page-header__subtitle {
+  margin: 0;
+  color: var(--color-slate-500);        /* Dezentes Grau */
+  font-size: var(--font-base);          /* 16px */
+  line-height: var(--leading-relaxed);  /* 1.75 — mehr Zeilenabstand für lange Texte */
+}
