@@ -1,0 +1,112 @@
+/* src/styles/components/SummaryCard.css — Generische Übersichtskarte (US-10) */
+/*
+ * Die SummaryCard hat einen weißen Hintergrund mit einem farbigen Akzent-Rand
+ * auf der linken Seite. Die Farbe des Randes hängt von der Variante ab:
+ *
+ *   --care  → Blau   (#2563eb) — Termine
+ *   --coach → Grün   (#16a34a) — Check-in / Empfehlungen
+ *   --labs  → Violett (#7c3aed) — Labor / Medikamente
+ *
+ * Dieser "Left-Border-Accent" ist ein gängiges UI-Pattern: Es zeigt auf
+ * einen Blick, zu welchem Modul die Karte gehört, ohne plakativ zu wirken.
+ */
+
+.summary-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* Linker Akzent-Rand — Standard: Blau */
+  border-left: 4px solid #2563eb;
+
+  /* Sanfter Übergang bei Hover */
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Leichter Hover-Effekt: Karte hebt sich etwas an */
+.summary-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* ── Farbvarianten: Linker Akzentrand ──────────────────────────────────── */
+
+.summary-card--care {
+  border-left-color: #2563eb;   /* Blau — AIVA Care */
+}
+
+.summary-card--coach {
+  border-left-color: #16a34a;   /* Grün — AIVA Coach */
+}
+
+.summary-card--labs {
+  border-left-color: #7c3aed;   /* Violett — AIVA Labs */
+}
+
+/* ── Kopfzeile: Icon + Titel ───────────────────────────────────────────── */
+
+.summary-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-card__icon {
+  font-size: 1.375rem;         /* Emoji etwas größer als Text */
+  line-height: 1;
+}
+
+.summary-card__title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;              /* Slate-500: dezent, wie ein Label */
+  text-transform: uppercase;
+  letter-spacing: 0.03em;      /* Leichte Spreizung für Label-Look */
+}
+
+/* ── Inhalt: Beliebiger Text/Content ───────────────────────────────────── */
+
+.summary-card__body {
+  color: #1e293b;              /* Slate-800: gut lesbar */
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Absätze innerhalb der Karte: */
+.summary-card__body p {
+  margin: 0.25rem 0;
+}
+
+/* Hervorgehobene Zeile (z.B. Arztname, Medikamentenname) */
+.summary-card__body strong {
+  font-weight: 600;
+  color: #0f172a;              /* Slate-900: etwas dunkler */
+}
+
+/* ── Optionaler Footer mit Action-Button ───────────────────────────────── */
+
+.summary-card__footer {
+  margin-top: 0.875rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;  /* Dezente Trennlinie */
+}
+
+.summary-card__action {
+  padding: 0.5rem 1rem;
+  background-color: #f8fafc;      /* Sehr helles Grau */
+  color: #2563eb;                  /* Blau als Textfarbe */
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.summary-card__action:hover {
+  background-color: #eff6ff;       /* Hellblau bei Hover */
+  border-color: #bfdbfe;
+}
