@@ -48,12 +48,66 @@ const mockMedikament = {
 };
 
 export default function DashboardPage() {
-  // user aus dem AuthContext holen — wir brauchen den Vornamen für die Begrüßung
-  const { user } = useAuth();
+  // user + logout aus dem AuthContext holen
+  // user → Vornamen für Begrüßung + Avatar im Header
+  // logout → wird vom Logout-Button im Header aufgerufen
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // ── Logout-Handler ───────────────────────────────────────────────────────
+  // Token + User aus Context und localStorage löschen, dann zur Login-Seite.
+  function handleLogout() {
+    logout();
+    navigate('/login');
+  }
 
   return (
     <div className="dashboard-page">
+      {/* ── Dashboard-Header ─────────────────────────────────────────── */}
+      {/* Dezente Leiste oben: App-Logo links, Action-Buttons rechts.     */}
+      {/* Hier erreicht der User Profil, Datenschutz und Logout —         */}
+      {/* Funktionen die NICHT in der Bottom-Nav sind.                    */}
+      <header className="dashboard-header">
+        <div className="dashboard-header__brand">
+          <span className="dashboard-header__logo">🩺</span>
+          <span className="dashboard-header__app-name">AIVA Health</span>
+        </div>
+        <div className="dashboard-header__actions">
+          {/* Profil: Zeigt Avatar wenn vorhanden, sonst 👤 */}
+          <button
+            className="dashboard-header__btn"
+            onClick={() => navigate('/profile')}
+            title="Mein Profil"
+          >
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt="Profil"
+                className="dashboard-header__avatar"
+              />
+            ) : (
+              <span>👤</span>
+            )}
+          </button>
+          {/* Datenschutz-Einstellungen */}
+          <button
+            className="dashboard-header__btn"
+            onClick={() => navigate('/datenschutz')}
+            title="Datenschutz-Einstellungen"
+          >
+            🔒
+          </button>
+          {/* Ausloggen */}
+          <button
+            className="dashboard-header__btn dashboard-header__btn--logout"
+            onClick={handleLogout}
+            title="Ausloggen"
+          >
+            🚪
+          </button>
+        </div>
+      </header>
+
       {/* ── 1. Persönliche Begrüßung ─────────────────────────────────── */}
       {/* GreetingCard liest den Vornamen und zeigt z.B.                  */}
       {/* "Guten Morgen, Laura 👋" + das heutige Datum                   */}
