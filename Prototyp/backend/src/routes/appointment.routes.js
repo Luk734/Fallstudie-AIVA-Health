@@ -19,6 +19,7 @@ import { authenticateToken } from '../middleware/auth.middleware.js';
 import {
   getAppointments,
   getUpcomingAppointments,
+  getAppointmentById,
 } from '../controllers/appointment.controller.js';
 
 const router = Router();
@@ -27,6 +28,11 @@ const router = Router();
 // Dashboard-Endpunkt: Nächste 3 (oder N) anstehende Termine.
 // MUSS vor der allgemeinen Route stehen (sonst matcht /:id zuerst).
 router.get('/upcoming', authenticateToken, getUpcomingAppointments);
+
+// ── GET /api/appointments/:id ───────────────────────────────────────────
+// Detail-Ansicht eines einzelnen Termins (US-14).
+// MUSS nach /upcoming stehen, damit "upcoming" nicht als :id interpretiert wird.
+router.get('/:id', authenticateToken, getAppointmentById);
 
 // ── GET /api/appointments ───────────────────────────────────────────────
 // Alle Termine des Users (mit optionalen Filtern: time, status).

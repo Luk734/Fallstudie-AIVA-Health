@@ -16,6 +16,7 @@
 //   PageContainer, PageHeader, Button (für Tabs), Alert, Spinner
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import PageContainer from '../ui/PageContainer';
 import PageHeader from '../ui/PageHeader';
@@ -43,8 +44,7 @@ export default function AppointmentList() {
   const [error, setError] = useState(null);
 
   // Token aus AuthContext für authentifizierte API-Calls
-  const { token } = useAuth();
-
+  const { token } = useAuth();  const navigate = useNavigate();
   // ── Daten laden bei Tab-Wechsel ────────────────────────────────────────
   // useEffect wird ausgeführt wenn sich activeTab ändert.
   // So werden bei Tab-Wechsel automatisch die richtigen Daten geladen.
@@ -143,7 +143,11 @@ export default function AppointmentList() {
         {!loading && !error && appointments.length > 0 && (
           <div className="appointment-list">
             {appointments.map((apt) => (
-              <AppointmentCard key={apt.id} appointment={apt} />
+              <AppointmentCard
+                key={apt.id}
+                appointment={apt}
+                onClick={() => navigate(`/care/appointments/${apt.id}`)}
+              />
             ))}
           </div>
         )}

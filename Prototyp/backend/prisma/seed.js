@@ -79,6 +79,7 @@ async function main() {
       userId: user.id,
       title: 'Zahnarzt-Kontrolle',
       doctor: 'Dr. Müller',
+      phone: '089 / 123 4567',
       location: 'Hauptstr. 12, München',
       datetime: dateOffset(7, 10, 30),   // in 7 Tagen
       notes: 'Professionelle Zahnreinigung mitbuchen',
@@ -88,6 +89,7 @@ async function main() {
       userId: user.id,
       title: 'Hausarzt Check-up',
       doctor: 'Dr. Schmidt',
+      phone: '089 / 234 5678',
       location: 'Berliner Str. 5, München',
       datetime: dateOffset(14, 9, 0),   // in 14 Tagen
       notes: 'Blutbild besprechen',
@@ -97,6 +99,7 @@ async function main() {
       userId: user.id,
       title: 'Augenarzt',
       doctor: 'Dr. Weber',
+      phone: '089 / 345 6789',
       location: 'Leopoldstr. 88, München',
       datetime: dateOffset(1, 14, 15),   // morgen
       notes: null,
@@ -106,6 +109,7 @@ async function main() {
       userId: user.id,
       title: 'Dermatologin',
       doctor: 'Dr. Fischer',
+      phone: '089 / 456 7890',
       location: 'Sendlinger Str. 22, München',
       datetime: dateOffset(-10, 11, 0),  // vor 10 Tagen
       notes: 'Muttermal-Screening abgeschlossen',
@@ -115,6 +119,7 @@ async function main() {
       userId: user.id,
       title: 'Orthopäde',
       doctor: 'Dr. Braun',
+      phone: null,
       location: 'Karlsplatz 3, München',
       datetime: dateOffset(-30, 8, 30),  // vor 30 Tagen
       notes: 'Rücken-Übungen empfohlen',

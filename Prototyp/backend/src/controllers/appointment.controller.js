@@ -1,4 +1,4 @@
-// src/controllers/appointment.controller.js — Termin-Endpunkte (US-13)
+// src/controllers/appointment.controller.js — Termin-Endpunkte (US-13, US-14)
 //
 // Dieser Controller verwaltet die Arzttermine eines Nutzers.
 // Jeder Handler ist mit authenticateToken geschützt — die userId
@@ -7,6 +7,7 @@
 // Endpunkte:
 //   GET /api/appointments          → Alle Termine (mit Filtern)
 //   GET /api/appointments/upcoming → Nächste N Termine (für Dashboard)
+//   GET /api/appointments/:id      → Einzelner Termin (Detail-Ansicht)
 
 import prisma from '../config/prisma.js';
 
@@ -62,6 +63,7 @@ export async function getAppointments(req, res) {
         id: true,
         title: true,
         doctor: true,
+        phone: true,
         location: true,
         datetime: true,
         notes: true,
@@ -104,6 +106,7 @@ export async function getUpcomingAppointments(req, res) {
         id: true,
         title: true,
         doctor: true,
+        phone: true,
         location: true,
         datetime: true,
         notes: true,
@@ -115,5 +118,54 @@ export async function getUpcomingAppointments(req, res) {
   } catch (error) {
     console.error('getUpcomingAppointments error:', error);
     return res.status(500).json({ error: 'Termine konnten nicht geladen werden.' });
+  }
+}
+
+// ─── GET /api/appointments/:id ──────────────────────────────────────────
+// Gibt einen einzelnen Termin zurück (Detail-Ansicht, US-14).
+//
+// Sicherheit: Es wird IMMER nach id UND userId gefiltert.
+// So kann ein User nur seine eigenen Termine abrufen —
+// selbst wenn er die ID eines fremden Termins kennt.
+//
+// 404 wenn der Termin nicht gefunden wurde (oder nicht dem User gehört).
+
+export async function getAppointmentById(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+
+    // ── ID validieren ─────────────────────────────────────────────────
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Ungültige Termin-ID.' });
+    }
+
+    const appointment = await prisma.appointment.findFirst({
+      where: {
+        id,
+        userId: req.user.userId,  // Sicherheit: nur eigene Termine
+      },
+      select: {
+        id: true,
+        title: true,
+        doctor: true,
+        phone: true,
+        location: true,
+        datetime: true,
+        notes: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    // ── Nicht gefunden → 404 ──────────────────────────────────────────
+    if (!appointment) {
+      return res.status(404).json({ error: 'Termin nicht gefunden.' });
+    }
+
+    return res.json({ appointment });
+  } catch (error) {
+    console.error('getAppointmentById error:', error);
+    return res.status(500).json({ error: 'Termin konnte nicht geladen werden.' });
   }
 }

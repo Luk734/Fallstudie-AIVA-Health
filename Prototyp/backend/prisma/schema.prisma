@@ -118,6 +118,7 @@ model Appointment {
   // ── Termin-Daten ───────────────────────────────────────────
   title     String                              // z.B. "Zahnarzt-Kontrolle"
   doctor    String                              // Arztname, z.B. "Dr. Müller"
+  phone     String?                             // Telefon der Praxis (US-14, optional)
   location  String                              // Praxis/Adresse
   datetime  DateTime                            // Datum + Uhrzeit des Termins
   notes     String?                             // Optionale Notizen
