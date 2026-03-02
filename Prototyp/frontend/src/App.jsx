@@ -6,22 +6,43 @@
 //
 // Routes + Route: Definieren welche Komponente bei welcher URL angezeigt wird.
 //
-// Struktur:
-//   /              → Weiterleitung zu /dashboard (oder /login wenn ausgeloggt)
-//   /login         → LoginPage (öffentlich)
-//   /consent       → ConsentPage (geschützt, DSGVO-Einwilligungen, US-07)
-//   /dashboard     → DashboardPage (geschützt durch PrivateRoute)
-//   /profile       → ProfilePage (geschützt durch PrivateRoute, US-05)
-//   /datenschutz   → PrivacySettingsPage (geschützt, Consent-Verwaltung, US-08)
+// US-09: AppLayout wrapping
+//   Alle geschützten Seiten (außer /login und /consent) werden jetzt von
+//   <AppLayout> umhüllt. AppLayout rendert die Bottom-Navigation, sodass
+//   sie auf JEDER geschützten Seite sichtbar ist — ohne Code-Duplizierung.
+//
+//   /login und /consent bekommen KEIN AppLayout, weil:
+//   - /login: Der User ist noch nicht eingeloggt → keine App-Navigation
+//   - /consent: Onboarding-Pflicht → User soll zuerst zustimmen
+//
+// Routing-Struktur:
+//   /              → Weiterleitung zu /dashboard
+//   /login         → LoginPage (öffentlich, OHNE Navigation)
+//   /consent       → ConsentPage (geschützt, OHNE Navigation)
+//   /dashboard     → AppLayout > DashboardPage (geschützt, MIT Navigation)
+//   /profile       → AppLayout > ProfilePage (geschützt, MIT Navigation)
+//   /datenschutz   → AppLayout > PrivacySettingsPage (geschützt, MIT Navigation)
+//   /care          → AppLayout > CarePage (geschützt, MIT Navigation)
+//   /labs          → AppLayout > LabsPage (geschützt, MIT Navigation)
+//   /coach         → AppLayout > CoachPage (geschützt, MIT Navigation)
+//   /family        → AppLayout > FamilyPage (geschützt, MIT Navigation)
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
-import LoginPage from './pages/LoginPage';
-import ConsentPage from './pages/ConsentPage';
-import DashboardPage from './pages/DashboardPage';
-import ProfilePage from './pages/ProfilePage';
-import PrivacySettingsPage from './pages/PrivacySettingsPage';
+import AppLayout from './components/AppLayout';
+// Auth-Pages (Login, Onboarding)
+import LoginPage from './pages/auth/LoginPage';
+import ConsentPage from './pages/auth/ConsentPage';
+// Core-Pages (Dashboard, Profil, Datenschutz)
+import DashboardPage from './pages/core/DashboardPage';
+import ProfilePage from './pages/core/ProfilePage';
+import PrivacySettingsPage from './pages/core/PrivacySettingsPage';
+// Modul-Pages (Care, Labs, Coach, Family)
+import CarePage from './pages/modules/care/CarePage';
+import LabsPage from './pages/modules/labs/LabsPage';
+import CoachPage from './pages/modules/coach/CoachPage';
+import FamilyPage from './pages/modules/family/FamilyPage';
 
 export default function App() {
   return (
@@ -33,12 +54,11 @@ export default function App() {
           {/* Wurzel-URL: direkt zu /dashboard weiterleiten */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Öffentliche Route: Login-Seite */}
+          {/* Öffentliche Route: Login-Seite (OHNE Bottom-Navigation) */}
           <Route path="/login" element={<LoginPage />} />
 
           {/* Geschützte Route: DSGVO-Einwilligungen (US-07) */}
-          {/* Wird im Onboarding nach der Registrierung angezeigt. */}
-          {/* Pflicht-Station: Ohne Einwilligungen geht es nicht weiter. */}
+          {/* OHNE Bottom-Navigation — Onboarding-Pflicht-Station */}
           <Route
             path="/consent"
             element={
@@ -48,35 +68,90 @@ export default function App() {
             }
           />
 
-          {/* Geschützte Route: Dashboard */}
+          {/* ── Geschützte Routen MIT Bottom-Navigation (US-09) ──────── */}
+          {/* Alle folgenden Seiten werden von AppLayout umhüllt.         */}
+          {/* AppLayout rendert: <main>{Seite}</main> + <nav>BottomNav</nav> */}
+
+          {/* Dashboard / Home-Tab */}
           <Route
             path="/dashboard"
             element={
               <PrivateRoute>
-                <DashboardPage />
+                <AppLayout>
+                  <DashboardPage />
+                </AppLayout>
               </PrivateRoute>
             }
           />
 
-          {/* Geschützte Route: Profil (US-05 + US-06) */}
-          {/* Hierhin kommt der User nach der Registrierung (Onboarding) */}
-          {/* oder wenn er im Dashboard auf "Profil bearbeiten" klickt */}
+          {/* Profil (US-05 + US-06) — erreichbar über Header-Button */}
           <Route
             path="/profile"
             element={
               <PrivateRoute>
-                <ProfilePage />
+                <AppLayout>
+                  <ProfilePage />
+                </AppLayout>
               </PrivateRoute>
             }
           />
 
-          {/* Geschützte Route: Datenschutz-Einstellungen (US-08) */}
-          {/* Hier kann der User seine Einwilligungen einsehen/widerrufen */}
+          {/* Datenschutz-Einstellungen (US-08) — Consent-Verwaltung */}
           <Route
             path="/datenschutz"
             element={
               <PrivateRoute>
-                <PrivacySettingsPage />
+                <AppLayout>
+                  <PrivacySettingsPage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Care — Termine, Vorsorge, Erinnerungen */}
+          <Route
+            path="/care"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <CarePage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Labs — Laborbefunde, Medikamente */}
+          <Route
+            path="/labs"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <LabsPage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Coach — Check-in, Empfehlungen, Wearables */}
+          <Route
+            path="/coach"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <CoachPage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Family — Familienkonto, Kinderprofile */}
+          <Route
+            path="/family"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <FamilyPage />
+                </AppLayout>
               </PrivateRoute>
             }
           />

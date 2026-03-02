@@ -9,8 +9,8 @@
 // einen Hinweis, dass er sein Profil vervollständigen soll.
 
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import './DashboardPage.css';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../styles/pages/core/DashboardPage.css';
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();

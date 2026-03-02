@@ -1,0 +1,42 @@
+/* src/pages/FamilyPage.css — Styling für die Family-Platzhalter-Seite */
+
+.family-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.family-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.family-heading {
+  font-size: 1.75rem;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+}
+
+.family-description {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.family-placeholder {
+  background: #fff0f5;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.family-placeholder-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.family-placeholder p {
+  color: #666;
+  font-size: 0.95rem;
+}
