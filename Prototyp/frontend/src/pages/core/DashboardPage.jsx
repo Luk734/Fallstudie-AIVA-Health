@@ -1,109 +1,191 @@
-// src/pages/DashboardPage.jsx — Geschützte Hauptseite (US-03 + US-05)
+// src/pages/core/DashboardPage.jsx — Dashboard / Startseite (US-10)
 //
-// Diese Seite ist NUR für eingeloggte Nutzer zugänglich.
-// PrivateRoute in App.jsx sorgt dafür, dass Nicht-Eingeloggte
-// automatisch zur Login-Seite weitergeleitet werden.
+// Die zentrale Übersichtsseite der App. Zeigt dem User auf einen Blick:
+//   1. Persönliche Begrüßung (tageszeitabhängig)
+//   2. Nächster Termin (AIVA Care)
+//   3. Täglicher Check-in Status (AIVA Coach)
+//   4. Nächste Medikamenteneinnahme (AIVA Labs)
+//   5. Quick-Action Buttons für die wichtigsten Aktionen
 //
-// US-05 ergänzt: Personalisierte Begrüßung mit Vorname + Profil-Link.
-// Wenn der User noch kein Profil hat (firstName fehlt), zeigen wir
-// einen Hinweis, dass er sein Profil vervollständigen soll.
+// Warum Mock-Daten?
+//   Die Module Care, Coach und Labs sind noch nicht implementiert.
+//   Deshalb simulieren wir die Daten als Konstanten direkt in dieser Datei.
+//   Später werden diese durch echte API-Calls ersetzt (z.B. useSWR oder useEffect).
+//
+// Warum kein eigener Header mehr?
+//   Seit US-09 haben wir die Bottom-Navigation (AppLayout).
+//   Profil, Datenschutz und Logout sind über die Navigation erreichbar.
+//   → Der alte Header mit Buttons ist überflüssig geworden.
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import GreetingCard from '../../components/GreetingCard';
+import SummaryCard from '../../components/SummaryCard';
+import QuickActions from '../../components/QuickActions';
 import '../../styles/pages/core/DashboardPage.css';
 
+// ── Mock-Daten ────────────────────────────────────────────────────────────────
+// Diese Daten simulieren, was später von den Backend-APIs kommen wird.
+// Sie stehen AUSSERHALB der Komponente, damit sie nicht bei jedem Render
+// neu erstellt werden (Performance-Optimierung bei statischen Daten).
+
+const mockTermin = {
+  arzt: 'Dr. Müller',
+  fachrichtung: 'Hausarzt',
+  datum: 'Mo, 3. Mär 2026',
+  uhrzeit: '10:00 Uhr',
+};
+
+const mockCheckin = {
+  erledigt: false,           // Noch nicht ausgefüllt
+  letzter: 'Gestern, 18:30', // Letzter Check-in
+};
+
+const mockMedikament = {
+  name: 'Ibuprofen 400mg',
+  uhrzeit: '14:00 Uhr',
+  hinweis: 'Nach dem Essen einnehmen',
+};
+
 export default function DashboardPage() {
+  // user + logout aus dem AuthContext holen
+  // user → Vornamen für Begrüßung + Avatar im Header
+  // logout → wird vom Logout-Button im Header aufgerufen
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // ── Logout-Handler ───────────────────────────────────────────────────────────
+  // ── Logout-Handler ───────────────────────────────────────────────────────
+  // Token + User aus Context und localStorage löschen, dann zur Login-Seite.
   function handleLogout() {
-    logout();           // Token aus Context + localStorage löschen
-    navigate('/login'); // Zur Login-Seite navigieren
+    logout();
+    navigate('/login');
   }
-
-  // ── Begrüßungstext ──────────────────────────────────────────────────────────
-  // Wenn der User einen Vornamen hat → "Hallo, Julian!"
-  // Wenn nicht → "Willkommen!" (noch kein Profil ausgefüllt)
-  const greeting = user?.firstName
-    ? `Hallo, ${user.firstName}!`
-    : 'Willkommen!';
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-container">
-
-        {/* ── Header mit Profil-Link + Logout-Button ───────────────────── */}
-        <header className="dashboard-header">
-          <div className="dashboard-header-brand">
-            <span className="dashboard-logo">🩺</span>
-            <span className="dashboard-app-name">AIVA Health</span>
-          </div>
-          <div className="dashboard-header-actions">
-            {/* Profil-Button: öffnet die ProfilePage */}
-            <button
-              onClick={() => navigate('/profile')}
-              className="dashboard-profile-btn"
-            >
-              {/* Wenn Avatar vorhanden → Bild zeigen, sonst Emoji */}
-              {user?.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt="Profil"
-                  className="dashboard-profile-avatar"
-                />
-              ) : (
-                <span>👤</span>
-              )}
-              Profil
-            </button>
-            {/* Datenschutz-Button: öffnet die Consent-Verwaltung (US-08) */}
-            <button
-              onClick={() => navigate('/datenschutz')}
-              className="dashboard-privacy-btn"
-            >
-              🔒 Datenschutz
-            </button>
-            <button onClick={handleLogout} className="dashboard-logout-btn">
-              Ausloggen
-            </button>
-          </div>
-        </header>
-
-        {/* ── Willkommens-Bereich ──────────────────────────────────────── */}
-        <main className="dashboard-main">
-          <div className="dashboard-card">
-            <h1 className="dashboard-heading">{greeting}</h1>
-            <p className="dashboard-email">📧 {user?.email}</p>
-
-            {/* Wenn noch kein Profil ausgefüllt → Hinweis anzeigen */}
-            {!user?.firstName && (
-              <div className="dashboard-profile-hint">
-                <p>
-                  <strong>Tipp:</strong> Vervollständige dein Profil, damit
-                  AIVA Health dich persönlich ansprechen kann.
-                </p>
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="dashboard-profile-cta"
-                >
-                  Profil anlegen →
-                </button>
-              </div>
+      {/* ── Dashboard-Header ─────────────────────────────────────────── */}
+      {/* Dezente Leiste oben: App-Logo links, Action-Buttons rechts.     */}
+      {/* Hier erreicht der User Profil, Datenschutz und Logout —         */}
+      {/* Funktionen die NICHT in der Bottom-Nav sind.                    */}
+      <header className="dashboard-header">
+        <div className="dashboard-header__brand">
+          <span className="dashboard-header__logo">🩺</span>
+          <span className="dashboard-header__app-name">AIVA Health</span>
+        </div>
+        <div className="dashboard-header__actions">
+          {/* Profil: Zeigt Avatar wenn vorhanden, sonst 👤 */}
+          <button
+            className="dashboard-header__btn"
+            onClick={() => navigate('/profile')}
+            title="Mein Profil"
+          >
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt="Profil"
+                className="dashboard-header__avatar"
+              />
+            ) : (
+              <span>👤</span>
             )}
+          </button>
+          {/* Datenschutz-Einstellungen */}
+          <button
+            className="dashboard-header__btn"
+            onClick={() => navigate('/datenschutz')}
+            title="Datenschutz-Einstellungen"
+          >
+            🔒
+          </button>
+          {/* Ausloggen */}
+          <button
+            className="dashboard-header__btn dashboard-header__btn--logout"
+            onClick={handleLogout}
+            title="Ausloggen"
+          >
+            🚪
+          </button>
+        </div>
+      </header>
 
-            {/* Wenn Profil vorhanden → kurze Zusammenfassung */}
-            {user?.firstName && (
-              <div className="dashboard-profile-summary">
-                <p className="dashboard-info">
-                  Dein Profil ist eingerichtet. Du kannst es jederzeit über den
-                  Button oben rechts bearbeiten.
-                </p>
-              </div>
-            )}
-          </div>
-        </main>
+      {/* ── 1. Persönliche Begrüßung ─────────────────────────────────── */}
+      {/* GreetingCard liest den Vornamen und zeigt z.B.                  */}
+      {/* "Guten Morgen, Laura 👋" + das heutige Datum                   */}
+      <GreetingCard firstName={user?.firstName} />
+
+      {/* ── Profil-Hinweis (wenn noch kein Profil angelegt) ──────────── */}
+      {/* Zeigt einen freundlichen Hinweis mit Link zur Profilseite.      */}
+      {/* Verschwindet sobald der User seinen Vornamen eingetragen hat.   */}
+      {!user?.firstName && (
+        <div className="dashboard-profile-hint">
+          <p>
+            <strong>Tipp:</strong> Vervollständige dein Profil, damit
+            AIVA Health dich persönlich begrüßen kann.
+          </p>
+          <button
+            onClick={() => navigate('/profile')}
+            className="dashboard-profile-hint__btn"
+          >
+            Profil anlegen →
+          </button>
+        </div>
+      )}
+
+      {/* ── 2. Summary-Karten ────────────────────────────────────────── */}
+      {/* Drei Karten in einem vertikalen Stack. Jede zeigt eine          */}
+      {/* Zusammenfassung aus einem der drei Haupt-Module.                */}
+      <div className="dashboard-cards">
+
+        {/* ── Nächster Termin (AIVA Care) ───────────────────────────── */}
+        <SummaryCard
+          icon="📅"
+          title="Nächster Termin"
+          variant="care"
+          actionLabel="Alle Termine"
+          onAction={() => navigate('/care')}
+        >
+          <p>
+            <strong>{mockTermin.arzt}</strong> — {mockTermin.fachrichtung}
+          </p>
+          <p>{mockTermin.datum}, {mockTermin.uhrzeit}</p>
+        </SummaryCard>
+
+        {/* ── Täglicher Check-in (AIVA Coach) ──────────────────────── */}
+        <SummaryCard
+          icon={mockCheckin.erledigt ? '✅' : '💚'}
+          title="Täglicher Check-in"
+          variant="coach"
+          actionLabel={mockCheckin.erledigt ? 'Ergebnis ansehen' : 'Jetzt ausfüllen'}
+          onAction={() => navigate('/coach')}
+        >
+          {mockCheckin.erledigt ? (
+            <p>Heute bereits ausgefüllt ✓</p>
+          ) : (
+            <>
+              <p><strong>Noch nicht ausgefüllt</strong></p>
+              <p className="dashboard-cards__hint">Letzter: {mockCheckin.letzter}</p>
+            </>
+          )}
+        </SummaryCard>
+
+        {/* ── Nächste Medikamenteneinnahme (AIVA Labs) ─────────────── */}
+        <SummaryCard
+          icon="💊"
+          title="Nächste Einnahme"
+          variant="labs"
+          actionLabel="Medikamentenplan"
+          onAction={() => navigate('/labs')}
+        >
+          <p>
+            <strong>{mockMedikament.name}</strong> — {mockMedikament.uhrzeit}
+          </p>
+          <p className="dashboard-cards__hint">{mockMedikament.hinweis}</p>
+        </SummaryCard>
       </div>
+
+      {/* ── 3. Quick-Action Buttons ──────────────────────────────────── */}
+      {/* Zwei prominente Buttons: "Check-in starten" + "Termin buchen"  */}
+      <QuickActions />
     </div>
   );
 }
