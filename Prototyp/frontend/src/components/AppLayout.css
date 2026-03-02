@@ -1,0 +1,62 @@
+/* src/components/AppLayout.css — Layout-Styling mit Bottom-Navigation (US-09, TASK-35)
+ *
+ * Aufbau:
+ *   .app-layout        → Äußerer Container (volle Bildschirmhöhe)
+ *   .app-layout__main  → Hauptbereich (scrollbar, nimmt restlichen Platz ein)
+ *   .app-layout__nav   → Bottom-Navigation (fixiert unten, 64px hoch)
+ *
+ * Trick mit padding-bottom:
+ *   Da die Nav mit position:fixed aus dem normalen Dokumentfluss herausgenommen
+ *   wird, würde der Seiteninhalt UNTER der Nav verschwinden. Deshalb bekommt
+ *   __main ein padding-bottom von 72px (Nav-Höhe + etwas Abstand).
+ */
+
+/* ── Äußerer Container ────────────────────────────────────────────────────── */
+.app-layout {
+  /* Flexbox vertikal: main oben, nav unten */
+  display: flex;
+  flex-direction: column;
+
+  /* Volle Bildschirmhöhe */
+  min-height: 100vh;
+
+  /* Hintergrundfarbe passend zum hellen Theme */
+  background-color: #f5f7fa;
+}
+
+/* ── Hauptbereich (Seiten-Inhalt) ─────────────────────────────────────────── */
+.app-layout__main {
+  /* Nimmt den gesamten verfügbaren Platz ein */
+  flex: 1;
+
+  /* Scrollbar wenn der Inhalt länger als der Bildschirm ist */
+  overflow-y: auto;
+
+  /* Abstand unten, damit Inhalt nicht hinter der fixierten Nav verschwindet */
+  /* 64px Nav-Höhe + 8px Puffer = 72px */
+  padding-bottom: 72px;
+}
+
+/* ── Bottom-Navigation (fixiert am unteren Rand) ──────────────────────────── */
+.app-layout__nav {
+  /* Fixiert: bleibt immer am unteren Bildschirmrand, auch beim Scrollen */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  /* Höhe der Navigationsleiste */
+  height: 64px;
+
+  /* Flexbox horizontal: Tabs nebeneinander, gleichmäßig verteilt */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  /* Weißer Hintergrund mit Schatten nach oben → hebt sich vom Content ab */
+  background-color: #ffffff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+
+  /* Über allem anderen Content (z-index) */
+  z-index: 100;
+}

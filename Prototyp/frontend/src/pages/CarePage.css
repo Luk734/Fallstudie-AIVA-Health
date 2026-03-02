@@ -1,0 +1,43 @@
+/* src/pages/CarePage.css — Styling für die Care-Platzhalter-Seite */
+
+.care-page {
+  /* Füllt den gesamten verfügbaren Bereich im AppLayout */
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.care-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.care-heading {
+  font-size: 1.75rem;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+}
+
+.care-description {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.care-placeholder {
+  background: #f0f4ff;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.care-placeholder-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.care-placeholder p {
+  color: #666;
+  font-size: 0.95rem;
+}

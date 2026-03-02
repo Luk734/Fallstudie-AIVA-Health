@@ -1,0 +1,64 @@
+/* src/components/NavItem.css — Styling für einen einzelnen Nav-Tab (US-09, TASK-36)
+ *
+ * BEM-Namenskonvention (Block Element Modifier):
+ *   .nav-item           → Block (der gesamte Tab)
+ *   .nav-item__icon     → Element (Icon innerhalb des Tabs)
+ *   .nav-item__label    → Element (Text-Label innerhalb des Tabs)
+ *   .nav-item--active   → Modifier (aktiver Zustand des Tabs)
+ *
+ * Barrierefreiheit:
+ *   - min-height/min-width: 44px → Touch-Target (WCAG 2.1 AA)
+ *   - font-size: 1rem (=16px) → Lesbarkeit (Anforderung Thomas Wagner, ≥16px)
+ */
+
+/* ── Basis-Style für jeden Nav-Tab ────────────────────────────────────────── */
+.nav-item {
+  /* Flexbox: Icon oben, Label unten, zentriert */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* Touch-Target: mind. 44×44px (WCAG 2.1 AA Anforderung) */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 8px;
+
+  /* Kein Standard-Link-Styling */
+  text-decoration: none;
+  color: #888;
+
+  /* Sanfter Farbübergang beim Tab-Wechsel */
+  transition: color 0.2s ease;
+
+  /* Oberer Rand: unsichtbar im Normalzustand, wird bei Active sichtbar */
+  border-top: 3px solid transparent;
+}
+
+/* ── Hover-Effekt (Desktop mit Maus) ──────────────────────────────────────── */
+.nav-item:hover {
+  color: #5a5a5a;
+}
+
+/* ── Aktiver Tab (aktuelle Seite) ─────────────────────────────────────────── */
+.nav-item--active {
+  /* Primärfarbe des AIVA Health Design Systems */
+  color: #4A90D9;
+
+  /* Farbiger Balken oben am Tab → zeigt visuell "du bist hier" */
+  border-top: 3px solid #4A90D9;
+}
+
+/* ── Icon (Emoji) ─────────────────────────────────────────────────────────── */
+.nav-item__icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+/* ── Label (Text unter dem Icon) ──────────────────────────────────────────── */
+.nav-item__label {
+  /* Mindestens 16px (1rem) wie von Thomas gefordert */
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 2px;
+}

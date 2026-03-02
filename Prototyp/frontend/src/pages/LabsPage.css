@@ -1,0 +1,42 @@
+/* src/pages/LabsPage.css — Styling für die Labs-Platzhalter-Seite */
+
+.labs-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.labs-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.labs-heading {
+  font-size: 1.75rem;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+}
+
+.labs-description {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.labs-placeholder {
+  background: #f0fff4;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.labs-placeholder-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.labs-placeholder p {
+  color: #666;
+  font-size: 0.95rem;
+}
