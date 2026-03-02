@@ -10,7 +10,7 @@
 //
 // Aktuell nur Platzhalter für die Navigation.
 
-import './FamilyPage.css';
+import '../../../styles/pages/modules/family/FamilyPage.css';
 
 export default function FamilyPage() {
   return (

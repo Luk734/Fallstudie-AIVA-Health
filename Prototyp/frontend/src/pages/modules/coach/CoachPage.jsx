@@ -9,7 +9,7 @@
 //
 // Aktuell nur Platzhalter für die Navigation.
 
-import './CoachPage.css';
+import '../../../styles/pages/modules/coach/CoachPage.css';
 
 export default function CoachPage() {
   return (

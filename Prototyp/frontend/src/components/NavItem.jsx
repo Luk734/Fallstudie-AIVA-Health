@@ -20,7 +20,7 @@
 //   - aria-label: Beschreibt den Link für Screenreader
 
 import { NavLink } from 'react-router-dom';
-import './NavItem.css';
+import '../styles/components/NavItem.css';
 
 export default function NavItem({ to, icon, label }) {
   return (

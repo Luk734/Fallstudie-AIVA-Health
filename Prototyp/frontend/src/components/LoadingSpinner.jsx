@@ -5,7 +5,7 @@
 // kurz die Login-Seite aufblitzen lassen bevor sie merkt,
 // dass der User eigentlich eingeloggt ist ("Flash of unauthenticated content").
 
-import './LoadingSpinner.css';
+import '../styles/components/LoadingSpinner.css';
 
 export default function LoadingSpinner() {
   return (

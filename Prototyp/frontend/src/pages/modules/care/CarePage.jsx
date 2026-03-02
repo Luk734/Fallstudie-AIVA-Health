@@ -9,7 +9,7 @@
 // Aktuell ist es nur ein Platzhalter, damit die Navigation
 // bereits funktioniert und man zwischen den Tabs wechseln kann.
 
-import './CarePage.css';
+import '../../../styles/pages/modules/care/CarePage.css';
 
 export default function CarePage() {
   return (

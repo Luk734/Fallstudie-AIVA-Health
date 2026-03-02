@@ -26,8 +26,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import './LoginPage.css';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../styles/pages/auth/LoginPage.css';
 
 // Liest VITE_API_URL aus frontend/.env
 // Fallback auf localhost falls .env fehlt

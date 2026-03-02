@@ -8,7 +8,7 @@
 //
 // Aktuell nur Platzhalter für die Navigation.
 
-import './LabsPage.css';
+import '../../../styles/pages/modules/labs/LabsPage.css';
 
 export default function LabsPage() {
   return (

@@ -24,8 +24,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import './ProfilePage.css';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../styles/pages/core/ProfilePage.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 

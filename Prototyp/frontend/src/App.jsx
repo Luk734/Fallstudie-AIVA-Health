@@ -31,15 +31,18 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import AppLayout from './components/AppLayout';
-import LoginPage from './pages/LoginPage';
-import ConsentPage from './pages/ConsentPage';
-import DashboardPage from './pages/DashboardPage';
-import ProfilePage from './pages/ProfilePage';
-import PrivacySettingsPage from './pages/PrivacySettingsPage';
-import CarePage from './pages/CarePage';
-import LabsPage from './pages/LabsPage';
-import CoachPage from './pages/CoachPage';
-import FamilyPage from './pages/FamilyPage';
+// Auth-Pages (Login, Onboarding)
+import LoginPage from './pages/auth/LoginPage';
+import ConsentPage from './pages/auth/ConsentPage';
+// Core-Pages (Dashboard, Profil, Datenschutz)
+import DashboardPage from './pages/core/DashboardPage';
+import ProfilePage from './pages/core/ProfilePage';
+import PrivacySettingsPage from './pages/core/PrivacySettingsPage';
+// Modul-Pages (Care, Labs, Coach, Family)
+import CarePage from './pages/modules/care/CarePage';
+import LabsPage from './pages/modules/labs/LabsPage';
+import CoachPage from './pages/modules/coach/CoachPage';
+import FamilyPage from './pages/modules/family/FamilyPage';
 
 export default function App() {
   return (

@@ -26,7 +26,7 @@
 //     </AppLayout>
 
 import NavItem from './NavItem';
-import './AppLayout.css';
+import '../styles/components/AppLayout.css';
 
 export default function AppLayout({ children }) {
   return (
