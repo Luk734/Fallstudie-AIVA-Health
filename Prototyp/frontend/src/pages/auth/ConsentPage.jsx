@@ -1,4 +1,4 @@
-// src/pages/ConsentPage.jsx — DSGVO-Einwilligungen beim Onboarding (US-07)
+// src/pages/ConsentPage.jsx — DSGVO-Einwilligungen beim Onboarding (US-07, US-12 Migration)
 //
 // Diese Seite wird nach der Registrierung angezeigt — BEVOR der User
 // zum Profil oder Dashboard kommt. Ohne die Pflicht-Einwilligungen
@@ -15,14 +15,24 @@
 //   3. POST /api/consents → Backend validiert + speichert
 //   4. Erfolg → Weiterleitung zu /profile (Onboarding geht weiter)
 //
-// Neue React-Konzepte hier:
-//   - Checkboxen (checked + onChange mit Boolean statt String)
-//   - target="_blank" + rel="noopener noreferrer" (sicheres Öffnen in neuem Tab)
-//   - Berechneter disabled-State (Button nur klickbar wenn Pflicht-Checkboxen an)
+// US-12 Migration:
+//   - .consent-error → <Alert variant="error">
+//   - .consent-info → <Alert variant="info">
+//   - .consent-badge-required/optional → <Badge variant="required/optional">
+//   - .consent-submit-btn → <Button variant="primary">
+//   - .consent-header → <PageHeader>
+//   - .consent-page + .consent-container → <PageContainer>
+//   - .consent-form → <Card as="form">
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import Card from '../../components/ui/Card';
+import Alert from '../../components/ui/Alert';
+import Badge from '../../components/ui/Badge';
+import Button from '../../components/ui/Button';
 import '../../styles/pages/auth/ConsentPage.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -97,118 +107,103 @@ export default function ConsentPage() {
   }
 
   return (
-    <div className="consent-page">
-      <div className="consent-container">
+    // ── PageContainer: Ersetzt .consent-page + .consent-container ──────
+    // maxWidth="md" = 500px (passend für dieses Formular)
+    <PageContainer maxWidth="md">
 
-        {/* ── Header ─────────────────────────────────────────────────────── */}
-        <header className="consent-header">
-          <h1 className="consent-title">🔒 Datenschutz & Einwilligungen</h1>
-          <p className="consent-subtitle">
-            Deine Gesundheitsdaten gehören dir. Bitte lies die folgenden Punkte
-            sorgfältig durch und entscheide, welche Datenverarbeitung du erlaubst.
+      {/* ── PageHeader: Ersetzt .consent-header/title/subtitle ─────── */}
+      <PageHeader
+        title="🔒 Datenschutz & Einwilligungen"
+        subtitle="Deine Gesundheitsdaten gehören dir. Bitte lies die folgenden Punkte sorgfältig durch und entscheide, welche Datenverarbeitung du erlaubst."
+      />
+
+      {/* ── Alert: Ersetzt .consent-error ──────────────────────────── */}
+      {error && <Alert variant="error">{error}</Alert>}
+
+      {/* ── Card als Formular: Ersetzt .consent-form ───────────────── */}
+      <Card as="form" padding="lg" shadow="md" className="consent-form" onSubmit={handleSubmit}>
+
+        {/* ── Checkbox 1: Nutzungsbedingungen (PFLICHT) ────────────── */}
+        <label className="consent-checkbox-label consent-required">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            className="consent-checkbox"
+          />
+          <span className="consent-checkbox-text">
+            Ich habe die{' '}
+            <a href="/datenschutz" target="_blank" rel="noopener noreferrer">
+              Datenschutzerklärung
+            </a>{' '}
+            und die{' '}
+            <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer">
+              Nutzungsbedingungen
+            </a>{' '}
+            gelesen und akzeptiere diese.
+            {/* ── Badge: Ersetzt .consent-badge-required ───────────── */}
+            <Badge variant="required" className="consent-badge-spacing">Pflicht</Badge>
+          </span>
+        </label>
+
+        {/* ── Checkbox 2: Gesundheitsdaten (PFLICHT) ───────────────── */}
+        <label className="consent-checkbox-label consent-required">
+          <input
+            type="checkbox"
+            checked={healthDataAccepted}
+            onChange={(e) => setHealthDataAccepted(e.target.checked)}
+            className="consent-checkbox"
+          />
+          <span className="consent-checkbox-text">
+            Ich willige ein, dass AIVA Health meine Gesundheitsdaten
+            (Termine, Medikamente, Laborwerte, Befinden) verarbeitet,
+            um mir personalisierte Empfehlungen zu geben.
+            <Badge variant="required" className="consent-badge-spacing">Pflicht</Badge>
+          </span>
+        </label>
+
+        {/* ── Checkbox 3: Analytics (OPTIONAL) ─────────────────────── */}
+        <label className="consent-checkbox-label">
+          <input
+            type="checkbox"
+            checked={analyticsAccepted}
+            onChange={(e) => setAnalyticsAccepted(e.target.checked)}
+            className="consent-checkbox"
+          />
+          <span className="consent-checkbox-text">
+            Ich erlaube die anonymisierte Nutzung meiner Daten zur
+            Verbesserung von AIVA Health.
+            <Badge variant="optional" className="consent-badge-spacing">Optional</Badge>
+          </span>
+        </label>
+
+        {/* ── Alert als Info-Box: Ersetzt .consent-info ────────────── */}
+        <Alert variant="info">
+          <strong>Hinweis:</strong> Du kannst deine Einwilligungen jederzeit
+          in den Einstellungen widerrufen. Bei Widerruf der
+          Gesundheitsdaten-Verarbeitung werden die personalisierten
+          Funktionen deaktiviert.
+        </Alert>
+
+        {/* ── Button: Ersetzt .consent-submit-btn ──────────────────── */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          disabled={!canProceed}
+          loading={loading}
+        >
+          {loading ? 'Wird gespeichert...' : 'Weiter →'}
+        </Button>
+
+        {/* Hinweis unter dem Button wenn Pflicht-Checkboxen fehlen */}
+        {!canProceed && (
+          <p className="consent-hint">
+            Bitte akzeptiere die beiden Pflicht-Einwilligungen um fortzufahren.
           </p>
-        </header>
-
-        {/* ── Fehlermeldung ──────────────────────────────────────────────── */}
-        {error && <div className="consent-error">⚠️ {error}</div>}
-
-        <form onSubmit={handleSubmit} className="consent-form">
-
-          {/* ── Checkbox 1: Nutzungsbedingungen (PFLICHT) ────────────────── */}
-          {/* "label" umschließt die Checkbox → Klick auf den Text aktiviert  */}
-          {/* sie ebenfalls. Das verbessert die Usability.                     */}
-          <label className="consent-checkbox-label consent-required">
-            <input
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-              className="consent-checkbox"
-            />
-            <span className="consent-checkbox-text">
-              Ich habe die{' '}
-              {/* target="_blank": Öffnet in neuem Tab.                        */}
-              {/* rel="noopener noreferrer": Sicherheit — verhindert dass die  */}
-              {/* neue Seite auf window.opener zugreifen kann.                 */}
-              <a href="/datenschutz" target="_blank" rel="noopener noreferrer">
-                Datenschutzerklärung
-              </a>{' '}
-              und die{' '}
-              <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer">
-                Nutzungsbedingungen
-              </a>{' '}
-              gelesen und akzeptiere diese.
-              <span className="consent-badge consent-badge-required">Pflicht</span>
-            </span>
-          </label>
-
-          {/* ── Checkbox 2: Gesundheitsdaten (PFLICHT) ───────────────────── */}
-          {/* DSGVO Art. 9: Gesundheitsdaten sind "besondere Kategorien"      */}
-          {/* personenbezogener Daten. Dafür brauchen wir eine AUSDRÜCKLICHE  */}
-          {/* Einwilligung — getrennt von den allgemeinen AGB.                */}
-          <label className="consent-checkbox-label consent-required">
-            <input
-              type="checkbox"
-              checked={healthDataAccepted}
-              onChange={(e) => setHealthDataAccepted(e.target.checked)}
-              className="consent-checkbox"
-            />
-            <span className="consent-checkbox-text">
-              Ich willige ein, dass AIVA Health meine Gesundheitsdaten
-              (Termine, Medikamente, Laborwerte, Befinden) verarbeitet,
-              um mir personalisierte Empfehlungen zu geben.
-              <span className="consent-badge consent-badge-required">Pflicht</span>
-            </span>
-          </label>
-
-          {/* ── Checkbox 3: Analytics (OPTIONAL) ─────────────────────────── */}
-          {/* Diese Einwilligung ist freiwillig. Der User kann sie weglassen  */}
-          {/* und trotzdem die App nutzen. Das entspricht dem DSGVO-Prinzip   */}
-          {/* der Datenminimierung.                                           */}
-          <label className="consent-checkbox-label">
-            <input
-              type="checkbox"
-              checked={analyticsAccepted}
-              onChange={(e) => setAnalyticsAccepted(e.target.checked)}
-              className="consent-checkbox"
-            />
-            <span className="consent-checkbox-text">
-              Ich erlaube die anonymisierte Nutzung meiner Daten zur
-              Verbesserung von AIVA Health.
-              <span className="consent-badge consent-badge-optional">Optional</span>
-            </span>
-          </label>
-
-          {/* ── Info-Box ─────────────────────────────────────────────────── */}
-          <div className="consent-info">
-            <p>
-              <strong>Hinweis:</strong> Du kannst deine Einwilligungen jederzeit
-              in den Einstellungen widerrufen. Bei Widerruf der
-              Gesundheitsdaten-Verarbeitung werden die personalisierten
-              Funktionen deaktiviert.
-            </p>
-          </div>
-
-          {/* ── Button ───────────────────────────────────────────────────── */}
-          {/* disabled={!canProceed || loading}:                               */}
-          {/* Der Button ist NICHT klickbar wenn:                               */}
-          {/*   - Pflicht-Checkboxen noch nicht gesetzt (!canProceed)           */}
-          {/*   - Gerade gespeichert wird (loading)                            */}
-          <button
-            type="submit"
-            disabled={!canProceed || loading}
-            className="consent-submit-btn"
-          >
-            {loading ? 'Wird gespeichert...' : 'Weiter →'}
-          </button>
-
-          {/* Hinweis unter dem Button wenn Pflicht-Checkboxen fehlen */}
-          {!canProceed && (
-            <p className="consent-hint">
-              Bitte akzeptiere die beiden Pflicht-Einwilligungen um fortzufahren.
-            </p>
-          )}
-        </form>
-      </div>
-    </div>
+        )}
+      </Card>
+    </PageContainer>
   );
 }

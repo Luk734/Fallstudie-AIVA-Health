@@ -1,22 +1,36 @@
-/* src/styles/pages/auth/LoginPage.css — Login-Seite (US-11 Tokens) */
+/* src/styles/pages/auth/LoginPage.css — Login-Seite (US-12: migriert auf UI-Komponenten)
+ *
+ * MIGRATION (US-12):
+ *   Folgende Klassen wurden durch UI-Komponenten ersetzt:
+ *     .login-error   → <Alert variant="error">    (Alert.css)
+ *     .login-label   → <Input label="...">         (Input.css)
+ *     .login-input   → <Input>                     (Input.css)
+ *     .login-button  → <Button variant="primary">  (Button.css)
+ *
+ *   Übrig bleiben nur noch seiten-spezifische Layout-Regeln,
+ *   die sich NICHT in generische Komponenten auslagern lassen.
+ */
 
+/* ── Seiten-Layout: Login zentriert auf dem Bildschirm ─────────────────── */
 .login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: var(--color-bg-app);
+  padding: var(--space-4);
 }
 
+/* ── Card-Override: Login-Card braucht eine maximale Breite ────────────── */
+/* Die generische Card hat keine max-width — das ist seiten-spezifisch.    */
 .login-card {
-  background-color: var(--color-bg-card);
-  padding: var(--space-10);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 400px;
 }
 
+/* ── Titel + Untertitel (Login-spezifisch, nicht PageHeader) ─────────── */
+/* Login hat ein eigenes Layout (zentriert auf leerem Bildschirm),         */
+/* deshalb nutzen wir hier NICHT die PageHeader-Komponente.                */
 .login-title {
   margin: 0 0 var(--space-1);
   font-size: var(--font-2xl);
@@ -31,64 +45,19 @@
   font-weight: var(--font-normal);
 }
 
-.login-error {
-  background-color: var(--color-red-light);
-  border: 1px solid var(--color-red-200);
-  color: var(--color-red-dark);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-4);
-  font-size: var(--font-sm);
-}
-
+/* ── Formular-Layout ──────────────────────────────────────────────────── */
 .login-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.login-label {
-  font-size: var(--font-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-slate-800);
-  margin-top: var(--space-2);
+/* ── Submit-Button braucht Extra-Margin ────────────────────────────────── */
+.login-submit {
+  margin-top: var(--space-3);
 }
 
-.login-input {
-  padding: 0.65rem 0.875rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-slate-300);
-  font-size: var(--font-base);
-  outline: none;
-  transition: border-color var(--transition-normal);
-}
-
-.login-input:focus {
-  border-color: var(--color-primary);
-}
-
-.login-button {
-  margin-top: var(--space-5);
-  padding: var(--space-3);
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-base);
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-  transition: background-color var(--transition-normal);
-}
-
-.login-button:hover:not(:disabled) {
-  background-color: var(--color-primary-dark);
-}
-
-.login-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
+/* ── Test-Account-Hinweis ─────────────────────────────────────────────── */
 .login-hint {
   margin-top: var(--space-6);
   font-size: var(--font-xs);

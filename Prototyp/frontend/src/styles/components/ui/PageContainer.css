@@ -1,0 +1,58 @@
+/* src/styles/components/ui/PageContainer.css — Seiten-Container (US-12, Bonus)
+ *
+ * ARCHITEKTUR:
+ *   Ersetzt die 3 identischen Page-Wrapper aus:
+ *     - .consent-page + .consent-container (ConsentPage.css)
+ *     - .profile-page + .profile-container (ProfilePage.css)
+ *     - .privacy-page + .privacy-container (PrivacySettingsPage.css)
+ *
+ *   Gemeinsames Pattern:
+ *     .XXX-page { min-height: 100vh; background: grau; padding: 32px 16px; }
+ *     .XXX-container { max-width: 500px; margin: 0 auto; }
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * ÄUSSERER CONTAINER — Füllt die volle Höhe
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.page-container {
+  min-height: 100vh;                     /* Mindestens volle Bildschirmhöhe */
+  background-color: var(--color-bg-app); /* Helles Grau (#F5F7FA) */
+  padding: var(--space-8) var(--space-4); /* 32px oben/unten, 16px seitlich */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * INNERER CONTAINER — Begrenzt die Breite und zentriert
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * margin: 0 auto;
+ *   → Kein Abstand oben/unten (0)
+ *   → "auto" links und rechts = gleichmäßig verteilen = zentriert
+ *   Das ist die Standard-Technik um Block-Elemente horizontal zu zentrieren.
+ */
+.page-container__inner {
+  margin: 0 auto;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * BREITEN-VARIANTEN
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
+/* ── Small: 400px — Für schmale Seiten (z.B. Login) ───────────────────── */
+.page-container--sm .page-container__inner {
+  max-width: 400px;
+}
+
+/* ── Medium: 500px — Standard für Formulare (Profil, Consent) ──────────── */
+.page-container--md .page-container__inner {
+  max-width: 500px;
+}
+
+/* ── Large: 600px — Für breitere Seiten (Privacy, Listen) ──────────────── */
+.page-container--lg .page-container__inner {
+  max-width: var(--max-width-page);   /* 600px aus tokens.css */
+}

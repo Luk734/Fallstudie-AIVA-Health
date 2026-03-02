@@ -1,4 +1,4 @@
-// src/pages/PrivacySettingsPage.jsx — Einwilligungen verwalten (US-08)
+// src/pages/PrivacySettingsPage.jsx — Einwilligungen verwalten (US-08, US-12 Migration)
 //
 // Diese Seite zeigt dem User alle seine erteilten Einwilligungen an
 // und erlaubt ihm, OPTIONALE Einwilligungen zu widerrufen.
@@ -8,29 +8,31 @@
 //    zu widerrufen. Der Widerruf der Einwilligung muss so einfach wie
 //    die Erteilung der Einwilligung sein."
 //
-// Ablauf:
-//   1. Beim Laden: GET /api/consents → alle Einwilligungen des Users laden
-//   2. Jede Einwilligung wird als Karte mit Status (erteilt/widerrufen) angezeigt
-//   3. Optionale Einwilligungen haben einen Toggle-Button
-//   4. Klick auf Toggle → PATCH /api/consents/:id → Status ändern
-//   5. Pflicht-Einwilligungen zeigen nur den Status (kein Widerruf möglich)
-//
-// Neue React-Konzepte hier:
-//   - Daten nach dem Laden transformieren (map über Array)
-//   - Optimistisches UI-Update (State ändern BEVOR Backend antwortet)
-//   - Datum formatieren mit toLocaleDateString()
+// US-12 Migration:
+//   - .privacy-page + .privacy-container → <PageContainer>
+//   - .privacy-header/title/subtitle → <PageHeader>
+//   - .privacy-error/success → <Alert>
+//   - .privacy-badge-required/optional → <Badge>
+//   - .privacy-consent-card → <Card>
+//   - .privacy-toggle-btn → <Button danger/success>
+//   - .privacy-back-btn → <Button secondary>
+//   - .privacy-loading → <Spinner>
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import Alert from '../../components/ui/Alert';
+import Badge from '../../components/ui/Badge';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Spinner from '../../components/ui/Spinner';
 import '../../styles/pages/core/PrivacySettingsPage.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // ── Labels & Beschreibungen für jeden Consent-Typ ─────────────────────────
-// So müssen wir diese Texte nicht im JSX hardcoden.
-// Das Backend schickt nur den technischen Key (z.B. "terms"),
-// hier übersetzen wir ihn in menschenlesbare Texte.
 const CONSENT_INFO = {
   terms: {
     label: 'Nutzungsbedingungen & Datenschutzerklärung',
@@ -84,13 +86,11 @@ export default function PrivacySettingsPage() {
   }, [token]);
 
   // ── handleToggle: Einzelne Einwilligung ändern ──────────────────────────
-  // Wird aufgerufen wenn der User einen Toggle-Button klickt.
-  // Sendet PATCH /api/consents/:id mit dem neuen granted-Wert.
   async function handleToggle(consentId, currentGranted) {
     setError('');
     setSuccess('');
 
-    const newGranted = !currentGranted; // Toggle: true → false, false → true
+    const newGranted = !currentGranted;
 
     try {
       const response = await fetch(`${API_URL}/api/consents/${consentId}`, {
@@ -109,11 +109,6 @@ export default function PrivacySettingsPage() {
         return;
       }
 
-      // ── State aktualisieren ─────────────────────────────────────────
-      // Wir ersetzen den geänderten Consent im Array.
-      // .map() erstellt ein neues Array: für den geänderten Eintrag nehmen
-      // wir die Daten aus der Server-Antwort, für alle anderen die
-      // bestehenden Daten.
       setConsents((prev) =>
         prev.map((c) => (c.id === consentId ? data.consent : c))
       );
@@ -124,27 +119,24 @@ export default function PrivacySettingsPage() {
           : 'Einwilligung widerrufen.'
       );
 
-      // Erfolgsmeldung nach 3 Sekunden ausblenden
       setTimeout(() => setSuccess(''), 3000);
     } catch {
       setError('Server nicht erreichbar.');
     }
   }
 
-  // ── Ladebildschirm ─────────────────────────────────────────────────────
+  // ── Ladebildschirm: Spinner statt einfachen Text ───────────────────────
   if (pageLoading) {
     return (
-      <div className="privacy-page">
-        <div className="privacy-container">
-          <p className="privacy-loading">Einwilligungen werden geladen...</p>
+      <PageContainer maxWidth="lg">
+        <div className="privacy-loading-container">
+          <Spinner size="lg" label="Einwilligungen werden geladen..." />
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   // ── Datum formatieren ───────────────────────────────────────────────────
-  // Wandelt ISO-String "2026-03-01T12:29:44.189Z" in "01.03.2026, 13:29"
-  // Locale 'de-DE' sorgt für deutsches Datumsformat.
   function formatDate(isoString) {
     return new Date(isoString).toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -156,101 +148,91 @@ export default function PrivacySettingsPage() {
   }
 
   return (
-    <div className="privacy-page">
-      <div className="privacy-container">
+    <PageContainer maxWidth="lg">
 
-        {/* ── Header ─────────────────────────────────────────────────────── */}
-        <header className="privacy-header">
-          <h1 className="privacy-title">🔒 Datenschutz-Einstellungen</h1>
-          <p className="privacy-subtitle">
-            Hier kannst du deine Einwilligungen einsehen und optionale
-            Einwilligungen jederzeit widerrufen.
-          </p>
-        </header>
+      {/* ── PageHeader: Ersetzt .privacy-header/title/subtitle ────── */}
+      <PageHeader
+        title="🔒 Datenschutz-Einstellungen"
+        subtitle="Hier kannst du deine Einwilligungen einsehen und optionale Einwilligungen jederzeit widerrufen."
+      />
 
-        {/* ── Meldungen ──────────────────────────────────────────────────── */}
-        {error && <div className="privacy-error">⚠️ {error}</div>}
-        {success && <div className="privacy-success">✅ {success}</div>}
+      {/* ── Alerts: Ersetzen .privacy-error und .privacy-success ──── */}
+      {error && <Alert variant="error">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
 
-        {/* ── Consent-Liste ──────────────────────────────────────────────── */}
-        <div className="privacy-consent-list">
-          {consents.map((consent) => {
-            // Info-Objekt für diesen Consent-Typ laden
-            const info = CONSENT_INFO[consent.consentType] || {
-              label: consent.consentType,
-              description: '',
-              required: false,
-            };
+      {/* ── Consent-Liste ──────────────────────────────────────────── */}
+      <div className="privacy-consent-list">
+        {consents.map((consent) => {
+          const info = CONSENT_INFO[consent.consentType] || {
+            label: consent.consentType,
+            description: '',
+            required: false,
+          };
 
-            return (
-              <div
-                key={consent.id}
-                className={`privacy-consent-card ${
-                  consent.granted ? 'granted' : 'revoked'
-                }`}
-              >
-                {/* ── Kopfzeile: Label + Badge ────────────────────────────── */}
-                <div className="privacy-consent-header">
-                  <h3 className="privacy-consent-label">{info.label}</h3>
-                  <span
-                    className={`privacy-badge ${
-                      info.required ? 'privacy-badge-required' : 'privacy-badge-optional'
-                    }`}
-                  >
-                    {info.required ? 'Pflicht' : 'Optional'}
-                  </span>
-                </div>
-
-                {/* ── Beschreibung ──────────────────────────────────────── */}
-                <p className="privacy-consent-desc">{info.description}</p>
-
-                {/* ── Status + Zeitstempel ──────────────────────────────── */}
-                <div className="privacy-consent-status">
-                  <span
-                    className={`privacy-status-dot ${
-                      consent.granted ? 'active' : 'inactive'
-                    }`}
-                  />
-                  <span className="privacy-status-text">
-                    {consent.granted ? 'Erteilt' : 'Widerrufen'} am{' '}
-                    {formatDate(consent.grantedAt)}
-                  </span>
-                </div>
-
-                {/* ── Toggle-Button (nur für optionale Consents) ─────────── */}
-                {/* Pflicht-Consents zeigen keinen Button — sie können       */}
-                {/* nicht widerrufen werden (s. Backend-Validierung).         */}
-                {!info.required && (
-                  <button
-                    onClick={() => handleToggle(consent.id, consent.granted)}
-                    className={`privacy-toggle-btn ${
-                      consent.granted ? 'privacy-toggle-revoke' : 'privacy-toggle-grant'
-                    }`}
-                  >
-                    {consent.granted ? 'Widerrufen' : 'Erteilen'}
-                  </button>
-                )}
-
-                {/* Hinweis für Pflicht-Consents */}
-                {info.required && (
-                  <p className="privacy-consent-hint">
-                    Diese Einwilligung ist für die Nutzung der App erforderlich
-                    und kann nicht widerrufen werden.
-                  </p>
-                )}
+          return (
+            <Card
+              key={consent.id}
+              padding="md"
+              accent={consent.granted ? 'success' : 'danger'}
+              className={`privacy-consent-card ${
+                consent.granted ? 'granted' : 'revoked'
+              }`}
+            >
+              {/* ── Kopfzeile: Label + Badge ──────────────────────── */}
+              <div className="privacy-consent-header">
+                <h3 className="privacy-consent-label">{info.label}</h3>
+                <Badge variant={info.required ? 'required' : 'optional'}>
+                  {info.required ? 'Pflicht' : 'Optional'}
+                </Badge>
               </div>
-            );
-          })}
-        </div>
 
-        {/* ── Zurück-Button ──────────────────────────────────────────────── */}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="privacy-back-btn"
-        >
-          ← Zurück zum Dashboard
-        </button>
+              {/* ── Beschreibung ──────────────────────────────────── */}
+              <p className="privacy-consent-desc">{info.description}</p>
+
+              {/* ── Status + Zeitstempel ──────────────────────────── */}
+              <div className="privacy-consent-status">
+                <span
+                  className={`privacy-status-dot ${
+                    consent.granted ? 'active' : 'inactive'
+                  }`}
+                />
+                <span className="privacy-status-text">
+                  {consent.granted ? 'Erteilt' : 'Widerrufen'} am{' '}
+                  {formatDate(consent.grantedAt)}
+                </span>
+              </div>
+
+              {/* ── Toggle-Button: Button danger/success statt eigener Klasse */}
+              {!info.required && (
+                <Button
+                  variant={consent.granted ? 'danger' : 'success'}
+                  size="sm"
+                  onClick={() => handleToggle(consent.id, consent.granted)}
+                >
+                  {consent.granted ? 'Widerrufen' : 'Erteilen'}
+                </Button>
+              )}
+
+              {/* Hinweis für Pflicht-Consents */}
+              {info.required && (
+                <p className="privacy-consent-hint">
+                  Diese Einwilligung ist für die Nutzung der App erforderlich
+                  und kann nicht widerrufen werden.
+                </p>
+              )}
+            </Card>
+          );
+        })}
       </div>
-    </div>
+
+      {/* ── Zurück-Button: Button secondary statt .privacy-back-btn ── */}
+      <Button
+        variant="secondary"
+        onClick={() => navigate('/dashboard')}
+        className="privacy-back-btn"
+      >
+        ← Zurück zum Dashboard
+      </Button>
+    </PageContainer>
   );
 }

@@ -1,0 +1,112 @@
+/* src/styles/components/ui/Card.css — Card Design System (US-12, TASK-44)
+ *
+ * ARCHITEKTUR:
+ *   Vereinheitlicht alle "Karten"-Container der App:
+ *     - LoginPage: .login-card
+ *     - ConsentPage: .consent-form
+ *     - ProfilePage: .profile-form
+ *     - PrivacySettingsPage: .privacy-consent-card
+ *   Alle hatten: bg weiß, border-radius 12px, box-shadow, padding.
+ *
+ * MODIFIER-SYSTEM:
+ *   Padding:  card--padding-sm / md / lg
+ *   Shadow:   card--shadow-sm / md / lg
+ *   Accent:   card--accent-care / coach / labs / family
+ *   Hover:    card--hoverable (für interaktive Karten)
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * BASIS — Weißer Container mit abgerundeten Ecken
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.card {
+  background-color: var(--color-bg-card);   /* Weiß */
+  border-radius: var(--radius-lg);          /* 12px Abrundung */
+  /* Kein Standard-Schatten/Padding — das kommt über die Modifier */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * PADDING-STUFEN
+ * ══════════════════════════════════════════════════════════════════════════════
+ * sm: Kompakte Karten (Consent-Cards, Badges)
+ * md: Standard (die meisten Karten)
+ * lg: Großzügige Karten (Login-Card, Formulare)
+ */
+.card--padding-sm {
+  padding: var(--space-4);              /* 16px */
+}
+
+.card--padding-md {
+  padding: var(--space-6);              /* 24px */
+}
+
+.card--padding-lg {
+  padding: var(--space-8);              /* 32px */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * SCHATTEN-STUFEN
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.card--shadow-sm {
+  box-shadow: var(--shadow-sm);         /* Subtiler Schatten */
+}
+
+.card--shadow-md {
+  box-shadow: var(--shadow-md);         /* Standard-Schatten */
+}
+
+.card--shadow-lg {
+  box-shadow: var(--shadow-lg);         /* Prominenter Schatten */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * AKZENT-RÄNDER — Farbiger linker Rand pro Modul
+ * ══════════════════════════════════════════════════════════════════════════════
+ * Visuell zeigt der farbige Rand sofort, zu welchem Modul eine Karte gehört.
+ * Beispiel: SummaryCard "Nächster Termin" → accent="care" → blauer Rand
+ */
+.card--accent-care {
+  border-left: 4px solid var(--color-care);       /* Blau: Termine */
+}
+
+.card--accent-coach {
+  border-left: 4px solid var(--color-coach);      /* Grün: Check-in */
+}
+
+.card--accent-labs {
+  border-left: 4px solid var(--color-labs);       /* Violett: Labor/Medikamente */
+}
+
+.card--accent-family {
+  border-left: 4px solid var(--color-family);     /* Pink: Familie */
+}
+
+/* ── Zusätzliche Akzent-Farben für Status-Karten ──────────────────────── */
+.card--accent-success {
+  border-left: 4px solid var(--color-green);      /* Grün: Erteilt */
+}
+
+.card--accent-danger {
+  border-left: 4px solid var(--color-red);        /* Rot: Widerrufen */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * HOVER-EFFEKT — Für interaktive Karten (z.B. SummaryCard)
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.card--hoverable {
+  transition:
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
+}
+
+.card--hoverable:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);           /* Leichtes "Anheben" */
+}

@@ -1,0 +1,99 @@
+/* src/styles/components/ui/Spinner.css — Spinner Design System (US-12, TASK-46)
+ *
+ * ARCHITEKTUR:
+ *   Ergänzt den bestehenden LoadingSpinner (Vollbild-Overlay) um einen
+ *   INLINE-fähigen Spinner mit wählbarer Größe.
+ *
+ *   LoadingSpinner.jsx → Vollbild (Auth-Check)     ← bleibt unverändert
+ *   Spinner.jsx        → Inline (Buttons, Karten)  ← NEU
+ *
+ * ANIMATION:
+ *   @keyframes spin dreht den Kreis um 360° in 0.8 Sekunden.
+ *   Die obere Border ist farbig (Indigo), der Rest ist grau →
+ *   so entsteht der visuelle "Lade"-Effekt.
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * BASIS — Zentrierter Container
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);               /* 12px zwischen Kreis und Label */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * DER DREHENDE KREIS
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * Technik: Ein <div> mit border-radius: 50% (= Kreis).
+ * 3 Seiten: grauer Rand. 1 Seite (oben): farbiger Rand (Indigo).
+ * Die @keyframes Animation dreht das Element im Kreis.
+ */
+.spinner__circle {
+  border-radius: var(--radius-full);              /* 9999px = perfekter Kreis */
+  border-style: solid;
+  border-color: var(--color-slate-200);           /* Grauer Basis-Rand */
+  border-top-color: var(--color-primary);         /* Indigo oben */
+  animation: spinner-rotate 0.8s linear infinite; /* Endlos drehen */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * GRÖSSEN — sm, md, lg
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
+/* ── Small: 20px — Für den Einsatz in Buttons ─────────────────────────── */
+.spinner--sm .spinner__circle {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+/* ── Medium: 32px — Standard für Karten und Abschnitte ─────────────────── */
+.spinner--md .spinner__circle {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+/* ── Large: 48px — Für Vollbild-Ladezustände ───────────────────────────── */
+.spinner--lg .spinner__circle {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * LABEL — Optionaler Text unter dem Spinner
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+.spinner__label {
+  margin: 0;
+  color: var(--color-slate-500);
+  font-size: var(--font-base);
+  text-align: center;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * ANIMATION — Drehung im Uhrzeigersinn
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * @keyframes definiert eine CSS-Animation:
+ *   "to { transform: rotate(360deg) }" = drehe von 0° bis 360°
+ *   "linear" = gleichmäßige Geschwindigkeit (kein ease-in/out)
+ *   "infinite" = hört nie auf
+ *   "0.8s" = eine volle Umdrehung dauert 0.8 Sekunden
+ */
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

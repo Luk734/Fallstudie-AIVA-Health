@@ -1,4 +1,4 @@
-// src/pages/core/DashboardPage.jsx — Dashboard / Startseite (US-10)
+// src/pages/core/DashboardPage.jsx — Dashboard / Startseite (US-10, US-12 Migration)
 //
 // Die zentrale Übersichtsseite der App. Zeigt dem User auf einen Blick:
 //   1. Persönliche Begrüßung (tageszeitabhängig)
@@ -7,21 +7,17 @@
 //   4. Nächste Medikamenteneinnahme (AIVA Labs)
 //   5. Quick-Action Buttons für die wichtigsten Aktionen
 //
-// Warum Mock-Daten?
-//   Die Module Care, Coach und Labs sind noch nicht implementiert.
-//   Deshalb simulieren wir die Daten als Konstanten direkt in dieser Datei.
-//   Später werden diese durch echte API-Calls ersetzt (z.B. useSWR oder useEffect).
-//
-// Warum kein eigener Header mehr?
-//   Seit US-09 haben wir die Bottom-Navigation (AppLayout).
-//   Profil, Datenschutz und Logout sind über die Navigation erreichbar.
-//   → Der alte Header mit Buttons ist überflüssig geworden.
+// US-12 Migration:
+//   - .dashboard-profile-hint → <Alert variant="warning">
+//   - .dashboard-profile-hint__btn → <Button variant="primary" size="sm">
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import GreetingCard from '../../components/GreetingCard';
 import SummaryCard from '../../components/SummaryCard';
 import QuickActions from '../../components/QuickActions';
+import Alert from '../../components/ui/Alert';
+import Button from '../../components/ui/Button';
 import '../../styles/pages/core/DashboardPage.css';
 
 // ── Mock-Daten ────────────────────────────────────────────────────────────────
@@ -114,21 +110,22 @@ export default function DashboardPage() {
       <GreetingCard firstName={user?.firstName} />
 
       {/* ── Profil-Hinweis (wenn noch kein Profil angelegt) ──────────── */}
-      {/* Zeigt einen freundlichen Hinweis mit Link zur Profilseite.      */}
-      {/* Verschwindet sobald der User seinen Vornamen eingetragen hat.   */}
+      {/* Alert variant="warning" + Button — ersetzt .dashboard-profile-hint */}
       {!user?.firstName && (
-        <div className="dashboard-profile-hint">
+        <Alert variant="warning" className="dashboard-profile-hint">
           <p>
             <strong>Tipp:</strong> Vervollständige dein Profil, damit
             AIVA Health dich persönlich begrüßen kann.
           </p>
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => navigate('/profile')}
             className="dashboard-profile-hint__btn"
           >
             Profil anlegen →
-          </button>
-        </div>
+          </Button>
+        </Alert>
       )}
 
       {/* ── 2. Summary-Karten ────────────────────────────────────────── */}
