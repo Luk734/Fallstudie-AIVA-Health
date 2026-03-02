@@ -1,42 +1,42 @@
-/* src/pages/LabsPage.css — Styling für die Labs-Platzhalter-Seite */
+/* src/styles/pages/modules/labs/LabsPage.css — Labs-Platzhalter (US-11 Tokens) */
 
 .labs-page {
   display: flex;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: var(--space-8) var(--space-4);
 }
 
 .labs-container {
-  max-width: 600px;
+  max-width: var(--max-width-page);
   width: 100%;
   text-align: center;
 }
 
 .labs-heading {
-  font-size: 1.75rem;
-  color: #1a1a2e;
-  margin-bottom: 0.5rem;
+  font-size: var(--font-2xl);
+  color: var(--color-slate-800);
+  margin-bottom: var(--space-2);
 }
 
 .labs-description {
-  color: #555;
-  font-size: 1rem;
-  margin-bottom: 2rem;
+  color: var(--color-slate-600);
+  font-size: var(--font-base);
+  margin-bottom: var(--space-8);
 }
 
 .labs-placeholder {
-  background: #f0fff4;
-  border-radius: 12px;
-  padding: 2rem;
+  background: var(--color-labs-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
 }
 
 .labs-placeholder-icon {
   font-size: 2.5rem;
   display: block;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .labs-placeholder p {
-  color: #666;
-  font-size: 0.95rem;
+  color: var(--color-slate-500);
+  font-size: var(--font-base);
 }

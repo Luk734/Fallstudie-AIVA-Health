@@ -1,17 +1,9 @@
-/* src/pages/ConsentPage.css — Styling für DSGVO-Einwilligungen (US-07)
- *
- * Design-Pattern:
- *   - Konsistent mit Login, Dashboard & Profil
- *   - Gleiche Farben (#f0f4f8, #2563eb, #1e293b)
- *   - Gleiche Rundungen (border-radius: 12px/8px)
- *   - Fokus auf Lesbarkeit (Checkboxen-Texte sind wichtig bei DSGVO)
- */
+/* src/styles/pages/auth/ConsentPage.css — DSGVO-Einwilligungen (US-07, US-11 Tokens) */
 
 .consent-page {
   min-height: 100vh;
-  background-color: #f0f4f8;
-  font-family: system-ui, sans-serif;
-  padding: 2rem 1rem;
+  background-color: var(--color-bg-app);
+  padding: var(--space-8) var(--space-4);
 }
 
 .consent-container {
@@ -23,89 +15,80 @@
 
 .consent-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
 }
 
 .consent-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
-  color: #1e293b;
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-2xl);
+  color: var(--color-slate-800);
 }
 
 .consent-subtitle {
   margin: 0;
-  color: #64748b;
-  font-size: 0.95rem;
-  line-height: 1.6;
+  color: var(--color-slate-500);
+  font-size: var(--font-base);
+  line-height: var(--leading-relaxed);
 }
 
 /* ── Fehlermeldung ───────────────────────────────────────────────────────── */
 
 .consent-error {
-  background-color: #fff0f0;
-  border: 1px solid #ffcccc;
-  color: #c00;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  background-color: var(--color-red-light);
+  border: 1px solid var(--color-red-200);
+  color: var(--color-red-dark);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-sm);
 }
 
 /* ── Formular ────────────────────────────────────────────────────────────── */
 
 .consent-form {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  background-color: var(--color-bg-card);
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 /* ── Checkbox-Labels ─────────────────────────────────────────────────────── */
-/* Jede Checkbox + Text ist in einem <label> zusammengefasst.                 */
-/* display: flex sorgt dafür, dass die Checkbox links vom Text steht.         */
-/* align-items: flex-start → Checkbox bleibt oben (bei mehrzeiligem Text).    */
 
 .consent-checkbox-label {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
-/* Hover-Effekt → signalisiert dem User: "das ist klickbar" */
 .consent-checkbox-label:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background-color: var(--color-slate-50);
+  border-color: var(--color-slate-300);
 }
 
-/* Pflicht-Einwilligungen: leicht getönter Hintergrund */
 .consent-checkbox-label.consent-required {
-  background-color: #fefce8;
-  border-color: #fde68a;
+  background-color: var(--color-yellow-50);
+  border-color: var(--color-amber-200);
 }
 
 .consent-checkbox-label.consent-required:hover {
-  background-color: #fef9c3;
+  background-color: var(--color-amber-100);
 }
 
 /* ── Die Checkbox selbst ─────────────────────────────────────────────────── */
-/* Die native Checkbox wird etwas vergrößert damit sie gut klickbar ist.      */
-/* accent-color ändert die Farbe des Häkchens (modernes CSS, ab 2022).        */
-/* flex-shrink: 0 → die Checkbox soll nicht kleiner werden wenn der Text lang */
-/* ist (sonst würde sie im Flex-Container zusammengedrückt).                  */
 
 .consent-checkbox {
   width: 20px;
   height: 20px;
   margin-top: 2px;
-  accent-color: #2563eb;
+  accent-color: var(--color-primary);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -113,95 +96,93 @@
 /* ── Checkbox-Text ───────────────────────────────────────────────────────── */
 
 .consent-checkbox-text {
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: #334155;
+  font-size: var(--font-sm);
+  line-height: var(--leading-normal);
+  color: var(--color-slate-700);
 }
 
-/* Links im Text: Datenschutzerklärung, AGB */
 .consent-checkbox-text a {
-  color: #2563eb;
+  color: var(--color-primary);
   text-decoration: underline;
-  font-weight: 600;
+  font-weight: var(--font-semibold);
 }
 
 .consent-checkbox-text a:hover {
-  color: #1d4ed8;
+  color: var(--color-primary-dark);
 }
 
 /* ── Badges (Pflicht / Optional) ─────────────────────────────────────────── */
-/* Kleine Etiketten die anzeigen ob die Einwilligung Pflicht oder Optional ist */
 
 .consent-badge {
   display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 0.15rem 0.5rem;
+  font-size: var(--font-xs);
+  font-weight: var(--font-bold);
+  padding: 0.15rem var(--space-2);
   border-radius: 4px;
-  margin-left: 0.5rem;
+  margin-left: var(--space-2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   vertical-align: middle;
 }
 
 .consent-badge-required {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background-color: var(--color-red-light);
+  color: var(--color-red-dark);
+  border: 1px solid var(--color-red-200);
 }
 
 .consent-badge-optional {
-  background-color: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
+  background-color: var(--color-green-light);
+  color: var(--color-coach);
+  border: 1px solid var(--color-green-200);
 }
 
 /* ── Info-Box ────────────────────────────────────────────────────────────── */
 
 .consent-info {
-  padding: 0.875rem 1rem;
-  background-color: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-blue-50);
+  border: 1px solid var(--color-blue-200);
+  border-radius: var(--radius-md);
 }
 
 .consent-info p {
   margin: 0;
-  font-size: 0.85rem;
-  color: #1e40af;
-  line-height: 1.5;
+  font-size: var(--font-sm);
+  color: var(--color-blue-800);
+  line-height: var(--leading-normal);
 }
 
 /* ── Submit-Button ───────────────────────────────────────────────────────── */
 
 .consent-submit-btn {
-  padding: 0.875rem;
-  background-color: #2563eb;
+  padding: var(--space-3);
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1.05rem;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: var(--font-lg);
+  font-weight: var(--font-semibold);
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 0.5rem;
+  transition: background-color var(--transition-normal);
+  margin-top: var(--space-2);
 }
 
 .consent-submit-btn:hover:not(:disabled) {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-dark);
 }
 
 .consent-submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #94a3b8;
+  background-color: var(--color-slate-400);
 }
 
 /* ── Hinweis unter dem Button ────────────────────────────────────────────── */
 
 .consent-hint {
   text-align: center;
-  font-size: 0.8rem;
-  color: #94a3b8;
+  font-size: var(--font-xs);
+  color: var(--color-slate-400);
   margin: 0;
 }
