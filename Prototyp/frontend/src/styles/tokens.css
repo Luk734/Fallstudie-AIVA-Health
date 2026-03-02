@@ -1,0 +1,215 @@
+/* src/styles/tokens.css — Design Tokens für AIVA Health (US-11, TASK-40)
+ *
+ * Was sind Design Tokens?
+ *   Design Tokens sind die KLEINSTEN Einheiten eines Design Systems.
+ *   Sie definieren konkrete Werte (Farben, Abstände, Schriftgrößen) an
+ *   EINER zentralen Stelle. Alle CSS-Dateien referenzieren diese Tokens
+ *   anstatt eigene Werte zu hardcoden.
+ *
+ * Warum CSS Custom Properties (Variablen)?
+ *   - Einmal definieren, überall nutzen → Konsistenz
+ *   - Änderung an einer Stelle wirkt sich überall aus
+ *   - Können zur Laufzeit geändert werden (z.B. für Dark Mode)
+ *   - Kaskadieren wie normale CSS-Properties (vererbbar)
+ *
+ * Syntax:
+ *   Definition:  --name: wert;        (in :root für globale Verfügbarkeit)
+ *   Verwendung:  var(--name)          (überall in CSS nutzbar)
+ *   Fallback:    var(--name, #fff)    (optionaler Fallback-Wert)
+ *
+ * Namenskonvention:
+ *   --color-{name}     → Farben
+ *   --font-{size}      → Schriftgrößen
+ *   --space-{stufe}    → Abstände (4px-Raster)
+ *   --radius-{size}    → Border-Radien
+ *   --shadow-{size}    → Box-Shadows
+ *
+ * Zugänglichkeit (Thomas Wagner, WCAG 2.1 AA):
+ *   - Mindestschriftgröße für Fließtext: 16px (1rem = --font-base)
+ *   - Farbkontraste: Alle Textfarben auf ihren Hintergründen ≥ 4.5:1
+ */
+
+:root {
+  /* ══════════════════════════════════════════════════════════════════════════
+   * FARBEN — Markenfarben & Funktionale Farben
+   * ══════════════════════════════════════════════════════════════════════════
+   *
+   * Jede Farbe hat eine -light Variante (für Hintergründe/Hover) und
+   * das Hauptwert wird für Text/Buttons/Icons verwendet.
+   */
+
+  /* ── Primary: Indigo ─────────────────────────────────────────────────────
+   * Hauptfarbe der App: Buttons, Links, aktive Navigation, Fokus-Ringe.
+   * Indigo wirkt professionell und vertrauenswürdig — passend für Health. */
+  --color-primary:       #4F46E5;
+  --color-primary-light: #EEF2FF;   /* Indigo-50: für Hover-Hintergründe */
+  --color-primary-dark:  #3730A3;   /* Indigo-800: für Hover auf Buttons */
+
+  /* ── Teal: Sekundärfarbe ─────────────────────────────────────────────────
+   * Für AIVA Coach Modul und sekundäre Akzente. Teal steht für Wellness. */
+  --color-teal:          #06B6D4;
+  --color-teal-light:    #ECFEFF;   /* Cyan-50 */
+
+  /* ── Green: Erfolg / Positiv ─────────────────────────────────────────────
+   * Erfolgsmeldungen, Check-in erledigt, positive Status-Badges.          */
+  --color-green:         #10B981;
+  --color-green-light:   #ECFDF5;   /* Emerald-50 */
+
+  /* ── Coral/Orange: Warnung / Aufmerksamkeit ──────────────────────────────
+   * Warnungen, Erinnerungen, Medikamenten-Hinweise.                       */
+  --color-coral:         #F97316;
+  --color-coral-light:   #FFF7ED;   /* Orange-50 */
+
+  /* ── Red: Fehler / Gefahr ────────────────────────────────────────────────
+   * Fehlermeldungen, Lösch-Aktionen, Logout-Button Hover.                 */
+  --color-red:           #EF4444;
+  --color-red-light:     #FEF2F2;   /* Red-50 */
+
+  /* ── Graustufen (Slate-Palette) ──────────────────────────────────────────
+   * Von dunkel nach hell. Slate hat einen leichten Blau-Stich der
+   * professioneller wirkt als reines Grau.                                 */
+  --color-slate-900:     #0F172A;   /* Sehr dunkel: Überschriften */
+  --color-slate-800:     #1E293B;   /* Dunkel: Normaler Text */
+  --color-slate-700:     #334155;   /* Zwischen-Stufe: Consent-Text */
+  --color-slate-600:     #475569;   /* Mittel: Sekundärer Text */
+  --color-slate-500:     #64748B;   /* Label-Text, Platzhalter */
+  --color-slate-400:     #94A3B8;   /* Dezente Hinweistexte */
+  --color-slate-300:     #CBD5E1;   /* Borders, Trennlinien */
+  --color-slate-200:     #E2E8F0;   /* Helle Borders */
+  --color-slate-100:     #F1F5F9;   /* Hover-Hintergründe */
+  --color-slate-50:      #F8FAFC;   /* Sehr helle Hintergründe */
+
+  /* ── Spezielle Hintergrund-Farben ────────────────────────────────────────
+   * Zentrale Definition damit alle Seiten den gleichen Hintergrund haben. */
+  --color-bg-app:        #F5F7FA;   /* App-Hintergrund (helles Grau) */
+  --color-bg-card:       #FFFFFF;   /* Karten-Hintergrund (weiß) */
+  --color-bg-nav:        #FFFFFF;   /* Navigation-Hintergrund */
+
+  /* ── Modul-Akzentfarben ──────────────────────────────────────────────────
+   * Jedes AIVA-Modul hat seine eigene Akzentfarbe für den linken
+   * Kartenrand (SummaryCard) und Modul-spezifische Elemente.              */
+  --color-care:          #2563EB;   /* Blue-600: Termine */
+  --color-coach:         #16A34A;   /* Green-600: Check-in, Empfehlungen */
+  --color-labs:          #7C3AED;   /* Violet-600: Labor, Medikamente */
+  --color-family:        #EC4899;   /* Pink-500: Familie */
+
+  /* ── Modul-Hintergründe (Platzhalter & Akzente) ──────────────────────────
+   * Jedes Modul hat eine helle Hintergrund-Variante für Platzhalter-Seiten
+   * und Akzent-Bereiche.                                                  */
+  --color-care-light:    #F0F4FF;   /* Light Blue */
+  --color-coach-light:   #FFF8F0;   /* Light Orange */
+  --color-labs-light:    #F0FFF4;   /* Light Mint */
+  --color-family-light:  #FFF0F5;   /* Light Pink */
+
+  /* ── Erweiterte Palette (Badges, Alerts, Status) ─────────────────────────
+   * Zusätzliche Farb-Abstufungen für Badges, Info-Boxen, Warnungen.
+   * Benannt nach dem Tailwind-System: farbe-stufe (50=hell, 800=dunkel). */
+  --color-amber-50:      #FFFBEB;   /* Warning-Hintergrund */
+  --color-amber-100:     #FEF9C3;   /* Warning-Hover */
+  --color-amber-200:     #FDE68A;   /* Warning-Border */
+  --color-amber-800:     #92400E;   /* Warning-Text */
+  --color-yellow-50:     #FEFCE8;   /* Required-Badge-Hintergrund */
+  --color-blue-50:       #EFF6FF;   /* Info-Hintergrund */
+  --color-blue-200:      #BFDBFE;   /* Info-Border */
+  --color-blue-300:      #93C5FD;   /* Focus-Ring, Hover */
+  --color-blue-800:      #1E40AF;   /* Info-Text */
+  --color-green-200:     #BBF7D0;   /* Success-Border */
+  --color-green-800:     #166534;   /* Success-Text */
+  --color-red-dark:      #DC2626;   /* Stärkeres Rot (Badge-Text) */
+  --color-red-200:       #FECACA;   /* Error-Border */
+
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * TYPOGRAFIE — Schriftgrößen-Skala
+   * ══════════════════════════════════════════════════════════════════════════
+   *
+   * Einheit: rem (relative em)
+   *   1rem = die Schriftgröße des <html>-Elements (standardmäßig 16px).
+   *   rem ist besser als px, weil User die Browser-Schriftgröße ändern
+   *   können und rem diese Einstellung respektiert.
+   *
+   * WCAG 2.1 AA (Thomas Wagner):
+   *   Fließtext muss mindestens 16px (1rem) groß sein.
+   *   Wir verwenden --font-base (1rem) als Standard.
+   *   Kleinere Größen (xs, sm) nur für Labels, Badges, Fußnoten.
+   */
+  --font-xs:     0.75rem;    /*  12px — NUR für Badges, Fußnoten */
+  --font-sm:     0.875rem;   /*  14px — Labels, sekundäre Info */
+  --font-base:   1rem;       /*  16px — Fließtext (WCAG Minimum) ✓ */
+  --font-lg:     1.125rem;   /*  18px — Hervorgehobener Text */
+  --font-xl:     1.25rem;    /*  20px — Kleine Überschriften */
+  --font-2xl:    1.5rem;     /*  24px — Mittlere Überschriften */
+  --font-3xl:    1.875rem;   /*  30px — Große Überschriften */
+
+  /* Schrift-Gewichte */
+  --font-normal:  400;
+  --font-medium:  500;
+  --font-semibold: 600;
+  --font-bold:    700;
+
+  /* Zeilenhöhen */
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * SPACING — Abstands-Skala (4px-Raster)
+   * ══════════════════════════════════════════════════════════════════════════
+   *
+   * Alle Abstände sind Vielfache von 4px (0.25rem).
+   * Ein konsistentes Raster sorgt für visuellen Rhythmus und Ordnung.
+   *
+   * Die Benennung folgt Tailwind CSS Konvention:
+   *   --space-1 = 1 × 4px, --space-2 = 2 × 4px, etc.
+   */
+  --space-1:   0.25rem;    /*   4px */
+  --space-2:   0.5rem;     /*   8px */
+  --space-3:   0.75rem;    /*  12px */
+  --space-4:   1rem;       /*  16px */
+  --space-5:   1.25rem;    /*  20px */
+  --space-6:   1.5rem;     /*  24px */
+  --space-8:   2rem;       /*  32px */
+  --space-10:  2.5rem;     /*  40px */
+  --space-12:  3rem;       /*  48px */
+  --space-16:  4rem;       /*  64px */
+
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * BORDER-RADIEN
+   * ══════════════════════════════════════════════════════════════════════════
+   */
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;   /* Für Kreise (Avatare) */
+
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * SCHATTEN (Box-Shadows)
+   * ══════════════════════════════════════════════════════════════════════════
+   */
+  --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md:  0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg:  0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-nav: 0 -2px 8px rgba(0, 0, 0, 0.08);   /* Navigation: Schatten nach oben */
+
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * ÜBERGÄNGE (Transitions)
+   * ══════════════════════════════════════════════════════════════════════════
+   */
+  --transition-fast:   0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow:   0.3s ease;
+
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * LAYOUT
+   * ══════════════════════════════════════════════════════════════════════════
+   */
+  --nav-height:     64px;       /* Höhe der Bottom-Navigation */
+  --max-width-page: 600px;      /* Maximale Seitenbreite */
+  --min-touch-target: 44px;     /* WCAG 2.1: Mindest-Touch-Ziel */
+}

@@ -1,0 +1,162 @@
+/* src/styles/global.css — Globale Base-Styles für AIVA Health (US-11, TASK-41)
+ *
+ * Diese Datei ERSETZT die alte index.css und nutzt die Design Tokens
+ * aus tokens.css. Sie wird in main.jsx NACH tokens.css importiert:
+ *
+ *   import './styles/tokens.css';   ← Variablen definieren
+ *   import './styles/global.css';   ← Variablen verwenden
+ *
+ * Inhalt:
+ *   1. Box-Sizing Reset
+ *   2. Body + #root Basis-Styling
+ *   3. Typografie-Defaults
+ *   4. Button-Reset
+ *   5. Link-Reset
+ *   6. Bild-Reset
+ *   7. Focus-Styles (Accessibility)
+ *
+ * Wichtig: Hier stehen NUR allgemeine Basis-Regeln.
+ *   Komponenten-spezifische Styles kommen in die jeweiligen CSS-Dateien.
+ */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 1. BOX-SIZING RESET
+ * ══════════════════════════════════════════════════════════════════════════════
+ * border-box bedeutet: padding und border werden IN die Breite eingerechnet.
+ * Ohne das wäre ein Element mit width:100px + padding:10px → 120px breit.
+ * Mit border-box bleibt es bei 100px. Das macht Layouts VIEL einfacher.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Alle Default-Margins entfernen — wir setzen Abstände selbst */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 2. BODY + #ROOT — Volle Bildschirmhöhe
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+:root {
+  /* Schriftart für die gesamte App */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
+
+  /* Standard-Textfarbe und Hintergrund aus Design Tokens */
+  color: var(--color-slate-800);
+  background-color: var(--color-bg-app);
+
+  /* Besseres Text-Rendering auf allen Betriebssystemen */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  min-width: 320px;
+  font-size: var(--font-base);   /* 16px = WCAG Minimum für Fließtext */
+}
+
+/* React-Wurzelelement: muss volle Höhe bekommen */
+#root {
+  min-height: 100vh;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 3. TYPOGRAFIE-DEFAULTS
+ * ══════════════════════════════════════════════════════════════════════════════
+ * Überschriften bekommen Größen aus der Schriftgrößen-Skala.
+ * So sind sie überall konsistent, egal welche Komponente sie nutzt.
+ */
+h1 {
+  font-size: var(--font-2xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-slate-900);
+}
+
+h2 {
+  font-size: var(--font-xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  color: var(--color-slate-900);
+}
+
+h3 {
+  font-size: var(--font-lg);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  color: var(--color-slate-800);
+}
+
+p {
+  line-height: var(--leading-normal);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 4. BUTTON-RESET
+ * ══════════════════════════════════════════════════════════════════════════════
+ * Browser-Buttons sehen unterschiedlich aus. Wir setzen sie auf "neutral"
+ * zurück und stylen sie in den Komponenten-CSS-Dateien individuell.
+ */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 5. LINK-RESET
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 6. BILD-RESET
+ * ══════════════════════════════════════════════════════════════════════════════
+ * Bilder sollen nie breiter als ihr Container werden.
+ */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+ * 7. FOCUS-STYLES (Accessibility)
+ * ══════════════════════════════════════════════════════════════════════════════
+ * Wenn ein User per Tastatur navigiert (Tab-Taste), muss das fokussierte
+ * Element visuell hervorgehoben werden (WCAG 2.1 AA Anforderung).
+ *
+ * :focus-visible wird NUR bei Tastatur-Navigation angezeigt,
+ * NICHT bei Mausklicks. So haben Tastatur-User den Fokusring,
+ * aber Maus-User werden nicht durch einen Ring gestört.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

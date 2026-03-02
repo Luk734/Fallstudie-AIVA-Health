@@ -1,17 +1,9 @@
-/* src/pages/ProfilePage.css — Styling für die Profilseite (US-05)
- *
- * Design-Pattern:
- *   - Gleiche Farben wie Login + Dashboard (#f0f4f8, #2563eb, #1e293b)
- *   - Gleiche Abstände und Rundungen (border-radius: 12px/8px)
- *   - Mobile-first: max-width: 500px zentriert auf großen Screens
- *   - Avatar-Grid: CSS Grid mit 3 Spalten (responsive)
- */
+/* src/styles/pages/core/ProfilePage.css — Profilseite (US-05, US-11 Tokens) */
 
 .profile-page {
   min-height: 100vh;
-  background-color: #f0f4f8;
-  font-family: system-ui, sans-serif;
-  padding: 2rem 1rem;
+  background-color: var(--color-bg-app);
+  padding: var(--space-8) var(--space-4);
 }
 
 .profile-container {
@@ -23,165 +15,156 @@
 
 .profile-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
 }
 
 .profile-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
-  color: #1e293b;
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-2xl);
+  color: var(--color-slate-800);
 }
 
 .profile-subtitle {
   margin: 0;
-  color: #64748b;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  color: var(--color-slate-500);
+  font-size: var(--font-base);
+  line-height: var(--leading-normal);
 }
 
 /* ── Meldungen (Fehler / Erfolg) ─────────────────────────────────────────── */
 
 .profile-error {
-  background-color: #fff0f0;
-  border: 1px solid #ffcccc;
-  color: #c00;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  background-color: var(--color-red-light);
+  border: 1px solid var(--color-red-200);
+  color: var(--color-red-dark);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-sm);
 }
 
 .profile-success {
-  background-color: #f0fff4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  background-color: var(--color-green-light);
+  border: 1px solid var(--color-green-200);
+  color: var(--color-green-800);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-sm);
 }
 
 /* ── Formular ────────────────────────────────────────────────────────────── */
 
 .profile-form {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  background-color: var(--color-bg-card);
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .profile-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #333;
-  margin-top: 0.75rem;
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-800);
+  margin-top: var(--space-3);
 }
 
 .profile-required {
-  color: #ef4444;
+  color: var(--color-red);
 }
 
 .profile-input {
   padding: 0.65rem 0.875rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-slate-300);
+  font-size: var(--font-base);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-normal);
   font-family: inherit;
 }
 
 .profile-input:focus {
-  border-color: #2563eb;
+  border-color: var(--color-primary);
 }
 
 /* ── Avatar-Auswahl ──────────────────────────────────────────────────────── */
-/* fieldset: Gruppiert zusammengehörige Formularfelder mit einem Rahmen.     */
-/* legend: Die Überschrift der Gruppe (sitzt oben im Rahmen).                */
 
 .profile-fieldset {
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
   margin: 0;
 }
 
 .profile-legend {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #333;
-  padding: 0 0.5rem;
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-800);
+  padding: 0 var(--space-2);
 }
 
-/* CSS Grid: Ordnet die Avatare in 3 Spalten an.
- * repeat(3, 1fr) = 3 gleich breite Spalten.
- * gap: Abstand zwischen den Grid-Zellen.                                   */
 .profile-avatar-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 
-/* Jeder Avatar ist ein Button (klickbar, fokussierbar, barrierefrei).       */
 .profile-avatar-btn {
   background: none;
   border: 3px solid transparent;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   padding: 4px;
   cursor: pointer;
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color var(--transition-normal), transform var(--transition-normal);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .profile-avatar-btn:hover {
-  border-color: #93c5fd;
+  border-color: var(--color-blue-300);
   transform: scale(1.05);
 }
 
-/* .selected = der aktuell gewählte Avatar.
- * Bekommt einen blauen Rahmen und einen leichten Schatten.                  */
 .profile-avatar-btn.selected {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
-/* Das Bild selbst: rund, füllt den Button-Container.                        */
 .profile-avatar-img {
   width: 72px;
   height: 72px;
-  border-radius: 50%;
-  object-fit: cover;     /* Bild wird beschnitten statt verzerrt */
+  border-radius: var(--radius-full);
+  object-fit: cover;
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
 
 .profile-actions {
   display: flex;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 .profile-save-btn {
   flex: 1;
-  padding: 0.75rem;
-  background-color: #2563eb;
+  padding: var(--space-3);
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-normal);
 }
 
 .profile-save-btn:hover:not(:disabled) {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-dark);
 }
 
 .profile-save-btn:disabled {
@@ -189,28 +172,26 @@
   cursor: not-allowed;
 }
 
-/* "Überspringen"-Button: weniger prominent (Ghost-Style).
- * So lenkt er nicht vom Haupt-Button "Speichern" ab.                        */
 .profile-skip-btn {
-  padding: 0.75rem 1.25rem;
+  padding: var(--space-3) var(--space-5);
   background-color: transparent;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  color: var(--color-slate-500);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-normal);
 }
 
 .profile-skip-btn:hover {
-  background-color: #f8fafc;
+  background-color: var(--color-slate-50);
 }
 
 /* ── Ladeanzeige ─────────────────────────────────────────────────────────── */
 
 .profile-loading {
   text-align: center;
-  color: #64748b;
-  font-size: 1rem;
-  padding: 4rem 0;
+  color: var(--color-slate-500);
+  font-size: var(--font-base);
+  padding: var(--space-16) 0;
 }

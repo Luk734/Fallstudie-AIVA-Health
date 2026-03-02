@@ -1,43 +1,42 @@
-/* src/pages/CarePage.css — Styling für die Care-Platzhalter-Seite */
+/* src/styles/pages/modules/care/CarePage.css — Care-Platzhalter (US-11 Tokens) */
 
 .care-page {
-  /* Füllt den gesamten verfügbaren Bereich im AppLayout */
   display: flex;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: var(--space-8) var(--space-4);
 }
 
 .care-container {
-  max-width: 600px;
+  max-width: var(--max-width-page);
   width: 100%;
   text-align: center;
 }
 
 .care-heading {
-  font-size: 1.75rem;
-  color: #1a1a2e;
-  margin-bottom: 0.5rem;
+  font-size: var(--font-2xl);
+  color: var(--color-slate-800);
+  margin-bottom: var(--space-2);
 }
 
 .care-description {
-  color: #555;
-  font-size: 1rem;
-  margin-bottom: 2rem;
+  color: var(--color-slate-600);
+  font-size: var(--font-base);
+  margin-bottom: var(--space-8);
 }
 
 .care-placeholder {
-  background: #f0f4ff;
-  border-radius: 12px;
-  padding: 2rem;
+  background: var(--color-care-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
 }
 
 .care-placeholder-icon {
   font-size: 2.5rem;
   display: block;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .care-placeholder p {
-  color: #666;
-  font-size: 0.95rem;
+  color: var(--color-slate-500);
+  font-size: var(--font-base);
 }

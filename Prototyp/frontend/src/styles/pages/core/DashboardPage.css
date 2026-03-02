@@ -1,50 +1,32 @@
-/* src/styles/pages/core/DashboardPage.css — Dashboard-Layout (US-10) */
+/* src/styles/pages/core/DashboardPage.css — Dashboard-Layout (US-10, US-11 Tokens) */
 /*
- * Das Dashboard ist ein vertikaler Stack:
- *
- *   ┌───────────────────────────┐
- *   │  Header (Logo + Buttons)  │  ← Profil, Datenschutz, Logout
- *   ├───────────────────────────┤
- *   │  GreetingCard             │  ← Begrüßung + Datum
- *   │  (Profil-Hinweis)         │  ← Nur wenn kein Vorname
- *   ├───────────────────────────┤
- *   │  SummaryCard: Termin      │  ← Nächster Termin
- *   │  SummaryCard: Check-in    │  ← Täglicher Check-in
- *   │  SummaryCard: Medikament  │  ← Nächste Einnahme
- *   ├───────────────────────────┤
- *   │  QuickActions             │  ← Zwei Buttons
- *   └───────────────────────────┘
- *
- * padding-bottom: 2rem → Abstand zur Bottom-Navigation,
- * damit der letzte Inhalt nicht unter der Nav verschwindet.
+ * Alle Werte nutzen Design Tokens aus tokens.css.
+ * Layout: Header → GreetingCard → (Profil-Hinweis) → SummaryCards → QuickActions
  */
 
 .dashboard-page {
-  padding: 0 1rem 2rem;
-  max-width: 600px;              /* Optimal lesbar auf großen Bildschirmen */
-  margin: 0 auto;                /* Zentriert */
+  padding: 0 var(--space-4) var(--space-8);
+  max-width: var(--max-width-page);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 /* ── Dashboard-Header ──────────────────────────────────────────────────── */
-/* Dezente Leiste oben: App-Name links, Icon-Buttons rechts.               */
-/* Der Header ist NICHT fixiert (scrollt mit dem Content).                  */
 
 .dashboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 0;
-  border-bottom: 1px solid #e2e8f0;  /* Dezente Trennlinie zum Content */
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-slate-200);
 }
 
-/* Linke Seite: Logo + App-Name */
 .dashboard-header__brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .dashboard-header__logo {
@@ -52,97 +34,87 @@
 }
 
 .dashboard-header__app-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: var(--font-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-slate-800);
 }
 
-/* Rechte Seite: Action-Buttons nebeneinander */
 .dashboard-header__actions {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
-/* Einzelner Icon-Button im Header */
 .dashboard-header__btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: var(--min-touch-target);
+  height: var(--min-touch-target);
+  border-radius: var(--radius-md);
   font-size: 1.2rem;
-  color: #64748b;                    /* Slate-500: dezent */
+  color: var(--color-slate-500);
   background-color: transparent;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-normal);
 }
 
 .dashboard-header__btn:hover {
-  background-color: #f1f5f9;         /* Slate-100: leichtes Highlight */
+  background-color: var(--color-slate-100);
 }
 
-/* Logout-Button: leicht rötlich bei Hover, damit klar ist was passiert */
 .dashboard-header__btn--logout:hover {
-  background-color: #fef2f2;         /* Red-50: sehr dezentes Rot */
-  color: #ef4444;                    /* Red-500 */
+  background-color: var(--color-red-light);
+  color: var(--color-red);
 }
 
-/* Kleines Avatar-Bild im Profil-Button */
 .dashboard-header__avatar {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   object-fit: cover;
 }
 
 /* ── Karten-Container ──────────────────────────────────────────────────── */
-/* Vertikaler Stack der drei SummaryCards mit gleichmäßigem Abstand.      */
 
 .dashboard-cards {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
-/* ── Dezenter Hinweistext innerhalb der Karten ─────────────────────────── */
-/* Z.B. "Nach dem Essen einnehmen" oder "Letzter: Gestern, 18:30"        */
-
 .dashboard-cards__hint {
-  color: #94a3b8;               /* Slate-400: dezent */
-  font-size: 0.85rem;
+  color: var(--color-slate-400);
+  font-size: var(--font-sm);
 }
 
 /* ── Profil-Hinweis (wenn noch kein Vorname vorhanden) ─────────────────── */
-/* Gelbe Hinweisbox die den User motiviert, sein Profil auszufüllen.      */
 
 .dashboard-profile-hint {
-  padding: 1rem 1.25rem;
-  background-color: #fffbeb;     /* Amber-50: sanftes Gelb */
-  border: 1px solid #fde68a;     /* Amber-200: Rand */
-  border-radius: 12px;
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--color-amber-50);
+  border: 1px solid var(--color-amber-200);
+  border-radius: var(--radius-lg);
 }
 
 .dashboard-profile-hint p {
-  margin: 0 0 0.75rem;
-  color: #92400e;                /* Amber-800: dunkler Text */
-  font-size: 0.9rem;
-  line-height: 1.5;
+  margin: 0 0 var(--space-3);
+  color: var(--color-amber-800);
+  font-size: var(--font-sm);
+  line-height: var(--leading-normal);
 }
 
-/* Button im Profil-Hinweis */
 .dashboard-profile-hint__btn {
-  padding: 0.5rem 1.25rem;
-  background-color: #2563eb;
+  padding: var(--space-2) var(--space-5);
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-semibold);
+  font-size: var(--font-sm);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-normal);
 }
 
 .dashboard-profile-hint__btn:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-dark);
 }

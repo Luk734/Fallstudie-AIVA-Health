@@ -1,75 +1,61 @@
-/* src/styles/components/QuickActions.css — Schnellzugriff-Buttons (US-10) */
+/* src/styles/components/QuickActions.css — Schnellzugriff-Buttons (US-10, US-11 Tokens) */
 /*
- * Zwei große, prominente Buttons nebeneinander.
- * Auf kleinen Bildschirmen werden sie automatisch untereinander gestapelt
- * (responsive via flex-wrap).
- *
- * Jeder Button hat:
- *   - Ein Emoji-Icon links
- *   - Fetten Text
- *   - Die Modulfarbe als Hintergrund (Coach=Grün, Care=Blau)
+ * Zwei prominente Buttons mit Modul-Akzentfarben aus Design Tokens.
  */
 
 .quick-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
-/* ── Basis-Button-Styling ──────────────────────────────────────────────── */
-
 .quick-actions__btn {
-  flex: 1;                       /* Beide Buttons gleich breit */
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1rem;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.95rem;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-semibold);
+  font-size: var(--font-base);
   color: white;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.15s;
+  transition: background-color var(--transition-normal), transform var(--transition-fast);
 }
 
-/* Hover: Button drückt sich leicht ein */
 .quick-actions__btn:hover {
   transform: scale(0.98);
 }
 
-/* Active: Noch etwas kleiner für "gedrückt"-Effekt */
 .quick-actions__btn:active {
   transform: scale(0.96);
 }
 
-/* ── Icon im Button ────────────────────────────────────────────────────── */
-
 .quick-actions__btn-icon {
-  font-size: 1.125rem;
+  font-size: var(--font-lg);
 }
 
 /* ── Coach-Variante: Grün ──────────────────────────────────────────────── */
 
 .quick-actions__btn--coach {
-  background-color: #16a34a;     /* Green-600 */
+  background-color: var(--color-coach);
 }
 
 .quick-actions__btn--coach:hover {
-  background-color: #15803d;     /* Green-700 */
+  background-color: #15803d;     /* Coach-Dark (kein eigener Token nötig) */
 }
 
 /* ── Care-Variante: Blau ───────────────────────────────────────────────── */
 
 .quick-actions__btn--care {
-  background-color: #2563eb;     /* Blue-600 */
+  background-color: var(--color-care);
 }
 
 .quick-actions__btn--care:hover {
-  background-color: #1d4ed8;     /* Blue-700 */
+  background-color: #1d4ed8;     /* Care-Dark */
 }
 
-/* ── Responsive: Auf sehr kleinen Bildschirmen untereinander ───────────── */
 @media (max-width: 400px) {
   .quick-actions {
     flex-direction: column;
