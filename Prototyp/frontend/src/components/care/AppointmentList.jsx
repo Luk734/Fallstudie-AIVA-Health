@@ -84,6 +84,15 @@ export default function AppointmentList() {
         subtitle="Verwalte deine Arzttermine und Vorsorgeuntersuchungen"
       />
 
+      {/* ── Neuer Termin Button (US-15) ─────────────────────────────── */}
+      <Button
+        variant="primary"
+        onClick={() => navigate('/care/new')}
+        className="appointment-list__create-btn"
+      >
+        ＋ Neuer Termin
+      </Button>
+
       {/* ── Tab-Navigation ──────────────────────────────────────────── */}
       {/* Zwei ghost-Buttons als Tabs. Der aktive Tab bekommt eine extra CSS-Klasse */}
       {/* für die visuelle Hervorhebung (Unterstrich + stärkere Farbe). */}

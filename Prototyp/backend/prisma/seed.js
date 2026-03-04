@@ -53,6 +53,74 @@ async function main() {
   }
   console.log('   ✅ Consents: terms, health_data, analytics');
 
+  // ── Ärzte-Datenbank (US-15) ─────────────────────────────────────────
+  // Vorbefüllte Arztliste ("Mock-Doctolib") für die Termin-Erstellung.
+  // Beim Erstellen eines Termins kann der User einen Arzt aus der Liste
+  // wählen → Telefon + Ort werden automatisch ins Formular eingetragen.
+  //
+  // Wir verwenden upsert basierend auf name + specialty,
+  // damit der Seed mehrfach ausgeführt werden kann.
+
+  const doctors = [
+    {
+      name: 'Dr. Sarah Müller',
+      specialty: 'Hausärztin',
+      phone: '089 / 123 4567',
+      location: 'Hauptstr. 12, München',
+    },
+    {
+      name: 'Dr. Thomas Weber',
+      specialty: 'Zahnarzt',
+      phone: '089 / 234 5678',
+      location: 'Marienplatz 8, München',
+    },
+    {
+      name: 'Dr. Anna Schmidt',
+      specialty: 'Augenärztin',
+      phone: '089 / 345 6789',
+      location: 'Leopoldstr. 88, München',
+    },
+    {
+      name: 'Dr. Michael Braun',
+      specialty: 'Orthopäde',
+      phone: '089 / 456 7890',
+      location: 'Karlsplatz 3, München',
+    },
+    {
+      name: 'Dr. Lisa Hoffmann',
+      specialty: 'Dermatologin',
+      phone: '089 / 567 8901',
+      location: 'Sendlinger Str. 22, München',
+    },
+    {
+      name: 'Dr. Markus Klein',
+      specialty: 'HNO-Arzt',
+      phone: '089 / 678 9012',
+      location: 'Schillerstr. 15, München',
+    },
+    {
+      name: 'Kinderarztpraxis am Park',
+      specialty: 'Kinderarzt',
+      phone: '089 / 789 0123',
+      location: 'Englischer Garten 1, München',
+    },
+    {
+      name: 'Dr. Julia Fischer',
+      specialty: 'Gynäkologin',
+      phone: '089 / 890 1234',
+      location: 'Theresienstr. 44, München',
+    },
+  ];
+
+  // Bestehende Ärzte löschen und neu anlegen (idempotent)
+  await prisma.doctor.deleteMany();
+
+  for (const doc of doctors) {
+    await prisma.doctor.create({ data: doc });
+  }
+
+  console.log(`   ✅ Ärzte: ${doctors.length} Beispielärzte erstellt`);
+
   // ── Termine (US-13) ────────────────────────────────────────────────
   // Wir erstellen 5 Beispieltermine:
   //   - 2 in der Zukunft (upcoming)

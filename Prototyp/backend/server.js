@@ -10,6 +10,7 @@ import authRoutes from './src/routes/auth.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 import consentRoutes from './src/routes/consent.routes.js';
 import appointmentRoutes from './src/routes/appointment.routes.js';
+import doctorRoutes from './src/routes/doctor.routes.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
 const app = express();
@@ -54,9 +55,15 @@ app.use('/api/users', userRoutes);
 // POST = Einwilligungen speichern, GET = Einwilligungen abrufen
 app.use('/api/consents', consentRoutes);
 
-// Appointment-Routen: Termin-Verwaltung unter /api/appointments/* (US-13)
-// GET = Termine abrufen (alle + upcoming für Dashboard)
+// Appointment-Routen: Termin-Verwaltung unter /api/appointments/* (US-13, US-14, US-15)
+// GET / = Termine abrufen (mit Filtern: time, status, limit)
+// GET /:id = Einzelner Termin (Detail-Ansicht)
+// POST / = Neuen Termin erstellen (US-15)
 app.use('/api/appointments', appointmentRoutes);
+
+// Doctor-Routen: Arztliste unter /api/doctors/* (US-15)
+// GET / = Alle Ärzte abrufen (für Dropdown im Termin-Formular)
+app.use('/api/doctors', doctorRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

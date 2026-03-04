@@ -13,6 +13,9 @@
 //
 // US-13 Integration:
 //   - Mock-Termin → echte Daten von GET /api/appointments/upcoming
+//
+// Header: Wurde in AppHeader.jsx extrahiert und wird über AppLayout
+// auf JEDER geschützten Seite angezeigt (nicht mehr nur hier).
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -56,10 +59,11 @@ function formatTerminKurz(isoString) {
 }
 
 export default function DashboardPage() {
-  // user + logout aus dem AuthContext holen
-  // user → Vornamen für Begrüßung + Avatar im Header
-  // logout → wird vom Logout-Button im Header aufgerufen
-  const { user, token, logout } = useAuth();
+  // user + token aus dem AuthContext holen
+  // user → Vornamen für Begrüßung
+  // token → für authentifizierte API-Calls (Termine laden)
+  // Hinweis: logout + Header-Buttons sind jetzt in AppHeader.jsx
+  const { user, token } = useAuth();
   const navigate = useNavigate();
 
   // ── Nächste Termine vom Backend laden (US-13) ────────────────────────────
@@ -70,7 +74,7 @@ export default function DashboardPage() {
 
     async function fetchUpcoming() {
       try {
-        const res = await fetch(`${API_URL}/api/appointments/upcoming?limit=3`, {
+        const res = await fetch(`${API_URL}/api/appointments?time=upcoming&limit=3`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -85,60 +89,8 @@ export default function DashboardPage() {
     fetchUpcoming();
   }, [token]);
 
-  // ── Logout-Handler ───────────────────────────────────────────────────────
-  // Token + User aus Context und localStorage löschen, dann zur Login-Seite.
-  function handleLogout() {
-    logout();
-    navigate('/login');
-  }
-
   return (
     <div className="dashboard-page">
-      {/* ── Dashboard-Header ─────────────────────────────────────────── */}
-      {/* Dezente Leiste oben: App-Logo links, Action-Buttons rechts.     */}
-      {/* Hier erreicht der User Profil, Datenschutz und Logout —         */}
-      {/* Funktionen die NICHT in der Bottom-Nav sind.                    */}
-      <header className="dashboard-header">
-        <div className="dashboard-header__brand">
-          <span className="dashboard-header__logo">🩺</span>
-          <span className="dashboard-header__app-name">AIVA Health</span>
-        </div>
-        <div className="dashboard-header__actions">
-          {/* Profil: Zeigt Avatar wenn vorhanden, sonst 👤 */}
-          <button
-            className="dashboard-header__btn"
-            onClick={() => navigate('/profile')}
-            title="Mein Profil"
-          >
-            {user?.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt="Profil"
-                className="dashboard-header__avatar"
-              />
-            ) : (
-              <span>👤</span>
-            )}
-          </button>
-          {/* Datenschutz-Einstellungen */}
-          <button
-            className="dashboard-header__btn"
-            onClick={() => navigate('/datenschutz')}
-            title="Datenschutz-Einstellungen"
-          >
-            🔒
-          </button>
-          {/* Ausloggen */}
-          <button
-            className="dashboard-header__btn dashboard-header__btn--logout"
-            onClick={handleLogout}
-            title="Ausloggen"
-          >
-            🚪
-          </button>
-        </div>
-      </header>
-
       {/* ── 1. Persönliche Begrüßung ─────────────────────────────────── */}
       {/* GreetingCard liest den Vornamen und zeigt z.B.                  */}
       {/* "Guten Morgen, Laura 👋" + das heutige Datum                   */}

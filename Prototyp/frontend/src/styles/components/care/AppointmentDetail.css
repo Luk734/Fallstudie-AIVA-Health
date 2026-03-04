@@ -1,0 +1,124 @@
+/* src/styles/components/care/AppointmentDetail.css — Termin-Detail (US-14)
+ *
+ * Layout für die Detail-Ansicht eines einzelnen Termins.
+ * Basis-Karten-Styles kommen von <Card>, hier nur Seitenstruktur:
+ *   - Zurück-Button oben
+ *   - Header mit Titel + Badge
+ *   - Info-Rows (Icon + Label + Value)
+ *   - Notizen-Card
+ *   - Action-Buttons
+ */
+
+/* ── Zurück-Button ─────────────────────────────────────────────────────── */
+.detail-back {
+  margin-bottom: var(--space-4);
+}
+
+/* ── Header: Titel + Badge ─────────────────────────────────────────────── */
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.detail-header__title {
+  font-size: var(--font-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-slate-800);
+  margin: 0;
+  line-height: var(--leading-tight);
+}
+
+/* ── Info-Card ─────────────────────────────────────────────────────────── */
+.detail-info {
+  margin-bottom: var(--space-4);
+}
+
+.detail-info__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+/* Trennlinie zwischen Rows (außer der letzten) */
+.detail-info__row:not(:last-child) {
+  border-bottom: 1px solid var(--color-slate-200);
+}
+
+.detail-info__icon {
+  font-size: var(--font-xl);
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.detail-info__label {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--color-slate-500);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.detail-info__value {
+  display: block;
+  font-size: var(--font-base);
+  color: var(--color-slate-800);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Telefon-Link */
+.detail-info__link {
+  color: var(--color-care);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.detail-info__link:hover {
+  color: var(--color-primary-700);
+  text-decoration: underline;
+}
+
+/* ── Notizen-Card ──────────────────────────────────────────────────────── */
+.detail-notes {
+  margin-bottom: var(--space-6);
+}
+
+.detail-notes__title {
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
+  margin: 0 0 var(--space-2);
+}
+
+.detail-notes__text {
+  font-size: var(--font-base);
+  color: var(--color-slate-600);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+/* ── Action-Buttons ────────────────────────────────────────────────────── */
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.detail-actions__row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* ── Loading-Center ────────────────────────────────────────────────────── */
+.detail-center {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}

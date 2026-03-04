@@ -1,49 +1,54 @@
 # AIVA Health - Entwicklungsfortschritt
-Stand: 02.03.2026
+Stand: 04.03.2026
 
-## Aktueller Branch: feat/basis-komponenten (2 Commits, noch nicht gemerged)
+## Aktueller Branch: feat/termine-anzeigen (noch nicht gemerged)
 
-## Abgeschlossene User Stories (alle in main gemerged und gepusht)
-- US-01 bis US-11 (Registrierung, Login, Logout, Session, Profil, DSGVO, Navigation, Dashboard, Tokens)
+## Abgeschlossene User Stories (in main)
+- US-01 bis US-12 (Registrierung, Login, Logout, Session, Profil, DSGVO, Navigation, Dashboard, Tokens, Basis-Komponenten)
 
-## US-12 Basis-Komponenten: IMPLEMENTIERT (noch nicht gemerged)
-Branch: feat/basis-komponenten
-Commits:
-- 9fc1e1f feat(US-12): add UI component library + migrate all pages
-- e9af395 refactor(US-12): migrate SummaryCard + QuickActions to UI primitives
+## US-13 Termine anzeigen: IMPLEMENTIERT (im Branch)
+- Prisma: Appointment-Modell, Migration, Seed (5 Beispieltermine)
+- Backend: GET /api/appointments (mit ?time, ?status, ?limit Filtern), GET /:id
+- Frontend: AppointmentList (Tabs: Anstehend/Verlauf), AppointmentCard, AppointmentDetail
+- Routing: /care, /care/appointments/:id
 
-### 8 UI-Komponenten in src/components/ui/ + src/styles/components/ui/
-1. Button (primary/secondary/ghost/danger/success, sm/md/lg, fullWidth, loading)
-2. Input (label + error + useId() Accessibility)
-3. Card (polymorphes "as" Prop, padding/shadow/accent care/coach/labs/family/success/danger)
-4. Badge (required/optional/info/warning)
-5. Spinner (inline sm/md/lg, role="status")
-6. Alert (error/success/info/warning, role="alert")
-7. PageHeader (title + subtitle) - Bonus
-8. PageContainer (maxWidth sm/md/lg) - Bonus
+## US-14 Termin-Detail: IMPLEMENTIERT (im Branch)
+- Phone-Feld ergänzt
+- AppointmentDetail als Komponente in components/care/
+- AppointmentDetailPage als dünner Wrapper
 
-### Alle 5 Pages migriert (dupliziertes CSS entfernt)
-- LoginPage: Button, Input, Alert, Card
-- ConsentPage: PageContainer, PageHeader, Card, Alert, Badge, Button
-- ProfilePage: PageContainer, PageHeader, Card, Alert, Input, Button, Spinner
-- PrivacySettingsPage: PageContainer, PageHeader, Alert, Badge, Card, Button, Spinner
-- DashboardPage: Alert, Button
+## US-15 Termin anlegen: IMPLEMENTIERT (im Branch)
+- Prisma: Doctor-Modell, Migration (add-doctors-table), Seed (8 Beispielärzte)
+- Backend: GET /api/doctors (doctor.controller + doctor.routes)
+- Backend: POST /api/appointments mit Validierung (Pflichtfelder, Datum nicht in Vergangenheit)
+- Frontend: AppointmentForm-Komponente (Arzt-Dropdown aus DB, Auto-Fill, Validation)
+- Frontend: AppointmentCreatePage (Wrapper), Route /care/new in App.jsx
+- AppointmentList: "+ Neuer Termin" Button ergänzt
 
-### Feature-Komponenten refactored
-- SummaryCard: Nutzt intern Card + Button (kein eigenes Card-CSS mehr)
-- QuickActions: Nutzt intern Button + CSS-Override (hardcodierte Farben gefixt)
-- GreetingCard, LoadingSpinner, AppLayout, NavItem, PrivateRoute: Nicht betroffen
+## Refactorings (im Branch, noch nicht committed):
+- AppHeader aus DashboardPage extrahiert → in AppLayout (global sichtbar)
+- /api/appointments/upcoming entfernt → ?time=upcoming&limit=3 reicht
+- AppointmentDetailPage → dünner Wrapper (Logik in AppointmentDetail-Komponente)
 
-### Noch zu tun
-- Branch in main mergen: git checkout main; git merge --no-ff feat/basis-komponenten
+## Codestruktur:
+### Backend
+- Prisma: User, Consent, Appointment, Doctor
+- Controller: auth, user, consent, appointment, doctor
+- Routes: auth, user, consent, appointment, doctor
+- server.js bindet alle unter /api/* ein
 
-## Nächste User Story: US-13 (Termine anzeigen) — Research DONE
-### Codebase-Stand für US-13 Planung:
-- Prisma Schema: NUR User + Consent. KEIN appointments Table vorhanden.
-- Backend: 3 Route-Dateien (auth, user, consent), 3 Controller, 1 Middleware (auth)
-- Server.js: Routes unter /api/auth, /api/users, /api/consents
-- Frontend Routing: /dashboard, /care, /labs, /coach, /family, /profile, /datenschutz
-- CarePage: Nur Platzhalter (🚧) in src/pages/modules/care/
-- DashboardPage: Header + Greeting + SummaryCards (hardcodiert) + QuickActions
-- SummaryCard: Generisch (icon, title, children, actionLabel, onAction, variant=care/coach/labs)
-- US-13 Tasks: TASK-48 (DB), TASK-49 (GET all), TASK-50 (GET upcoming 3), TASK-51 (AppointmentList), TASK-52 (AppointmentCard)
+### Frontend components/care/
+- AppointmentList.jsx (Tabs, API-Fetching)
+- AppointmentCard.jsx (einzelne Karte)
+- AppointmentDetail.jsx (Detail-Ansicht)
+- AppointmentForm.jsx (Create-Formular mit Arzt-Dropdown)
+
+### Frontend components/ (global)
+- AppHeader.jsx (Logo + Profil/Datenschutz/Logout)
+- AppLayout.jsx (Header + Main + BottomNav)
+
+### Nächste User Story: US-16 (Termin bearbeiten & löschen)
+- TASK-59: PUT /api/appointments/:id
+- TASK-60: DELETE /api/appointments/:id (Soft Delete)
+- TASK-61: Edit-Formular (AppointmentForm wiederverwenden)
+- TASK-62: ConfirmDialog-Komponente

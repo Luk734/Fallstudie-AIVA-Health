@@ -5,9 +5,9 @@
 // kommt aus dem JWT-Token (req.user.userId).
 //
 // Endpunkte:
-//   GET /api/appointments          → Alle Termine (mit Filtern)
-//   GET /api/appointments/upcoming → Nächste N Termine (für Dashboard)
-//   GET /api/appointments/:id      → Einzelner Termin (Detail-Ansicht)
+//   GET  /api/appointments          → Alle Termine (mit Filtern + optionalem Limit)
+//   GET  /api/appointments/:id      → Einzelner Termin (Detail-Ansicht)
+//   POST /api/appointments          → Neuen Termin erstellen (US-15)
 
 import prisma from '../config/prisma.js';
 
@@ -18,6 +18,8 @@ import prisma from '../config/prisma.js';
 //   ?time=upcoming  → nur zukünftige Termine (datetime >= jetzt)
 //   ?time=past      → nur vergangene Termine (datetime < jetzt)
 //   ?status=scheduled|completed|cancelled → nach Status filtern
+//   ?limit=N        → Maximal N Ergebnisse zurückgeben (max 50)
+//                     Nützlich z.B. für das Dashboard: ?time=upcoming&limit=3
 //
 // Sortierung:
 //   upcoming → aufsteigend (nächster Termin zuerst)
@@ -26,7 +28,7 @@ import prisma from '../config/prisma.js';
 
 export async function getAppointments(req, res) {
   try {
-    const { time, status } = req.query;
+    const { time, status, limit } = req.query;
 
     // ── Filter aufbauen ─────────────────────────────────────────────
     // where-Objekt wird dynamisch zusammengebaut.
@@ -54,9 +56,16 @@ export async function getAppointments(req, res) {
       ? { datetime: 'desc' }
       : { datetime: 'asc' };
 
+    // ── Optionales Limit ────────────────────────────────────────────
+    // Wenn ?limit=N gesetzt ist, werden nur N Ergebnisse zurückgegeben.
+    // Das nutzt z.B. das Dashboard: ?time=upcoming&limit=3
+    // Ohne limit: alle Treffer (z.B. für die vollständige Termin-Liste).
+    const take = limit ? Math.min(parseInt(limit) || 50, 50) : undefined;
+
     const appointments = await prisma.appointment.findMany({
       where,
       orderBy,
+      ...(take && { take }),
       // Wir geben nur die Felder zurück, die das Frontend braucht.
       // passwordHash o.Ä. von der User-Relation wird nicht mit-gesendet.
       select: {
@@ -75,48 +84,6 @@ export async function getAppointments(req, res) {
     return res.json({ appointments });
   } catch (error) {
     console.error('getAppointments error:', error);
-    return res.status(500).json({ error: 'Termine konnten nicht geladen werden.' });
-  }
-}
-
-// ─── GET /api/appointments/upcoming ─────────────────────────────────────
-// Spezieller Endpunkt für das Dashboard: gibt die nächsten N anstehenden
-// Termine zurück (Standard: 3).
-//
-// Query-Parameter:
-//   ?limit=3 (Standard) → Anzahl der zurückgegebenen Termine
-//
-// Nur Termine mit status="scheduled" und datetime >= jetzt werden berücksichtigt.
-// Sortierung: aufsteigend (nächster Termin zuerst).
-
-export async function getUpcomingAppointments(req, res) {
-  try {
-    // limit aus Query lesen, Standard = 3, max = 10
-    const limit = Math.min(parseInt(req.query.limit) || 3, 10);
-
-    const appointments = await prisma.appointment.findMany({
-      where: {
-        userId: req.user.userId,
-        datetime: { gte: new Date() },
-        status: 'scheduled',
-      },
-      orderBy: { datetime: 'asc' },
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        doctor: true,
-        phone: true,
-        location: true,
-        datetime: true,
-        notes: true,
-        status: true,
-      },
-    });
-
-    return res.json({ appointments });
-  } catch (error) {
-    console.error('getUpcomingAppointments error:', error);
     return res.status(500).json({ error: 'Termine konnten nicht geladen werden.' });
   }
 }
@@ -167,5 +134,88 @@ export async function getAppointmentById(req, res) {
   } catch (error) {
     console.error('getAppointmentById error:', error);
     return res.status(500).json({ error: 'Termin konnte nicht geladen werden.' });
+  }
+}
+
+// ─── POST /api/appointments ───────────────────────────────────────────
+// Erstellt einen neuen Termin für den eingeloggten User (US-15).
+//
+// Request-Body:
+//   { title, doctor, phone?, location, datetime, notes? }
+//
+// Validierung:
+//   - Pflichtfelder: title (2–100 Zeichen), doctor, location, datetime
+//   - Datum darf nicht in der Vergangenheit liegen
+//   - status wird automatisch auf "scheduled" gesetzt
+//
+// Response: 201 Created + das erstellte Termin-Objekt
+
+export async function createAppointment(req, res) {
+  try {
+    const { title, doctor, phone, location, datetime, notes } = req.body;
+
+    // ── Pflichtfelder prüfen ────────────────────────────────────────────
+    const errors = [];
+
+    if (!title || typeof title !== 'string' || title.trim().length < 2) {
+      errors.push('Titel muss mindestens 2 Zeichen lang sein.');
+    }
+    if (title && title.trim().length > 100) {
+      errors.push('Titel darf maximal 100 Zeichen lang sein.');
+    }
+    if (!doctor || typeof doctor !== 'string' || !doctor.trim()) {
+      errors.push('Arzt/Praxis ist ein Pflichtfeld.');
+    }
+    if (!location || typeof location !== 'string' || !location.trim()) {
+      errors.push('Ort ist ein Pflichtfeld.');
+    }
+    if (!datetime) {
+      errors.push('Datum & Uhrzeit ist ein Pflichtfeld.');
+    }
+
+    // ── Datum validieren ────────────────────────────────────────────────
+    if (datetime) {
+      const parsedDate = new Date(datetime);
+      if (isNaN(parsedDate.getTime())) {
+        errors.push('Ungültiges Datumsformat.');
+      } else if (parsedDate < new Date()) {
+        errors.push('Der Termin darf nicht in der Vergangenheit liegen.');
+      }
+    }
+
+    // ── Bei Fehlern: 400 Bad Request ───────────────────────────────────
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+
+    // ── Termin erstellen ────────────────────────────────────────────────
+    const appointment = await prisma.appointment.create({
+      data: {
+        userId: req.user.userId,
+        title: title.trim(),
+        doctor: doctor.trim(),
+        phone: phone?.trim() || null,
+        location: location.trim(),
+        datetime: new Date(datetime),
+        notes: notes?.trim() || null,
+        status: 'scheduled',
+      },
+      select: {
+        id: true,
+        title: true,
+        doctor: true,
+        phone: true,
+        location: true,
+        datetime: true,
+        notes: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    return res.status(201).json({ appointment });
+  } catch (error) {
+    console.error('createAppointment error:', error);
+    return res.status(500).json({ error: 'Termin konnte nicht erstellt werden.' });
   }
 }

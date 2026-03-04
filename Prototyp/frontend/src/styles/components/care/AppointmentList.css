@@ -1,10 +1,16 @@
-/* src/styles/components/care/AppointmentList.css — Termin-Liste (US-13, TASK-51)
+/* src/styles/components/care/AppointmentList.css — Termin-Liste (US-13, US-15)
  *
  * Layout für die Termin-Übersichtsseite:
+ *   - "Neuer Termin" Button (US-15)
  *   - Tab-Navigation (Anstehend / Verlauf)
  *   - Karten-Liste mit vertikalem Stack
  *   - Zentrierter Loading-State
  */
+
+/* ── Neuer-Termin-Button (US-15) ───────────────────────────────────────── */
+.appointment-list__create-btn {
+  margin-bottom: var(--space-4);
+}
 
 /* ── Tab-Navigation ────────────────────────────────────────────────────── */
 .appointment-tabs {

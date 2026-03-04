@@ -25,12 +25,18 @@
 //       <DashboardPage />    ← das ist children
 //     </AppLayout>
 
+import AppHeader from './AppHeader';
 import NavItem from './NavItem';
 import '../styles/components/AppLayout.css';
 
 export default function AppLayout({ children }) {
   return (
     <div className="app-layout">
+      {/* ── App-Header: Logo + Profil/Datenschutz/Logout ─────────────── */}
+      {/* Erscheint auf JEDER geschützten Seite (wie die Bottom-Nav).    */}
+      {/* Vorher war der Header nur in DashboardPage eingebettet.        */}
+      <AppHeader />
+
       {/* ── Hauptbereich: Hier erscheint die aktuelle Seite ──────────── */}
       {/* flex: 1 → nimmt den gesamten Platz ein, der nicht von der Nav   */}
       {/* belegt wird. overflow-y: auto → scrollbar bei langem Inhalt.    */}

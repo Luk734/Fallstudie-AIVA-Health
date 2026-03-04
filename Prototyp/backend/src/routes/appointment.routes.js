@@ -1,4 +1,4 @@
-// src/routes/appointment.routes.js — Termin-Endpunkte (US-13)
+// src/routes/appointment.routes.js — Termin-Endpunkte (US-13, US-14, US-15)
 //
 // Router-Pattern (wie bei auth/user/consent Routes):
 //   1. Express-Router erstellen
@@ -9,33 +9,29 @@
 // ALLE Routen sind durch authenticateToken geschützt.
 // Der User muss eingeloggt sein, damit seine Termine seiner userId
 // zugeordnet werden können.
-//
-// WICHTIG: Die Reihenfolge der Routen zählt!
-// /upcoming MUSS vor /:id definiert werden, sonst interpretiert Express
-// "upcoming" als :id-Parameter.
 
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 import {
   getAppointments,
-  getUpcomingAppointments,
   getAppointmentById,
+  createAppointment,
 } from '../controllers/appointment.controller.js';
 
 const router = Router();
 
-// ── GET /api/appointments/upcoming ──────────────────────────────────────
-// Dashboard-Endpunkt: Nächste 3 (oder N) anstehende Termine.
-// MUSS vor der allgemeinen Route stehen (sonst matcht /:id zuerst).
-router.get('/upcoming', authenticateToken, getUpcomingAppointments);
+// ── POST /api/appointments ───────────────────────────────────────────
+// Neuen Termin erstellen (US-15).
+router.post('/', authenticateToken, createAppointment);
 
 // ── GET /api/appointments/:id ───────────────────────────────────────────
 // Detail-Ansicht eines einzelnen Termins (US-14).
-// MUSS nach /upcoming stehen, damit "upcoming" nicht als :id interpretiert wird.
 router.get('/:id', authenticateToken, getAppointmentById);
 
 // ── GET /api/appointments ───────────────────────────────────────────────
-// Alle Termine des Users (mit optionalen Filtern: time, status).
+// Alle Termine des Users (mit optionalen Filtern: time, status, limit).
+// Dashboard nutzt: ?time=upcoming&limit=3
+// Care-Liste nutzt: ?time=upcoming oder ?time=past
 router.get('/', authenticateToken, getAppointments);
 
 export default router;

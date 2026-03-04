@@ -129,3 +129,26 @@ model Appointment {
 
   @@map("appointments")
 }
+
+// ─── EPIC-02 / US-15: Ärzte-Datenbank ────────────────────────────────────
+// Tabelle: doctors
+// Speichert eine Liste von Ärzten/Praxen, die beim Erstellen eines Termins
+// als Vorauswahl angeboten werden ("Mock-Doctolib").
+//
+// Beim Termin-Anlegen wählt der User einen Arzt aus der Liste →
+// Telefon + Ort werden automatisch ins Formular eingetragen.
+// Der User kann die Daten aber auch manuell überschreiben.
+//
+// Im MVP sind die Ärzte vorbefüllt per Seed-Daten.
+// Später könnte hier eine echte Doctolib-API angebunden werden.
+
+model Doctor {
+  id        Int      @id @default(autoincrement())
+  name      String                              // "Dr. Sarah Müller"
+  specialty String                              // "Hausärztin", "Zahnarzt", etc.
+  phone     String?                             // "0711 / 123 456"
+  location  String                              // "Praxis Müller, Königstr. 42, Stuttgart"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("doctors")
+}
