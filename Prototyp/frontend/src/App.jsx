@@ -46,6 +46,8 @@ import AppointmentDetailPage from './pages/modules/care/AppointmentDetailPage';
 import AppointmentCreatePage from './pages/modules/care/AppointmentCreatePage';
 import AppointmentEditPage from './pages/modules/care/AppointmentEditPage';
 import LabsPage from './pages/modules/labs/LabsPage';
+import MedicationCreatePage from './pages/modules/labs/MedicationCreatePage';
+import MedicationEditPage from './pages/modules/labs/MedicationEditPage';
 import CoachPage from './pages/modules/coach/CoachPage';
 import FamilyPage from './pages/modules/family/FamilyPage';
 
@@ -180,6 +182,30 @@ export default function App() {
               <PrivateRoute>
                 <AppLayout>
                   <LabsPage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Labs — Neues Medikament erstellen (US-19) */}
+          <Route
+            path="/labs/medications/new"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <MedicationCreatePage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Labs — Medikament bearbeiten (US-19) */}
+          <Route
+            path="/labs/medications/:id/edit"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <MedicationEditPage />
                 </AppLayout>
               </PrivateRoute>
             }

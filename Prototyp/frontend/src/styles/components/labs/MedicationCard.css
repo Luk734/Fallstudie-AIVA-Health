@@ -1,0 +1,110 @@
+/* src/styles/components/labs/MedicationCard.css — Medikamenten-Karte (US-19, TASK-76)
+ *
+ * Layout einer einzelnen Medikamenten-Karte.
+ * Die Card-Basis-Styles (bg, radius, shadow) kommen von <Card>.
+ * Hier regeln wir:
+ *   - Farbiger linker Streifen (Medikament-Farbe)
+ *   - Interne Abstände
+ *   - Header-Layout (Name vs. Dosierung)
+ *   - Einnahmezeit-Badges
+ *   - Aktions-Buttons
+ */
+
+/* ── Karte: Position für den absolut platzierten Farbstreifen ───────── */
+.medication-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Farbstreifen links (4px breit) ─────────────────────────────────── 
+ * Nutzt die CSS Custom Property --med-color, die per style-Prop gesetzt wird.
+ * So kann jedes Medikament seine eigene Farbe haben.
+ */
+.medication-card__color-stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: var(--med-color, var(--color-labs));
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+/* ── Inhalt: Nach rechts verschoben wegen Farbstreifen ──────────────── */
+.medication-card__content {
+  padding-left: var(--space-3);
+}
+
+/* ── Header: Name + Dosierung nebeneinander ─────────────────────────── */
+.medication-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+/* Medikament-Name */
+.medication-card__name {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-800);
+  margin: 0;
+  line-height: var(--leading-tight);
+}
+
+/* Wirkstoff (kleiner, unter dem Namen) */
+.medication-card__substance {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--color-slate-500);
+  margin-top: 2px;
+}
+
+/* Dosierung (rechts) */
+.medication-card__dosage {
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-labs);
+  white-space: nowrap;
+}
+
+/* ── Einnahmezeiten: Badge-Reihe ────────────────────────────────────── */
+.medication-card__times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+/* Emoji in den Badges etwas größer */
+.medication-card__time-emoji {
+  font-size: 1rem;
+}
+
+/* ── Datums-Bereich ─────────────────────────────────────────────────── */
+.medication-card__dates {
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+  margin-bottom: var(--space-3);
+}
+
+/* ── Notizen ────────────────────────────────────────────────────────── */
+.medication-card__notes {
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  background-color: var(--color-slate-50);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  margin: 0 0 var(--space-3);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Aktions-Buttons ────────────────────────────────────────────────── */
+.medication-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

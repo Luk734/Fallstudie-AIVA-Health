@@ -13,6 +13,7 @@ import appointmentRoutes from './src/routes/appointment.routes.js';
 import doctorRoutes from './src/routes/doctor.routes.js';
 import preventionRoutes from './src/routes/prevention.routes.js';
 import notificationRoutes from './src/routes/notification.routes.js';
+import medicationRoutes from './src/routes/medication.routes.js';
 import { startReminderCron } from './src/config/cron.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
@@ -78,6 +79,11 @@ app.use('/api/prevention', preventionRoutes);
 // PATCH /read-all = Alle als gelesen markieren
 // PATCH /:id/read = Eine als gelesen markieren
 app.use('/api/notifications', notificationRoutes);
+
+// Medication-Routen: Medikamentenverwaltung unter /api/medications/* (US-19)
+// GET / = Alle aktiven Medikamente, POST / = Neues Medikament
+// GET /:id = Detail, PUT /:id = Bearbeiten, PATCH /:id/deactivate = Absetzen
+app.use('/api/medications', medicationRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

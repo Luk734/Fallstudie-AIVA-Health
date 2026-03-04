@@ -60,6 +60,12 @@ model User {
   // Benachrichtigungstypen (Medikamente etc.) verwendet.
   notifications Notification[]
 
+  // ── Relation zu Medications (US-19) ────────────────────────
+  // Ein User kann mehrere Medikamente verwalten (1:N).
+  // Jedes Medikament hat Dosierung, Einnahmezeiten und einen
+  // aktiv/inaktiv-Status (Soft-Delete beim Absetzen).
+  medications  Medication[]
+
   @@map("users")
 }
 
@@ -272,4 +278,51 @@ model Notification {
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("notifications")
+}
+
+// ─── EPIC-03 / US-19: Medikamenten-Liste ─────────────────────────────────
+// Tabelle: medications
+// Speichert die Medikamente eines Nutzers mit Dosierung und Einnahmezeiten.
+//
+// Thomas (56, Bluthochdruck) nimmt täglich Ramipril, Amlodipin und ASS.
+// Jedes Medikament hat:
+//   - Dosierung ("5mg")
+//   - Einnahmezeiten als komma-separierter String ("morgens,abends")
+//   - Farbcode für visuelle Erkennung auf der Karte
+//   - active-Flag statt echtem Löschen (DSGVO: Daten nachvollziehbar)
+//
+// Warum times als String statt String[]?
+//   Prisma's Array-Support hat Einschränkungen bei Filtern.
+//   Ein komma-separierter String ("morgens,abends") ist im MVP
+//   einfacher und wird im Frontend per split(',') zum Array.
+//
+// active-Flag (Soft-Delete):
+//   false = Medikament wurde abgesetzt → wird nicht mehr in der aktiven
+//   Liste angezeigt, bleibt aber in der DB für die Einnahme-Historie.
+//   Das ist DSGVO-konform: Medizinische Daten dürfen nicht einfach
+//   gelöscht werden, solange der Nutzer sie nicht explizit löschen lässt.
+
+model Medication {
+  id          Int       @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Medikamenten-Daten ─────────────────────────────────────
+  name        String                              // "Ramipril"
+  substance   String?                             // Wirkstoff-Gruppe: "ACE-Hemmer" (optional)
+  dosage      String                              // "5mg"
+  times       String                              // Komma-separiert: "morgens,abends"
+  startDate   DateTime  @map("start_date")        // Ab wann eingenommen
+  endDate     DateTime? @map("end_date")          // Bis wann (null = dauerhaft)
+  color       String    @default("#4F46E5")       // Farbcode für visuelle Erkennung
+  leafletUrl  String?   @map("leaflet_url")       // Link zum Beipackzettel (optional)
+  active      Boolean   @default(true)             // true = aktiv, false = abgesetzt
+  notes       String?                             // Optionale Notizen
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("medications")
 }
