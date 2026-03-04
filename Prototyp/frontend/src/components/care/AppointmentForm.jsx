@@ -19,7 +19,7 @@
 //   PageContainer, PageHeader, Card, Input, Button, Alert, Spinner
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import PageContainer from '../ui/PageContainer';
 import PageHeader from '../ui/PageHeader';
@@ -36,6 +36,12 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 export default function AppointmentForm({ appointment: existingAppointment }) {
   const navigate = useNavigate();
   const { token } = useAuth();
+
+  // ── Query-Parameter lesen (Vorsorge → Termin-Verknüpfung) ──────────
+  // Wenn der User von PreventionCard "📅 Termin anlegen" klickt, wird
+  // die Vorsorge-Bezeichnung als ?title=... übergeben und hier vorausgefüllt.
+  const [searchParams] = useSearchParams();
+  const titleFromQuery = searchParams.get('title') || '';
 
   // ── Edit-Modus erkennen ─────────────────────────────────────────────
   // Wenn ein appointment-Prop übergeben wird, sind wir im Edit-Modus.
@@ -60,7 +66,7 @@ export default function AppointmentForm({ appointment: existingAppointment }) {
   const initial = isEditMode ? extractDateAndTime(existingAppointment.datetime) : { date: '', time: '' };
 
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
-  const [title, setTitle] = useState(isEditMode ? existingAppointment.title : '');
+  const [title, setTitle] = useState(isEditMode ? existingAppointment.title : titleFromQuery);
   const [doctor, setDoctor] = useState(isEditMode ? existingAppointment.doctor : '');
   const [phone, setPhone] = useState(isEditMode ? (existingAppointment.phone || '') : '');
   const [location, setLocation] = useState(isEditMode ? existingAppointment.location : '');
