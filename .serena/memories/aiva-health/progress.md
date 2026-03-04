@@ -46,7 +46,7 @@ Commit: feat(US-17): Vorsorge-Kalender mit GKV-Leistungskatalog
 - PATCH /api/prevention/:id/status (JWT) → Status toggle
 
 ### Frontend-Routes:
-/care/prevention → PreventionPage (Vorsorge-Kalender)
+/care → CarePage (Termine + Vorsorge unified, KEIN separater PreventionPage mehr)
 
 ## Codestruktur (aktualisiert)
 ### Backend Models: User, Consent, Appointment, Doctor, PreventionSchedule, UserPrevention
@@ -54,9 +54,11 @@ Commit: feat(US-17): Vorsorge-Kalender mit GKV-Leistungskatalog
 ### Backend Routes: auth, user, consent, appointment, doctor, prevention
 
 ### Frontend components/care/:
-AppointmentList, AppointmentCard, AppointmentDetail, AppointmentForm, PreventionCard
+AppointmentCard, AppointmentDetail, AppointmentForm, PreventionCard
+(AppointmentList GELÖSCHT — Logik in CarePage integriert)
 
 ### Frontend pages/modules/care/:
-CarePage, AppointmentDetailPage, AppointmentCreatePage, AppointmentEditPage, PreventionPage
+CarePage (unified: Termine + Vorsorge), AppointmentDetailPage, AppointmentCreatePage, AppointmentEditPage
+(PreventionPage GELÖSCHT — Logik in CarePage integriert)
 
 ## Naechste User Story: US-18 (Termin-Erinnerungen)

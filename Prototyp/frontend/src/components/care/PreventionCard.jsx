@@ -20,7 +20,6 @@
 //   loading (boolean) — Wird gerade gespeichert? (Button deaktivieren)
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
@@ -65,7 +64,6 @@ function formatDate(isoString) {
 export default function PreventionCard({ prevention, onToggleStatus, loading }) {
   const { type, description, frequencyMonths, userPreventionId, status, completedAt } = prevention;
   const statusConfig = STATUS_CONFIG[status] || STATUS_CONFIG.open;
-  const navigate = useNavigate();
 
   // ── ConfirmDialog State ─────────────────────────────────────────────
   const [showConfirm, setShowConfirm] = useState(false);
@@ -84,11 +82,6 @@ export default function PreventionCard({ prevention, onToggleStatus, loading }) 
   function handleConfirm() {
     setShowConfirm(false);
     onToggleStatus(userPreventionId, newStatus);
-  }
-
-  // "Termin anlegen" → Navigation zur Termin-Erstellung mit vorausgefülltem Titel
-  function handleCreateAppointment() {
-    navigate(`/care/new?title=${encodeURIComponent(type)}`);
   }
 
   // ── CSS-Klasse für erledigte Karten (grüner Schimmer) ──────────────
@@ -123,7 +116,7 @@ export default function PreventionCard({ prevention, onToggleStatus, loading }) 
         )}
       </div>
 
-      {/* ── Actions: Status + Termin anlegen ─────────────────────── */}
+      {/* ── Action: Status umschalten ────────────────────────────── */}
       <div className="prevention-card__action">
         <Button
           variant={status === 'completed' ? 'secondary' : 'success'}
@@ -133,17 +126,6 @@ export default function PreventionCard({ prevention, onToggleStatus, loading }) 
         >
           {buttonLabel}
         </Button>
-
-        {/* Termin anlegen — verknüpft Vorsorge mit Care-Terminkalender */}
-        {status === 'open' && (
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleCreateAppointment}
-          >
-            📅 Termin anlegen
-          </Button>
-        )}
       </div>
 
       {/* ── ConfirmDialog: Bestätigung vor Status-Änderung ────────── */}
