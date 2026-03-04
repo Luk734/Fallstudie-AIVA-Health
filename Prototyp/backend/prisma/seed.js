@@ -440,6 +440,76 @@ async function main() {
     console.log(`   ✅ Vorsorge ${u.firstName}: ${userPreventionCount} passende Einträge (Alter ${age}, ${u.gender})`);
   }
 
+  // ── US-19: Test-Medikamente für Thomas ─────────────────────────────
+  // Thomas hat Bluthochdruck und nimmt 3 Medikamente.
+  // So hat die LabsPage beim Login als Thomas sofort echte Daten.
+  //
+  // Zuerst alle bestehenden Medikamente löschen (idempotenter Seed).
+  await prisma.medication.deleteMany({});
+
+  const thomasMedications = [
+    {
+      userId: user2.id,
+      name: 'Ramipril',
+      substance: 'Ramipril',
+      dosage: '5 mg',
+      times: 'morgens',           // 1x morgens
+      color: '#3B82F6',           // Blau
+      startDate: new Date('2024-06-15'),
+      endDate: null,              // Dauermedikation
+      active: true,
+      notes: 'ACE-Hemmer gegen Bluthochdruck. Nüchtern einnehmen.',
+    },
+    {
+      userId: user2.id,
+      name: 'Amlodipin',
+      substance: 'Amlodipin',
+      dosage: '10 mg',
+      times: 'abends',           // 1x abends
+      color: '#8B5CF6',           // Violett
+      startDate: new Date('2024-06-15'),
+      endDate: null,
+      active: true,
+      notes: 'Kalziumkanalblocker. Ergänzend zu Ramipril.',
+    },
+    {
+      userId: user2.id,
+      name: 'ASS',
+      substance: 'Acetylsalicylsäure',
+      dosage: '100 mg',
+      times: 'morgens',           // 1x morgens
+      color: '#EF4444',           // Rot
+      startDate: new Date('2025-01-10'),
+      endDate: null,
+      active: true,
+      notes: 'Blutverdünner zur Herzinfarkt-Vorbeugung.',
+    },
+  ];
+
+  for (const med of thomasMedications) {
+    await prisma.medication.create({ data: med });
+  }
+
+  console.log(`   ✅ Medikamente Thomas: ${thomasMedications.length} Einträge`);
+
+  // Auch Laura bekommt 1 Medikament (für den zweiten Test-User)
+  await prisma.medication.create({
+    data: {
+      userId: user.id,
+      name: 'Ibuprofen',
+      substance: 'Ibuprofen',
+      dosage: '400 mg',
+      times: 'morgens,abends',    // 2x täglich
+      color: '#F97316',           // Orange
+      startDate: new Date('2026-02-20'),
+      endDate: new Date('2026-03-20'),  // Temporär (1 Monat)
+      active: true,
+      notes: 'Bei Bedarf gegen Kopfschmerzen. Max. 3x täglich.',
+    },
+  });
+
+  console.log('   ✅ Medikamente Laura: 1 Eintrag');
+
   // ── US-18: Test-Benachrichtigungen (Termin-Erinnerungen) ────────────
   // Erstelle einige Beispiel-Notifications für Laura, damit beim
   // ersten Login sofort etwas in der Benachrichtigungs-Ansicht sichtbar ist.

@@ -1,0 +1,164 @@
+/* src/styles/components/labs/MedicationForm.css — Medikamenten-Formular (US-19)
+ *
+ * Styling für das Formular zum Erstellen/Bearbeiten von Medikamenten.
+ * Besondere Elemente: Einnahmezeit-Buttons und Farbwahl-Kreise.
+ */
+
+/* ── Zweispaltige Zeile ───────────────────────────────────────────────
+ * Name+Dosierung und Start+Enddatum stehen nebeneinander.
+ * Auf kleinen Bildschirmen (< 480px) untereinander (flex-wrap).
+ */
+.medication-form__row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Jedes Kind in der Reihe bekommt mindestens 200px Breite,
+ * wächst aber auf den verfügbaren Platz (flex: 1). */
+.medication-form__row > * {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ── Formular-Sektion (Label + Inhalt) ────────────────────────────────
+ * Für Einnahmezeiten, Farbwahl und Notizen — die kein <Input> nutzen.
+ */
+.medication-form__section {
+  margin-bottom: var(--space-4);
+}
+
+/* Label-Stil (gleich wie in den Input-Komponenten) */
+.medication-form__label {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-slate-600);
+  margin-bottom: var(--space-2);
+}
+
+/* ── Einnahmezeiten: Button-Grid ──────────────────────────────────────
+ * 4 Buttons (Morgens, Mittags, Abends, Nachts) in einer Reihe.
+ * Auf kleinen Bildschirmen 2x2.
+ */
+.medication-form__times {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+@media (max-width: 480px) {
+  .medication-form__times {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Einzelner Einnahmezeit-Button ────────────────────────────────────
+ * Standard: Grauer Rand, weißer Hintergrund.
+ * Aktiv: Primary-Farbe Hintergrund, weißer Text.
+ * min-height: 48px → Touch-Target (WCAG, Thomas' große Finger).
+ */
+.medication-form__time-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  min-height: var(--min-touch-target);
+  border: 2px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  background-color: white;
+  color: var(--color-slate-600);
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.medication-form__time-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Aktiver Zustand: Ausgewählte Einnahmezeit */
+.medication-form__time-btn--active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.medication-form__time-btn--active:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: white;
+}
+
+/* Emoji etwas größer */
+.medication-form__time-emoji {
+  font-size: 1.1rem;
+}
+
+/* ── Farbwahl: Kreise ─────────────────────────────────────────────────
+ * 6 farbige Kreise in einer Reihe.
+ */
+.medication-form__colors {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Einzelner Farbkreis */
+.medication-form__color-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.medication-form__color-btn:hover {
+  transform: scale(1.15);
+}
+
+/* Ausgewählter Farbkreis: Ring drumherum */
+.medication-form__color-btn--selected {
+  border-color: var(--color-slate-800);
+  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-slate-400);
+}
+
+/* ── Textarea (Notizen) ───────────────────────────────────────────────
+ * Gleicher Stil wie die Input-Felder, aber mehrzeilig.
+ */
+.medication-form__textarea {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-family: inherit;
+  color: var(--color-slate-800);
+  background-color: white;
+  resize: vertical;
+  transition: border-color var(--transition-normal);
+}
+
+.medication-form__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.medication-form__textarea::placeholder {
+  color: var(--color-slate-400);
+}
+
+/* ── Action-Buttons (Abbrechen + Submit) ──────────────────────────────
+ * Rechts ausgerichtet, mit Abstand zueinander.
+ */
+.medication-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}

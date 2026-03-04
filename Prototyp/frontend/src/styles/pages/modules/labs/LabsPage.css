@@ -1,42 +1,95 @@
-/* src/styles/pages/modules/labs/LabsPage.css — Labs-Platzhalter (US-11 Tokens) */
+/* src/styles/pages/modules/labs/LabsPage.css — AIVA Labs: Medikamenten-Liste (US-19)
+ *
+ * Die Seite nutzt PageContainer + PageHeader (UI-Primitives) für
+ * das Grundlayout. Hier werden nur die Labs-spezifischen Styles definiert:
+ *   - Aktions-Leiste (Button-Reihe oben)
+ *   - Medikamenten-Grid
+ *   - Leerer Zustand
+ *   - Platzhalter für kommende Features
+ *   - Sektions-Titel
+ */
 
-.labs-page {
+/* ── Aktions-Leiste (Hinzufügen + Filter) ──────────────────────────── */
+.labs-page__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+/* ── Spinner-Container (zentriert) ─────────────────────────────────── */
+.labs-page__spinner {
   display: flex;
   justify-content: center;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-8) 0;
 }
 
-.labs-container {
-  max-width: var(--max-width-page);
-  width: 100%;
+/* ── Leerer Zustand ────────────────────────────────────────────────── */
+.labs-page__empty {
   text-align: center;
-}
-
-.labs-heading {
-  font-size: var(--font-2xl);
-  color: var(--color-slate-800);
-  margin-bottom: var(--space-2);
-}
-
-.labs-description {
-  color: var(--color-slate-600);
-  font-size: var(--font-base);
-  margin-bottom: var(--space-8);
-}
-
-.labs-placeholder {
-  background: var(--color-labs-light);
+  padding: var(--space-8) var(--space-4);
+  background-color: var(--color-slate-50);
   border-radius: var(--radius-lg);
-  padding: var(--space-8);
 }
 
-.labs-placeholder-icon {
-  font-size: 2.5rem;
+.labs-page__empty-icon {
+  font-size: 3rem;
   display: block;
   margin-bottom: var(--space-3);
 }
 
-.labs-placeholder p {
+.labs-page__empty p {
   color: var(--color-slate-500);
   font-size: var(--font-base);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Sektionen (Aktive / Deaktivierte / Platzhalter) ──────────────── */
+.labs-page__section {
+  margin-bottom: var(--space-8);
+}
+
+.labs-page__section--inactive {
+  opacity: 0.7;
+}
+
+.labs-page__section-title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Medikamenten-Grid (1 Spalte, Karten untereinander) ────────────── */
+.labs-page__grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Platzhalter-Box (für kommende Features) ───────────────────────── */
+.labs-page__placeholder {
+  border-top: 1px solid var(--color-slate-200);
+  padding-top: var(--space-6);
+}
+
+.labs-page__placeholder-box {
+  background: var(--color-labs-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.labs-page__placeholder-box span {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.labs-page__placeholder-box p {
+  color: var(--color-slate-500);
+  font-size: var(--font-sm);
+  margin: 0;
 }
