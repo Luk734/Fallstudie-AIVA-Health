@@ -22,6 +22,7 @@
 //   /dashboard     → AppLayout > DashboardPage (geschützt, MIT Navigation)
 //   /profile       → AppLayout > ProfilePage (geschützt, MIT Navigation)
 //   /datenschutz   → AppLayout > PrivacySettingsPage (geschützt, MIT Navigation)
+//   /notifications → AppLayout > NotificationsPage (geschützt, MIT Navigation)
 //   /care          → AppLayout > CarePage (geschützt, MIT Navigation)
 //   /labs          → AppLayout > LabsPage (geschützt, MIT Navigation)
 //   /coach         → AppLayout > CoachPage (geschützt, MIT Navigation)
@@ -34,10 +35,11 @@ import AppLayout from './components/AppLayout';
 // Auth-Pages (Login, Onboarding)
 import LoginPage from './pages/auth/LoginPage';
 import ConsentPage from './pages/auth/ConsentPage';
-// Core-Pages (Dashboard, Profil, Datenschutz)
+// Core-Pages (Dashboard, Profil, Datenschutz, Benachrichtigungen)
 import DashboardPage from './pages/core/DashboardPage';
 import ProfilePage from './pages/core/ProfilePage';
 import PrivacySettingsPage from './pages/core/PrivacySettingsPage';
+import NotificationsPage from './pages/core/NotificationsPage';
 // Modul-Pages (Care, Labs, Coach, Family)
 import CarePage from './pages/modules/care/CarePage';
 import AppointmentDetailPage from './pages/modules/care/AppointmentDetailPage';
@@ -106,6 +108,18 @@ export default function App() {
               <PrivateRoute>
                 <AppLayout>
                   <PrivacySettingsPage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* Benachrichtigungen (US-18) — Termin-Erinnerungen */}
+          <Route
+            path="/notifications"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <NotificationsPage />
                 </AppLayout>
               </PrivateRoute>
             }

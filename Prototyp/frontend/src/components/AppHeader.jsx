@@ -2,7 +2,7 @@
 //
 // Dezente Leiste oben auf JEDER geschützten Seite:
 //   Links:  App-Logo + Name ("🩺 AIVA Health")
-//   Rechts: Profil (👤), Datenschutz (🔒), Logout (🚪)
+//   Rechts: Profil (👤), Benachrichtigungen (🔔), Datenschutz (🔒), Logout (🚪)
 //
 // Vorher war dieser Header NUR in DashboardPage.jsx eingebettet.
 // Problem: Auf allen anderen Seiten (/care, /labs, /coach, /family, /profile)
@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ConfirmDialog from './ui/ConfirmDialog';
+import NotificationBell from './NotificationBell';
 import '../styles/components/AppHeader.css';
 
 export default function AppHeader() {
@@ -58,6 +59,8 @@ export default function AppHeader() {
             <span>👤</span>
           )}
         </button>
+        {/* Benachrichtigungen: Glocke mit Badge-Zähler (US-18) */}
+        <NotificationBell />
         {/* Datenschutz-Einstellungen */}
         <button
           className="app-header__btn"

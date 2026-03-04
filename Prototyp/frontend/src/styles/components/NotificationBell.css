@@ -1,0 +1,69 @@
+/* src/styles/components/NotificationBell.css — Glocke mit Badge (US-18)
+ *
+ * Die Glocke sitzt im AppHeader neben den anderen Action-Buttons.
+ * Der Badge ist ein kleiner roter Kreis mit der Anzahl ungelesener
+ * Benachrichtigungen — positioniert oben-rechts auf der Glocke.
+ *
+ * position: relative auf dem Button → damit der Badge (position: absolute)
+ * sich relativ zum Button positioniert, nicht zum gesamten Header.
+ */
+
+.notification-bell {
+  /* position: relative ist nötig, damit der Badge (absolute)
+   * sich innerhalb des Buttons positioniert */
+  position: relative;
+}
+
+/* ── Badge: Roter Kreis mit Zahl ──────────────────────────────────────
+ * position: absolute → wird aus dem normalen Dokumentfluss genommen
+ * und über der Glocke positioniert (oben-rechts).
+ *
+ * top: 4px / right: 2px → feine Positionierung, damit der Badge
+ * leicht über dem Glocken-Symbol schwebt.
+ *
+ * min-width: 18px → damit der Badge auch bei einstelligen Zahlen
+ * kreisrund aussieht (width = height bei einer Ziffer).
+ *
+ * pointer-events: none → Klicks auf den Badge gehen "durch" zum Button.
+ * Ohne das könnte der Badge den Klick auf die Glocke verdecken.
+ */
+.notification-bell__badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-red);
+  color: white;
+  font-size: 0.6875rem;   /* 11px — klein genug für den Badge */
+  font-weight: var(--font-bold);
+  line-height: 18px;       /* Vertikal zentriert im 18px-Kreis */
+  text-align: center;
+  pointer-events: none;    /* Klicks durchlassen zum Button */
+  /* Dezente Animation wenn der Badge erscheint */
+  animation: badge-pop 0.3s ease-out;
+}
+
+/* ── Badge Pop-Animation ──────────────────────────────────────────────
+ * Wenn eine neue Benachrichtigung kommt und der Badge erscheint,
+ * "poppt" er kurz auf (scale 0 → 1.2 → 1).
+ * Das zieht die Aufmerksamkeit des Users auf sich.
+ *
+ * @keyframes definiert die Animations-Schritte:
+ *   0%   → unsichtbar (scale 0)
+ *   60%  → leicht überdimensioniert (scale 1.2, "Bounce")
+ *   100% → normale Größe (scale 1)
+ */
+@keyframes badge-pop {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
