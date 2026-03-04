@@ -1,42 +1,142 @@
-/* src/styles/pages/modules/care/CarePage.css — Care-Platzhalter (US-11 Tokens) */
+/* src/styles/pages/modules/care/CarePage.css — Unified Care Kalender (US-13 + US-17)
+ *
+ * Layout für die vereinigte Care-Seite (Termine + Vorsorge):
+ *   - "Neuer Termin" Button
+ *   - Vorsorge-Fortschrittsbalken
+ *   - Sektionen mit Überschriften + Trennlinien:
+ *     1. Anstehende Termine
+ *     2. Vorsorge-Untersuchungen (gruppiert nach Häufigkeit)
+ *     3. Vergangene Termine
+ */
 
-.care-page {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-8) var(--space-4);
+/* ── Neuer-Termin-Button ───────────────────────────────────────────────── */
+.care-page__create-btn {
+  margin-bottom: var(--space-6);
 }
 
-.care-container {
-  max-width: var(--max-width-page);
-  width: 100%;
-  text-align: center;
-}
-
-.care-heading {
-  font-size: var(--font-2xl);
-  color: var(--color-slate-800);
-  margin-bottom: var(--space-2);
-}
-
-.care-description {
-  color: var(--color-slate-600);
-  font-size: var(--font-base);
+/* ═════════════════════════════════════════════════════════════════════════ */
+/* SEKTIONEN — Jeder Block (Termine, Vorsorge, Verlauf) wird als Section  */
+/* dargestellt mit klarem Header und Trennlinie zum nächsten Block.        */
+/* ═════════════════════════════════════════════════════════════════════════ */
+.care-section {
   margin-bottom: var(--space-8);
 }
 
-.care-placeholder {
-  background: var(--color-care-light);
-  border-radius: var(--radius-lg);
-  padding: var(--space-8);
+/* Gedämpfte Sektion (z.B. vergangene Termine) */
+.care-section--muted {
+  opacity: 0.85;
 }
 
-.care-placeholder-icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: var(--space-3);
+/* Section-Header: Titel links, Anzahl rechts */
+.care-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-care);
 }
 
-.care-placeholder p {
+.care-section__title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-800);
+  margin: 0;
+}
+
+.care-section__count {
+  font-size: var(--font-sm);
   color: var(--color-slate-500);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════ */
+/* KARTEN-LISTE — Vertikaler Stack für Cards (Termine und Vorsorge)       */
+/* ═════════════════════════════════════════════════════════════════════════ */
+.care-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ═════════════════════════════════════════════════════════════════════════ */
+/* FORTSCHRITTSBALKEN — Vorsorge-Fortschritt (X von Y erledigt)           */
+/* ═════════════════════════════════════════════════════════════════════════ */
+.care-progress {
+  padding: var(--space-4);
+  background: var(--color-slate-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-slate-200);
+}
+
+.care-progress__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.care-progress__label {
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
+}
+
+.care-progress__count {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+}
+
+/* Hintergrund-Balken (grau) */
+.care-progress__bar {
+  height: 10px;
+  background: var(--color-slate-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+/* Füll-Balken (grün) — Breite per inline style */
+.care-progress__fill {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  min-width: 0;
+}
+
+/* 🎉 Alles erledigt */
+.care-progress__complete {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-sm);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════ */
+/* VORSORGE-GRUPPEN — Sub-Header innerhalb der Vorsorge-Sektion           */
+/* (z.B. "Jährlich", "Alle 2 Jahre")                                       */
+/* ═════════════════════════════════════════════════════════════════════════ */
+.care-prevention-group {
+  margin-bottom: var(--space-5);
+}
+
+.care-prevention-group__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-1);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px dashed var(--color-slate-300);
+}
+
+.care-prevention-group__label {
   font-size: var(--font-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-care);
+}
+
+.care-prevention-group__count {
+  font-size: var(--font-xs);
+  color: var(--color-slate-400);
 }

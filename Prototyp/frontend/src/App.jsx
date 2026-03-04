@@ -43,7 +43,6 @@ import CarePage from './pages/modules/care/CarePage';
 import AppointmentDetailPage from './pages/modules/care/AppointmentDetailPage';
 import AppointmentCreatePage from './pages/modules/care/AppointmentCreatePage';
 import AppointmentEditPage from './pages/modules/care/AppointmentEditPage';
-import PreventionPage from './pages/modules/care/PreventionPage';
 import LabsPage from './pages/modules/labs/LabsPage';
 import CoachPage from './pages/modules/coach/CoachPage';
 import FamilyPage from './pages/modules/family/FamilyPage';
@@ -155,18 +154,6 @@ export default function App() {
               <PrivateRoute>
                 <AppLayout>
                   <AppointmentEditPage />
-                </AppLayout>
-              </PrivateRoute>
-            }
-          />
-
-          {/* AIVA Care — Vorsorge-Kalender (US-17) */}
-          <Route
-            path="/care/prevention"
-            element={
-              <PrivateRoute>
-                <AppLayout>
-                  <PreventionPage />
                 </AppLayout>
               </PrivateRoute>
             }
