@@ -12,6 +12,8 @@ import consentRoutes from './src/routes/consent.routes.js';
 import appointmentRoutes from './src/routes/appointment.routes.js';
 import doctorRoutes from './src/routes/doctor.routes.js';
 import preventionRoutes from './src/routes/prevention.routes.js';
+import notificationRoutes from './src/routes/notification.routes.js';
+import { startReminderCron } from './src/config/cron.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
 const app = express();
@@ -71,8 +73,20 @@ app.use('/api/doctors', doctorRoutes);
 // PATCH /:id/status = Status ändern (open ↔ completed)
 app.use('/api/prevention', preventionRoutes);
 
+// Notification-Routen: Benachrichtigungen unter /api/notifications/* (US-18)
+// GET / = Alle Benachrichtigungen abrufen (+ unreadCount)
+// PATCH /read-all = Alle als gelesen markieren
+// PATCH /:id/read = Eine als gelesen markieren
+app.use('/api/notifications', notificationRoutes);
+
 // ─── START ───────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`🚀 AIVA Backend läuft auf http://localhost:${PORT}`);
   console.log(`   Health-Check: http://localhost:${PORT}/api/health`);
+
+  // ─── CRON-JOB: Termin-Erinnerungen (US-18) ─────────────────────────────
+  // Startet den Hintergrund-Timer, der alle 15 Minuten prüft,
+  // ob Termine bevorstehen und automatisch Benachrichtigungen erstellt.
+  // Wird NACH dem Server-Start aufgerufen, damit die DB-Verbindung steht.
+  startReminderCron();
 });

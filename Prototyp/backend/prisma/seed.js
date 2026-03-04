@@ -440,6 +440,59 @@ async function main() {
     console.log(`   ✅ Vorsorge ${u.firstName}: ${userPreventionCount} passende Einträge (Alter ${age}, ${u.gender})`);
   }
 
+  // ── US-18: Test-Benachrichtigungen (Termin-Erinnerungen) ────────────
+  // Erstelle einige Beispiel-Notifications für Laura, damit beim
+  // ersten Login sofort etwas in der Benachrichtigungs-Ansicht sichtbar ist.
+  //
+  // Zuerst alle bestehenden Notifications löschen (für idempotenten Seed).
+  // deleteMany ohne where → löscht ALLE Notifications.
+  await prisma.notification.deleteMany({});
+
+  // Lauras Termine laden, um relatedId setzen zu können
+  const lauraAppointments = await prisma.appointment.findMany({
+    where: { userId: user.id, status: 'scheduled' },
+    orderBy: { datetime: 'asc' },
+  });
+
+  // Für jeden anstehenden Termin eine "24h vorher"-Erinnerung erstellen
+  const notificationsData = [];
+
+  for (const apt of lauraAppointments) {
+    notificationsData.push({
+      userId: user.id,
+      type: 'appointment_reminder_24h',
+      title: 'Termin morgen',
+      message: `${apt.title} am ${apt.datetime.toLocaleDateString('de-DE', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      })} um ${apt.datetime.toLocaleTimeString('de-DE', {
+        hour: '2-digit', minute: '2-digit'
+      })} Uhr bei ${apt.doctor}${apt.location ? ` — ${apt.location}` : ''}`,
+      relatedId: apt.id,
+      read: false,
+    });
+  }
+
+  // Zusätzlich eine bereits gelesene Erinnerung (für UI-Test)
+  if (lauraAppointments.length > 0) {
+    notificationsData.push({
+      userId: user.id,
+      type: 'appointment_reminder_1h',
+      title: 'Termin in 1 Stunde',
+      message: `Vergiss nicht: ${lauraAppointments[0].title} bei ${lauraAppointments[0].doctor}`,
+      relatedId: lauraAppointments[0].id,
+      read: true,   // Diese ist schon gelesen → wird im UI dezenter dargestellt
+    });
+  }
+
+  // Alle Notifications auf einmal erstellen (effizienter als einzeln)
+  // createMany erzeugt alle Einträge in einem einzigen DB-Query.
+  if (notificationsData.length > 0) {
+    await prisma.notification.createMany({ data: notificationsData });
+  }
+
+  const notifCount = await prisma.notification.count({ where: { userId: user.id } });
+  console.log(`   ✅ Notifications Laura: ${notifCount} Erinnerungen erstellt`);
+
   console.log('🌱 Seed abgeschlossen!');
 }
 

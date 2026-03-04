@@ -1,0 +1,148 @@
+/* src/styles/pages/core/NotificationsPage.css — Benachrichtigungs-Seite (US-18)
+ *
+ * Layout: Vertikale Liste von Notification-Cards.
+ * Ungelesene haben einen farbigen linken Rand und fetten Titel.
+ * Gelesene sind dezenter gestaltet (grauer Text, kein Akzent-Rand).
+ */
+
+/* ── Liste der Benachrichtigungen ─────────────────────────────────────
+ * Vertikaler Stack mit 12px Abstand zwischen den Karten.
+ * flex-direction: column → Karten untereinander anordnen.
+ */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Einzelne Benachrichtigung ────────────────────────────────────────
+ * cursor: pointer → zeigt dem User, dass man drauf klicken kann.
+ * transition → sanfte Animation beim Hover (Farbänderung).
+ */
+.notification-item {
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border-left: 4px solid transparent;
+}
+
+/* ── Ungelesene Benachrichtigung ──────────────────────────────────────
+ * Visuell hervorgehoben durch:
+ *   - Blauer/Primär-farbiger Rand links (Akzent)
+ *   - Leicht getönter Hintergrund
+ * Das macht sofort klar: "Diese ist noch nicht gelesen!"
+ */
+.notification-item--unread {
+  border-left-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+/* ── Inhalt der Benachrichtigung ──────────────────────────────────────
+ * Flexbox-Row: Icon links, Textblock rechts.
+ * align-items: flex-start → Icon bleibt oben, auch wenn Text mehrzeilig ist.
+ */
+.notification-item__content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* ── Icon (Typ-Emoji) ─────────────────────────────────────────────────
+ * font-size: 1.5rem → etwas größer als der Text, damit es auffällt.
+ * flex-shrink: 0 → Icon wird nicht kleiner, auch wenn der Text lang ist.
+ */
+.notification-item__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── Textblock ────────────────────────────────────────────────────────
+ * flex: 1 → nimmt den restlichen Platz neben dem Icon ein.
+ * min-width: 0 → verhindert, dass langer Text den Container sprengt
+ * (ein gängiger Flexbox-Trick).
+ */
+.notification-item__text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Titel der Benachrichtigung ───────────────────────────────────────
+ * display: flex + align-items: center → damit der Ungelesen-Punkt (Dot)
+ * vertikal neben dem Titel zentriert wird.
+ */
+.notification-item__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-800);
+  margin-bottom: var(--space-1);
+}
+
+/* ── Ungelesen-Punkt (blauer Kreis) ───────────────────────────────────
+ * Kleiner ausgefüllter Kreis neben dem Titel bei ungelesenen.
+ * Typisches UI-Pattern das man von E-Mail-Clients und Messenger kennt.
+ */
+.notification-item__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ── Nachricht (Haupttext) ────────────────────────────────────────────
+ * Etwas kleinere Schrift, dunkelgraue Farbe.
+ * Enthält den Termin-Detail-Text z.B. "Zahnarzt am 15.03. um 10:30".
+ */
+.notification-item__message {
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  margin-bottom: var(--space-1);
+  /* Langen Text abschneiden wenn nötig */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Zeitangabe ───────────────────────────────────────────────────────
+ * Kleinste Schrift, hellste Farbe → am wenigsten prominent.
+ * Zeigt z.B. "vor 5 Minuten" oder "vor 2 Stunden".
+ */
+.notification-item__time {
+  font-size: var(--font-xs);
+  color: var(--color-slate-400);
+}
+
+/* ── "Alle als gelesen markieren"-Button ──────────────────────────────
+ * Dezenter Text-Button (kein ausgefüllter Button), weil es eine
+ * sekundäre Aktion ist. Sitzt über der Liste.
+ */
+.notifications-mark-all {
+  display: block;
+  margin-left: auto;
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  transition: background-color var(--transition-normal);
+  cursor: pointer;
+}
+
+.notifications-mark-all:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* ── Leerer Zustand ───────────────────────────────────────────────────
+ * Zentrierter Text wenn es keine Benachrichtigungen gibt.
+ */
+.notifications-empty {
+  text-align: center;
+  color: var(--color-slate-400);
+  padding: var(--space-6) 0;
+  font-size: var(--font-base);
+}

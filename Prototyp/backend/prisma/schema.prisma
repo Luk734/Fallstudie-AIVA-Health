@@ -54,6 +54,12 @@ model User {
   // GKV-Katalog und speichert seinen persönlichen Status.
   preventions  UserPrevention[]
 
+  // ── Relation zu Notifications (US-18) ──────────────────────
+  // Ein User kann beliebig viele Benachrichtigungen haben (1:N).
+  // Wird für Termin-Erinnerungen und später auch für andere
+  // Benachrichtigungstypen (Medikamente etc.) verwendet.
+  notifications Notification[]
+
   @@map("users")
 }
 
@@ -224,4 +230,46 @@ model UserPrevention {
   // ── Unique: Ein User hat pro Vorsorge genau EINEN Eintrag ──
   @@unique([userId, preventionId])
   @@map("user_preventions")
+}
+
+// ─── EPIC-02 / US-18: Benachrichtigungen (Termin-Erinnerungen) ───────────
+// Tabelle: notifications
+// Speichert In-App-Benachrichtigungen für den Nutzer.
+//
+// Im MVP werden hier automatisch generierte Termin-Erinnerungen gespeichert.
+// Ein Cron-Job prüft regelmäßig, welche Termine bevorstehen und erstellt
+// passende Notification-Einträge (1 Tag vorher, 1 Stunde vorher).
+//
+// type: Art der Benachrichtigung
+//   "appointment_reminder" → Erinnerung an einen Arzttermin
+//   (Später erweiterbar: "medication_reminder", "prevention_reminder" etc.)
+//
+// relatedId: Verweis auf das zugehörige Objekt (z.B. Appointment.id)
+//   Damit können wir beim Klick auf die Benachrichtigung direkt
+//   zum betreffenden Termin navigieren.
+//   Nullable, weil nicht jede Benachrichtigung einen Bezug haben muss.
+//
+// read: Gelesen-Status
+//   false = ungelesen (Standard) → wird im Badge-Zähler gezählt
+//   true  = gelesen → wird nicht mehr im Badge gezählt
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  // Jede Benachrichtigung gehört zu genau einem User.
+  // onDelete: Cascade → User gelöscht = Notifications weg.
+  userId     Int      @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Benachrichtigungs-Daten ────────────────────────────────
+  type       String                              // "appointment_reminder"
+  title      String                              // Kurztitel: "Termin morgen"
+  message    String                              // Detail: "Zahnarzt am 15.03. um 10:30"
+  relatedId  Int?     @map("related_id")         // Optional: Appointment.id
+  read       Boolean  @default(false)             // Gelesen? (Standard: nein)
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
 }
