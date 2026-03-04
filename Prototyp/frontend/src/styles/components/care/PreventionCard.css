@@ -60,10 +60,23 @@
   color: var(--color-success);
 }
 
-/* ── Action-Bereich ────────────────────────────────────────────────────── */
+/* ── Erledigte Karte: Dezenter grüner Schimmer ─────────────────────────── */
+/* Visuelles Feedback: Erledigte Vorsorgen heben sich optisch ab.          */
+.prevention-card--completed {
+  background: color-mix(in srgb, var(--color-success) 6%, white);
+  border-left-color: var(--color-success) !important;
+}
+
+.prevention-card--completed .prevention-card__title {
+  color: var(--color-slate-500);
+}
+
+/* ── Action-Bereich: Zwei Buttons nebeneinander ────────────────────────── */
 .prevention-card__action {
   display: flex;
   justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: wrap;
   padding-top: var(--space-2);
   border-top: 1px solid var(--color-slate-100);
 }

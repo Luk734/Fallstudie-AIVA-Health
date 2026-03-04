@@ -1,22 +1,21 @@
-// src/pages/modules/care/PreventionPage.jsx — Vorsorge-Kalender (US-17, TASK-66)
+// src/pages/modules/care/PreventionPage.jsx — Vorsorge-Kalender (US-17)
 //
 // Zeigt alle GKV-Vorsorgeuntersuchungen, die zum Alter und Geschlecht
-// des eingeloggten Users passen. Jede Vorsorge wird als PreventionCard
-// angezeigt mit Status (offen/erledigt) und Toggle-Button.
+// des eingeloggten Users passen — als übersichtlichen Kalender mit:
+//   - Fortschrittsbalken (X von Y erledigt)
+//   - Gruppierung nach Häufigkeit (Jährlich, Alle 2 Jahre, etc.)
+//   - PreventionCards mit ConfirmDialog + Termin-Verknüpfung
 //
-// Features:
-//   - Automatische Filterung nach Profil (Alter + Geschlecht)
-//   - Status-Badges (Offen → gelb, Erledigt → grün)
-//   - Status per Klick umschalten (API-Call an PATCH /api/prevention/:id/status)
-//   - Filter-Tabs: Alle / Offen / Erledigt
-//   - Loading-State (Spinner)
-//   - Error-State (Alert mit hilfreicher Meldung)
-//   - Zurück-Button zur Care-Übersicht
+// REDESIGN-ENTSCHEIDUNG:
+//   Vorher: Tabs (Alle/Offen/Erledigt) — umständlich, viel Klicken.
+//   Jetzt:  Alle Vorsorgen immer sichtbar, gruppiert nach Häufigkeit.
+//           Fortschrittsbalken gibt Gesamtüberblick auf einen Blick.
 //
 // Datenfluss:
 //   1. Seite lädt → GET /api/prevention (Backend filtert nach Alter+Geschlecht)
-//   2. User klickt "Als erledigt markieren" → PATCH /api/prevention/:id/status
-//   3. Lokaler State wird aktualisiert (kein erneuter GET nötig)
+//   2. Frontend gruppiert die Vorsorgen nach frequencyMonths
+//   3. User klickt "Als erledigt markieren" → ConfirmDialog → PATCH
+//   4. User klickt "Termin anlegen" → Navigation zu /care/new?title=...
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -32,18 +31,50 @@ import '../../../styles/pages/modules/care/PreventionPage.css';
 // ── API-URL aus Umgebungsvariablen ────────────────────────────────────────
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-// ── Filter-Tabs ───────────────────────────────────────────────────────────
-// Drei Ansichten: Alle Vorsorgen, nur offene, nur erledigte.
-const FILTERS = Object.freeze({
-  ALL: 'all',
-  OPEN: 'open',
-  COMPLETED: 'completed',
-});
+// ── Häufigkeit → Gruppen-Label ────────────────────────────────────────────
+// Wandelt frequencyMonths in einen menschenlesbaren Gruppen-Titel um.
+// Gleiche Logik wie in PreventionCard, aber hier als Section-Header genutzt.
+function getFrequencyLabel(months) {
+  if (months >= 999) return 'Einmalig';
+  if (months === 6) return 'Halbjährlich';
+  if (months === 12) return 'Jährlich';
+  if (months === 24) return 'Alle 2 Jahre';
+  if (months === 36) return 'Alle 3 Jahre';
+  const years = months / 12;
+  if (Number.isInteger(years)) return `Alle ${years} Jahre`;
+  return `Alle ${months} Monate`;
+}
+
+// ── Vorsorgen nach Häufigkeit gruppieren ──────────────────────────────────
+// Input:  [{...frequencyMonths: 12}, {...frequencyMonths: 24}, {...frequencyMonths: 12}]
+// Output: [{ label: "Jährlich", months: 12, items: [...] }, { label: "Alle 2 Jahre", ... }]
+//
+// Sortierung: Häufigste zuerst (12 Monate vor 24 vor 36 etc.)
+// So sieht der User zuerst die Vorsorgen, die am öftesten fällig sind.
+function groupByFrequency(preventions) {
+  // 1. Map aufbauen: frequencyMonths → Array von Vorsorgen
+  const groups = new Map();
+  for (const p of preventions) {
+    const key = p.frequencyMonths;
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key).push(p);
+  }
+
+  // 2. In Array umwandeln und nach Häufigkeit sortieren (niedrigste Monate zuerst)
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([months, items]) => ({
+      label: getFrequencyLabel(months),
+      months,
+      items,
+    }));
+}
 
 export default function PreventionPage() {
   // ── State ─────────────────────────────────────────────────────────────
   const [preventions, setPreventions] = useState([]);   // Alle Vorsorgen vom Backend
-  const [activeFilter, setActiveFilter] = useState(FILTERS.ALL);  // Aktiver Filter-Tab
   const [loading, setLoading] = useState(true);         // Lade-Zustand
   const [error, setError] = useState(null);             // Fehlermeldung
   const [togglingId, setTogglingId] = useState(null);   // Welche Karte wird gerade gespeichert?
@@ -53,8 +84,6 @@ export default function PreventionPage() {
   const navigate = useNavigate();
 
   // ── Vorsorgen vom Backend laden ────────────────────────────────────────
-  // Einmal beim Mounten der Seite. Das Backend filtert bereits nach
-  // Alter + Geschlecht, wir bekommen nur die PASSSENDEN Vorsorgen.
   useEffect(() => {
     async function fetchPreventions() {
       setLoading(true);
@@ -83,18 +112,9 @@ export default function PreventionPage() {
   }, [token]);
 
   // ── Status einer Vorsorge umschalten ──────────────────────────────────
-  // Wird aufgerufen wenn der User auf "Als erledigt markieren" oder
-  // "Wieder öffnen" klickt.
-  //
-  // Ablauf:
-  //   1. PATCH Request an /api/prevention/:id/status
-  //   2. Bei Erfolg: lokalen State aktualisieren (kein erneuter GET nötig!)
-  //   3. Bei Fehler: Error anzeigen
-  //
-  // Optimistisches Update wäre hier auch möglich, aber bei einem
-  // Study-Projekt ist explizites Warten auf die Server-Antwort klarer.
+  // Wird vom ConfirmDialog in PreventionCard aufgerufen (nach Bestätigung).
   async function handleToggleStatus(userPreventionId, newStatus) {
-    setTogglingId(userPreventionId);  // Loading-State für diese Karte
+    setTogglingId(userPreventionId);
     setError(null);
 
     try {
@@ -113,9 +133,7 @@ export default function PreventionPage() {
 
       const updated = await res.json();
 
-      // ── Lokalen State aktualisieren ─────────────────────────────
-      // Wir ersetzen nur den einen Eintrag im Array.
-      // map() erstellt ein NEUES Array (React erkennt die Änderung).
+      // Lokalen State aktualisieren (kein erneuter GET nötig)
       setPreventions((prev) =>
         prev.map((p) =>
           p.userPreventionId === userPreventionId
@@ -126,20 +144,18 @@ export default function PreventionPage() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setTogglingId(null);  // Loading-State aufheben
+      setTogglingId(null);
     }
   }
 
-  // ── Vorsorgen nach aktuellem Filter filtern ───────────────────────────
-  // Das Filtern passiert im Frontend (die Daten sind schon da).
-  // Bei "all" werden alle angezeigt, sonst nur offene/erledigte.
-  const filteredPreventions = activeFilter === FILTERS.ALL
-    ? preventions
-    : preventions.filter((p) => p.status === activeFilter);
-
-  // Zähler für die Tab-Labels (z.B. "Offen (3)")
-  const openCount = preventions.filter((p) => p.status === 'open').length;
+  // ── Fortschritts-Berechnung ───────────────────────────────────────────
+  // Werden oben im Fortschrittsbalken angezeigt.
+  const total = preventions.length;
   const completedCount = preventions.filter((p) => p.status === 'completed').length;
+  const progressPercent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+  // ── Vorsorgen nach Häufigkeit gruppieren ──────────────────────────────
+  const groups = groupByFrequency(preventions);
 
   return (
     <PageContainer maxWidth="md">
@@ -158,68 +174,77 @@ export default function PreventionPage() {
         ← Zurück zu Termine
       </Button>
 
-      {/* ── Filter-Tabs ──────────────────────────────────────────── */}
-      {/* Drei Buttons als Tabs: Alle / Offen / Erledigt */}
-      {/* Die Zähler zeigen, wie viele Vorsorgen in jeder Kategorie sind. */}
-      <div className="prevention-tabs" role="tablist">
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`prevention-tabs__tab ${activeFilter === FILTERS.ALL ? 'prevention-tabs__tab--active' : ''}`}
-          onClick={() => setActiveFilter(FILTERS.ALL)}
-          role="tab"
-          aria-selected={activeFilter === FILTERS.ALL}
-        >
-          Alle ({preventions.length})
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`prevention-tabs__tab ${activeFilter === FILTERS.OPEN ? 'prevention-tabs__tab--active' : ''}`}
-          onClick={() => setActiveFilter(FILTERS.OPEN)}
-          role="tab"
-          aria-selected={activeFilter === FILTERS.OPEN}
-        >
-          Offen ({openCount})
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`prevention-tabs__tab ${activeFilter === FILTERS.COMPLETED ? 'prevention-tabs__tab--active' : ''}`}
-          onClick={() => setActiveFilter(FILTERS.COMPLETED)}
-          role="tab"
-          aria-selected={activeFilter === FILTERS.COMPLETED}
-        >
-          Erledigt ({completedCount})
-        </Button>
-      </div>
-
-      {/* ── Content: Loading / Error / Empty / Liste ─────────────── */}
+      {/* ── Content: Loading / Error / Kalender ──────────────────── */}
       {loading && <Spinner text="Vorsorge-Daten werden geladen..." />}
 
       {error && <Alert variant="error">{error}</Alert>}
 
-      {!loading && !error && filteredPreventions.length === 0 && (
+      {!loading && !error && preventions.length === 0 && (
         <Alert variant="info">
-          {activeFilter === FILTERS.ALL
-            ? 'Keine Vorsorgeuntersuchungen für dein Profil gefunden. Bitte stelle sicher, dass Geburtsdatum und Geschlecht im Profil hinterlegt sind.'
-            : activeFilter === FILTERS.OPEN
-              ? 'Alle Vorsorgen erledigt! 🎉'
-              : 'Noch keine Vorsorge als erledigt markiert.'}
+          Keine Vorsorgeuntersuchungen für dein Profil gefunden.
+          Bitte stelle sicher, dass Geburtsdatum und Geschlecht im Profil hinterlegt sind.
         </Alert>
       )}
 
-      {!loading && !error && filteredPreventions.length > 0 && (
-        <div className="prevention-list">
-          {filteredPreventions.map((prevention) => (
-            <PreventionCard
-              key={prevention.id}
-              prevention={prevention}
-              onToggleStatus={handleToggleStatus}
-              loading={togglingId === prevention.userPreventionId}
-            />
+      {!loading && !error && preventions.length > 0 && (
+        <>
+          {/* ── Fortschrittsbalken ─────────────────────────────────── */}
+          {/* Zeigt visuell wie viele Vorsorgen erledigt sind.          */}
+          {/* Die Breite des grünen Balkens = completedCount / total.   */}
+          <div className="prevention-progress">
+            <div className="prevention-progress__header">
+              <span className="prevention-progress__label">Dein Fortschritt</span>
+              <span className="prevention-progress__count">
+                {completedCount} von {total} erledigt
+              </span>
+            </div>
+            <div className="prevention-progress__bar">
+              <div
+                className="prevention-progress__fill"
+                style={{ width: `${progressPercent}%` }}
+                role="progressbar"
+                aria-valuenow={completedCount}
+                aria-valuemin={0}
+                aria-valuemax={total}
+                aria-label={`${completedCount} von ${total} Vorsorgen erledigt`}
+              />
+            </div>
+            {completedCount === total && (
+              <p className="prevention-progress__complete">
+                🎉 Alle Vorsorgen erledigt — großartig!
+              </p>
+            )}
+          </div>
+
+          {/* ── Gruppierte Vorsorge-Karten ─────────────────────────── */}
+          {/* Jede Gruppe hat einen dekorativen Section-Header           */}
+          {/* ("Jährlich", "Alle 2 Jahre" etc.) und darunter die Karten. */}
+          {groups.map((group) => (
+            <section key={group.months} className="prevention-group">
+              {/* Gruppen-Header mit Linie */}
+              <div className="prevention-group__header">
+                <span className="prevention-group__label">
+                  🔄 {group.label}
+                </span>
+                <span className="prevention-group__count">
+                  {group.items.length} {group.items.length === 1 ? 'Untersuchung' : 'Untersuchungen'}
+                </span>
+              </div>
+
+              {/* Karten in dieser Gruppe */}
+              <div className="prevention-group__cards">
+                {group.items.map((prevention) => (
+                  <PreventionCard
+                    key={prevention.id}
+                    prevention={prevention}
+                    onToggleStatus={handleToggleStatus}
+                    loading={togglingId === prevention.userPreventionId}
+                  />
+                ))}
+              </div>
+            </section>
           ))}
-        </div>
+        </>
       )}
     </PageContainer>
   );

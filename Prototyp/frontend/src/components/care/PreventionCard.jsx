@@ -19,9 +19,12 @@
 //     onToggleStatus(userPreventionId, neuerStatus)
 //   loading (boolean) — Wird gerade gespeichert? (Button deaktivieren)
 
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import '../../styles/components/care/PreventionCard.css';
 
 // ── Status → Badge-Mapping ────────────────────────────────────────────────
@@ -62,10 +65,34 @@ function formatDate(isoString) {
 export default function PreventionCard({ prevention, onToggleStatus, loading }) {
   const { type, description, frequencyMonths, userPreventionId, status, completedAt } = prevention;
   const statusConfig = STATUS_CONFIG[status] || STATUS_CONFIG.open;
+  const navigate = useNavigate();
+
+  // ── ConfirmDialog State ─────────────────────────────────────────────
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Neuer Status = das Gegenteil des aktuellen
   const newStatus = status === 'completed' ? 'open' : 'completed';
   const buttonLabel = status === 'completed' ? 'Wieder öffnen' : 'Als erledigt markieren';
+
+  // ── Handler ─────────────────────────────────────────────────────────
+  // Statt direkt den Status zu ändern, öffnen wir zuerst den ConfirmDialog.
+  function handleStatusClick() {
+    setShowConfirm(true);
+  }
+
+  // User hat im Dialog bestätigt → Status wirklich umschalten
+  function handleConfirm() {
+    setShowConfirm(false);
+    onToggleStatus(userPreventionId, newStatus);
+  }
+
+  // "Termin anlegen" → Navigation zur Termin-Erstellung mit vorausgefülltem Titel
+  function handleCreateAppointment() {
+    navigate(`/care/new?title=${encodeURIComponent(type)}`);
+  }
+
+  // ── CSS-Klasse für erledigte Karten (grüner Schimmer) ──────────────
+  const cardClassName = `prevention-card${status === 'completed' ? ' prevention-card--completed' : ''}`;
 
   return (
     <Card
@@ -73,7 +100,7 @@ export default function PreventionCard({ prevention, onToggleStatus, loading }) 
       accent="care"
       padding="md"
       shadow="sm"
-      className="prevention-card"
+      className={cardClassName}
     >
       {/* ── Header: Titel + Status-Badge ─────────────────────────── */}
       <div className="prevention-card__header">
@@ -96,17 +123,45 @@ export default function PreventionCard({ prevention, onToggleStatus, loading }) 
         )}
       </div>
 
-      {/* ── Action: Status umschalten ────────────────────────────── */}
+      {/* ── Actions: Status + Termin anlegen ─────────────────────── */}
       <div className="prevention-card__action">
         <Button
           variant={status === 'completed' ? 'secondary' : 'success'}
           size="sm"
           loading={loading}
-          onClick={() => onToggleStatus(userPreventionId, newStatus)}
+          onClick={handleStatusClick}
         >
           {buttonLabel}
         </Button>
+
+        {/* Termin anlegen — verknüpft Vorsorge mit Care-Terminkalender */}
+        {status === 'open' && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleCreateAppointment}
+          >
+            📅 Termin anlegen
+          </Button>
+        )}
       </div>
+
+      {/* ── ConfirmDialog: Bestätigung vor Status-Änderung ────────── */}
+      <ConfirmDialog
+        open={showConfirm}
+        title={newStatus === 'completed' ? 'Vorsorge als erledigt markieren?' : 'Vorsorge wieder öffnen?'}
+        message={
+          newStatus === 'completed'
+            ? `Möchtest du "${type}" wirklich als erledigt markieren?`
+            : `Möchtest du "${type}" wieder als offen markieren?`
+        }
+        confirmLabel={newStatus === 'completed' ? 'Ja, erledigt' : 'Ja, wieder öffnen'}
+        cancelLabel="Abbrechen"
+        variant={newStatus === 'completed' ? 'primary' : 'danger'}
+        onConfirm={handleConfirm}
+        onCancel={() => setShowConfirm(false)}
+        loading={loading}
+      />
     </Card>
   );
 }

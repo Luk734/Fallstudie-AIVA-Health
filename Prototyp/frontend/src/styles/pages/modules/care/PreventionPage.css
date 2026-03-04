@@ -1,12 +1,13 @@
 /* src/styles/pages/modules/care/PreventionPage.css — Vorsorge-Kalender (US-17)
  *
- * Layout für die Vorsorge-Seite:
+ * Layout für die Vorsorge-Seite (Redesign):
  *   - Zurück-Button
- *   - Tab-Navigation (Alle / Offen / Erledigt)
- *   - Karten-Liste mit vertikalem Stack
+ *   - Fortschrittsbalken (X von Y erledigt)
+ *   - Häufigkeits-Gruppen (Jährlich, Alle 2 Jahre, etc.)
+ *   - Karten pro Gruppe in vertikalem Stack
  *
- * Die Tab-Styles folgen dem gleichen Pattern wie AppointmentList.css
- * (Ghost-Buttons mit Unterstrich beim aktiven Tab).
+ * Kein Tab-System mehr — alle Vorsorgen sind immer sichtbar,
+ * gruppiert nach Untersuchungs-Häufigkeit.
  */
 
 /* ── Zurück-Button ─────────────────────────────────────────────────────── */
@@ -14,43 +15,90 @@
   margin-bottom: var(--space-4);
 }
 
-/* ── Tab-Navigation ────────────────────────────────────────────────────── */
-.prevention-tabs {
-  display: flex;
-  gap: var(--space-2);
+/* ── Fortschrittsbalken ────────────────────────────────────────────────── */
+/* Zeigt visuell: "3 von 6 erledigt" mit einem grünen Balken.             */
+.prevention-progress {
   margin-bottom: var(--space-6);
-  border-bottom: 2px solid var(--color-slate-200);
-  padding-bottom: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-slate-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-slate-200);
 }
 
-/* Tab-Button: Ghost-Basis + Unterstrich bei aktiv */
-.prevention-tabs__tab {
-  position: relative;
-  padding-bottom: var(--space-2) !important;
-  color: var(--color-slate-500) !important;
-  font-weight: var(--font-weight-medium) !important;
-  transition: color var(--transition-fast);
+/* Header-Zeile: "Dein Fortschritt" links, "3 von 6 erledigt" rechts */
+.prevention-progress__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
 }
 
-/* Aktiver Tab: Care-Blau + Unterstrich */
-.prevention-tabs__tab--active {
-  color: var(--color-care) !important;
-  font-weight: var(--font-weight-semibold) !important;
+.prevention-progress__label {
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
 }
 
-.prevention-tabs__tab--active::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--color-care);
+.prevention-progress__count {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+}
+
+/* Grauer Hintergrund-Balken */
+.prevention-progress__bar {
+  height: 10px;
+  background: var(--color-slate-200);
   border-radius: var(--radius-full);
+  overflow: hidden;
 }
 
-/* ── Karten-Liste ──────────────────────────────────────────────────────── */
-.prevention-list {
+/* Grüner Füll-Balken — Breite wird per inline style gesetzt */
+.prevention-progress__fill {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  min-width: 0;
+}
+
+/* Gratulations-Text wenn 100% erreicht */
+.prevention-progress__complete {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-sm);
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+/* ── Häufigkeits-Gruppen ───────────────────────────────────────────────── */
+/* Jede Gruppe (Jährlich, Alle 2 Jahre, etc.) wird als Section dargestellt */
+.prevention-group {
+  margin-bottom: var(--space-6);
+}
+
+/* Gruppen-Header: dekorative Linie mit Label + Anzahl */
+.prevention-group__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  border-bottom: 2px solid var(--color-care);
+}
+
+.prevention-group__label {
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-care);
+}
+
+.prevention-group__count {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+}
+
+/* Karten innerhalb einer Gruppe — vertikaler Stack */
+.prevention-group__cards {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
