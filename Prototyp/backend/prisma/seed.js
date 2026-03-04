@@ -35,6 +35,26 @@ async function main() {
 
   console.log(`   ✅ User: ${user.email} (ID: ${user.id})`);
 
+  // ── Zweiter Test-User: Thomas Wagner (US-17) ───────────────────────
+  // Thomas ist 56 Jahre alt und männlich → bekommt andere Vorsorge-
+  // empfehlungen als Laura (z.B. Prostata-Vorsorge, Koloskopie ab 50).
+  // So können wir die geschlechtsspezifische Filterung testen.
+  const user2 = await prisma.user.upsert({
+    where: { email: 'thomas@example.com' },
+    update: {},
+    create: {
+      email: 'thomas@example.com',
+      passwordHash,                           // gleiches Passwort: Test1234!
+      firstName: 'Thomas',
+      lastName: 'Wagner',
+      birthDate: new Date('1970-03-22'),      // 56 Jahre alt (März 2026)
+      gender: 'male',
+      avatarUrl: null,
+    },
+  });
+
+  console.log(`   ✅ User: ${user2.email} (ID: ${user2.id})`);
+
   // ── Consents für Test-User ──────────────────────────────────────────
   const consentTypes = ['terms', 'health_data', 'analytics'];
   for (const type of consentTypes) {
@@ -52,6 +72,23 @@ async function main() {
     });
   }
   console.log('   ✅ Consents: terms, health_data, analytics');
+
+  // ── Consents für Thomas (gleich wie Laura) ──────────────────────────
+  for (const type of consentTypes) {
+    await prisma.consent.upsert({
+      where: {
+        userId_consentType: { userId: user2.id, consentType: type },
+      },
+      update: {},
+      create: {
+        userId: user2.id,
+        consentType: type,
+        granted: true,
+        grantedAt: new Date(),
+      },
+    });
+  }
+  console.log('   ✅ Consents für Thomas: terms, health_data, analytics');
 
   // ── Ärzte-Datenbank (US-15) ─────────────────────────────────────────
   // Vorbefüllte Arztliste ("Mock-Doctolib") für die Termin-Erstellung.
@@ -200,6 +237,208 @@ async function main() {
   }
 
   console.log(`   ✅ Termine: ${appointments.length} Beispieltermine erstellt`);
+
+  // ── Termine für Thomas (US-17 Testdaten) ───────────────────────────
+  // Thomas bekommt auch ein paar Termine, damit wir sehen, dass User
+  // getrennte Daten haben.
+  await prisma.appointment.deleteMany({ where: { userId: user2.id } });
+
+  const thomasAppointments = [
+    {
+      userId: user2.id,
+      title: 'Hausarzt Check-up',
+      doctor: 'Dr. Sarah Müller',
+      phone: '089 / 123 4567',
+      location: 'Hauptstr. 12, München',
+      datetime: dateOffset(5, 9, 0),
+      notes: 'Blutdruck kontrollieren',
+      status: 'scheduled',
+    },
+    {
+      userId: user2.id,
+      title: 'Koloskopie',
+      doctor: 'Dr. med. Schneider',
+      phone: '089 / 999 8888',
+      location: 'Gastro-Zentrum, Maximilianstr. 10, München',
+      datetime: dateOffset(-60, 8, 0),
+      notes: 'Befund unauffällig',
+      status: 'completed',
+    },
+  ];
+
+  for (const apt of thomasAppointments) {
+    await prisma.appointment.create({ data: apt });
+  }
+
+  console.log(`   ✅ Termine Thomas: ${thomasAppointments.length} Beispieltermine`);
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ── GKV-Vorsorge-Katalog (US-17) ─────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════
+  //
+  // Statische Daten aus dem Leistungskatalog der gesetzlichen Kranken-
+  // versicherung (GKV). Jeder Eintrag definiert eine Vorsorge-Unter-
+  // suchung mit Altersbereich, Geschlecht und Häufigkeit.
+  //
+  // gender: null = gilt für alle Geschlechter
+  //         "male" = nur für Männer
+  //         "female" = nur für Frauen
+  //
+  // frequencyMonths: Wie oft die Untersuchung gemacht werden soll
+  //   12   = jährlich
+  //   24   = alle 2 Jahre
+  //   36   = alle 3 Jahre
+  //   120  = alle 10 Jahre
+  //   999  = einmalig (Sonderwert, z.B. Bauchaorta-Screening)
+
+  // Erst bestehende Vorsorge-Daten löschen (Reihenfolge wegen FK!)
+  await prisma.userPrevention.deleteMany();
+  await prisma.preventionSchedule.deleteMany();
+
+  const preventions = [
+    {
+      type: 'Gesundheits-Check-up',
+      description: 'Allgemeine Gesundheitsuntersuchung: Blut, Urin, Herz-Kreislauf. Einmalig zwischen 18-34, ab 35 alle 3 Jahre.',
+      gender: null,            // alle Geschlechter
+      ageFrom: 18,
+      ageTo: 99,
+      frequencyMonths: 36,     // alle 3 Jahre
+    },
+    {
+      type: 'Hautkrebs-Screening',
+      description: 'Visuelle Ganzkörperuntersuchung der Haut auf verdächtige Veränderungen (Muttermale, Pigmentflecken).',
+      gender: null,
+      ageFrom: 35,
+      ageTo: 99,
+      frequencyMonths: 24,     // alle 2 Jahre
+    },
+    {
+      type: 'Zahnärztliche Vorsorge',
+      description: 'Kontrolluntersuchung beim Zahnarzt. Wichtig für das Bonusheft (höherer Zuschuss bei Zahnersatz).',
+      gender: null,
+      ageFrom: 18,
+      ageTo: 99,
+      frequencyMonths: 12,     // jährlich
+    },
+    {
+      type: 'Gynäkologische Krebsvorsorge',
+      description: 'Abstrich (Pap-Test) zur Früherkennung von Gebärmutterhalskrebs. Ab 20 jährlich.',
+      gender: 'female',        // nur für Frauen
+      ageFrom: 20,
+      ageTo: 99,
+      frequencyMonths: 12,     // jährlich
+    },
+    {
+      type: 'Mammographie-Screening',
+      description: 'Röntgenuntersuchung der Brust zur Brustkrebsfrüherkennung. Einladung per Post.',
+      gender: 'female',
+      ageFrom: 50,
+      ageTo: 69,
+      frequencyMonths: 24,     // alle 2 Jahre
+    },
+    {
+      type: 'Darmkrebs-Vorsorge (Stuhltest)',
+      description: 'Immunologischer Stuhltest (iFOBT) auf verstecktes Blut im Stuhl. Einfach zu Hause durchführbar.',
+      gender: null,
+      ageFrom: 50,
+      ageTo: 99,
+      frequencyMonths: 12,     // jährlich (bis Koloskopie-Alter)
+    },
+    {
+      type: 'Koloskopie (Darmspiegelung)',
+      description: 'Darmspiegelung zur Früherkennung von Darmkrebs. Goldstandard der Vorsorge.',
+      gender: 'male',          // Männer ab 50
+      ageFrom: 50,
+      ageTo: 99,
+      frequencyMonths: 120,    // alle 10 Jahre
+    },
+    {
+      type: 'Koloskopie (Darmspiegelung)',
+      description: 'Darmspiegelung zur Früherkennung von Darmkrebs. Goldstandard der Vorsorge.',
+      gender: 'female',        // Frauen ab 55
+      ageFrom: 55,
+      ageTo: 99,
+      frequencyMonths: 120,    // alle 10 Jahre
+    },
+    {
+      type: 'Bauchaorta-Ultraschall',
+      description: 'Einmalige Ultraschalluntersuchung der Bauchschlagader auf Aneurysmen (Aussackungen).',
+      gender: 'male',          // nur Männer
+      ageFrom: 65,
+      ageTo: 99,
+      frequencyMonths: 999,    // einmalig
+    },
+    {
+      type: 'Prostata- & Genitaluntersuchung',
+      description: 'Abtasten der Prostata und äußeren Genitalien zur Krebsfrüherkennung.',
+      gender: 'male',
+      ageFrom: 45,
+      ageTo: 99,
+      frequencyMonths: 12,     // jährlich
+    },
+  ];
+
+  // Vorsorge-Katalog in DB schreiben
+  const createdPreventions = [];
+  for (const prev of preventions) {
+    const created = await prisma.preventionSchedule.create({ data: prev });
+    createdPreventions.push(created);
+  }
+
+  console.log(`   ✅ Vorsorge-Katalog: ${createdPreventions.length} GKV-Leistungen`);
+
+  // ── UserPrevention-Einträge automatisch erzeugen ──────────────────
+  // Für jeden User prüfen wir: Welche Vorsorge passt zu Alter + Geschlecht?
+  // Passende Vorsorgen bekommen einen Eintrag mit Status "open".
+  //
+  // So sieht Laura nur ihre Vorsorgen, Thomas nur seine.
+
+  // Hilfsfunktion: Alter aus Geburtsdatum berechnen
+  function calculateAge(birthDate) {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    // Noch nicht Geburtstag gehabt dieses Jahr? → 1 Jahr abziehen
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  // Beide User durchgehen und passende Vorsorgen zuweisen
+  const users = [
+    { ...user, birthDate: new Date('1992-06-15'), gender: 'female' },   // Laura, 33
+    { ...user2, birthDate: new Date('1970-03-22'), gender: 'male' },    // Thomas, 56
+  ];
+
+  for (const u of users) {
+    const age = calculateAge(u.birthDate);
+
+    for (const prev of createdPreventions) {
+      // Prüfung 1: Passt das Alter?
+      const ageMatch = age >= prev.ageFrom && age <= prev.ageTo;
+
+      // Prüfung 2: Passt das Geschlecht?
+      // gender = null → gilt für alle, sonst muss es übereinstimmen
+      const genderMatch = prev.gender === null || prev.gender === u.gender;
+
+      if (ageMatch && genderMatch) {
+        await prisma.userPrevention.create({
+          data: {
+            userId: u.id,
+            preventionId: prev.id,
+            status: 'open',        // Standardmäßig noch offen
+            completedAt: null,
+          },
+        });
+      }
+    }
+
+    const userPreventionCount = await prisma.userPrevention.count({
+      where: { userId: u.id },
+    });
+    console.log(`   ✅ Vorsorge ${u.firstName}: ${userPreventionCount} passende Einträge (Alter ${age}, ${u.gender})`);
+  }
 
   console.log('🌱 Seed abgeschlossen!');
 }

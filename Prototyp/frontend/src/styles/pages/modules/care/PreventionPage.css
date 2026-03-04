@@ -1,0 +1,57 @@
+/* src/styles/pages/modules/care/PreventionPage.css — Vorsorge-Kalender (US-17)
+ *
+ * Layout für die Vorsorge-Seite:
+ *   - Zurück-Button
+ *   - Tab-Navigation (Alle / Offen / Erledigt)
+ *   - Karten-Liste mit vertikalem Stack
+ *
+ * Die Tab-Styles folgen dem gleichen Pattern wie AppointmentList.css
+ * (Ghost-Buttons mit Unterstrich beim aktiven Tab).
+ */
+
+/* ── Zurück-Button ─────────────────────────────────────────────────────── */
+.prevention-page__back-btn {
+  margin-bottom: var(--space-4);
+}
+
+/* ── Tab-Navigation ────────────────────────────────────────────────────── */
+.prevention-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  border-bottom: 2px solid var(--color-slate-200);
+  padding-bottom: var(--space-1);
+}
+
+/* Tab-Button: Ghost-Basis + Unterstrich bei aktiv */
+.prevention-tabs__tab {
+  position: relative;
+  padding-bottom: var(--space-2) !important;
+  color: var(--color-slate-500) !important;
+  font-weight: var(--font-weight-medium) !important;
+  transition: color var(--transition-fast);
+}
+
+/* Aktiver Tab: Care-Blau + Unterstrich */
+.prevention-tabs__tab--active {
+  color: var(--color-care) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+.prevention-tabs__tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-care);
+  border-radius: var(--radius-full);
+}
+
+/* ── Karten-Liste ──────────────────────────────────────────────────────── */
+.prevention-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

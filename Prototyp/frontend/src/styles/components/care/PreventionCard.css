@@ -1,0 +1,69 @@
+/* src/styles/components/care/PreventionCard.css — Vorsorge-Karte (US-17, TASK-66)
+ *
+ * Nur Layout-Styling — Basis-Karten-Styles (bg, radius, shadow, accent)
+ * kommen von der <Card> UI-Komponente.
+ *
+ * Aufbau der Karte:
+ *   ┌─────────────────────────────────────────┐
+ *   │ [Titel]                    [Status-Badge]│  ← Header (flex)
+ *   │ Beschreibungstext...                     │  ← Description
+ *   │ 🔄 Jährlich  · 📅 Erledigt am 4.3.2026 │  ← Meta
+ *   │ [Button: Als erledigt markieren]         │  ← Action
+ *   └─────────────────────────────────────────┘
+ */
+
+/* ── Header: Titel + Badge nebeneinander ───────────────────────────────── */
+.prevention-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+/* ── Titel ─────────────────────────────────────────────────────────────── */
+.prevention-card__title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-800);
+  margin: 0;
+  line-height: var(--leading-tight);
+  /* Titel soll nicht das Badge wegdrücken */
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Beschreibung ──────────────────────────────────────────────────────── */
+.prevention-card__description {
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  line-height: var(--leading-normal);
+  margin: 0 0 var(--space-3);
+}
+
+/* ── Meta-Zeile: Häufigkeit + Erledigt-Datum ──────────────────────────── */
+.prevention-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+  margin-bottom: var(--space-3);
+}
+
+.prevention-card__frequency {
+  font-weight: var(--font-weight-medium);
+}
+
+.prevention-card__completed-date {
+  color: var(--color-success);
+}
+
+/* ── Action-Bereich ────────────────────────────────────────────────────── */
+.prevention-card__action {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-slate-100);
+}

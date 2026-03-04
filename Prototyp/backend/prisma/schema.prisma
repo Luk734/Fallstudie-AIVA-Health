@@ -48,6 +48,12 @@ model User {
   // Ein User kann beliebig viele Termine haben (1:N).
   appointments Appointment[]
 
+  // ── Relation zu UserPrevention (US-17) ─────────────────────
+  // Ein User kann mehrere Vorsorge-Einträge haben (1:N).
+  // Jeder Eintrag verknüpft den User mit einer Vorsorge aus dem
+  // GKV-Katalog und speichert seinen persönlichen Status.
+  preventions  UserPrevention[]
+
   @@map("users")
 }
 
@@ -151,4 +157,71 @@ model Doctor {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("doctors")
+}
+
+// ─── EPIC-02 / US-17: Vorsorge-Katalog (GKV-Leistungen) ─────────────────
+// Tabelle: prevention_schedules
+// Statische Daten aus dem GKV-Leistungskatalog.
+// Jede Zeile definiert EINE Vorsorge-Untersuchung mit:
+//   - Altersbereich (ageFrom..ageTo)
+//   - Geschlecht (null = alle, "male"/"female" = geschlechtsspezifisch)
+//   - Häufigkeit in Monaten (12 = jährlich, 24 = alle 2 Jahre)
+//
+// Diese Daten ändern sich nicht zur Laufzeit — sie werden per Seed befüllt.
+// Im MVP kein Live-API, sondern statische Abbildung des GKV-Katalogs.
+
+model PreventionSchedule {
+  id              Int      @id @default(autoincrement())
+  type            String                        // Name: "Hautkrebs-Screening"
+  description     String                        // Was wird gemacht?
+  gender          String?                       // null = alle, "male", "female"
+  ageFrom         Int      @map("age_from")     // Ab welchem Alter (inklusiv)
+  ageTo           Int      @map("age_to")       // Bis welchem Alter (inklusiv)
+  frequencyMonths Int      @map("frequency_months") // Intervall in Monaten
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // ── Relation: Welche User haben diese Vorsorge? ────────────
+  userPreventions UserPrevention[]
+
+  @@map("prevention_schedules")
+}
+
+// ─── EPIC-02 / US-17: User-Vorsorge-Status ──────────────────────────────
+// Tabelle: user_preventions
+// Verknüpft einen User mit einer Vorsorge aus dem GKV-Katalog.
+// Speichert den persönlichen Status des Users für diese Vorsorge.
+//
+// status:
+//   "open"      → Vorsorge steht noch aus, User hat sie noch nicht gemacht
+//   "completed" → User hat die Vorsorge als erledigt markiert
+//
+// completedAt:
+//   Zeitstempel, wann der User die Vorsorge als erledigt markiert hat.
+//   null = noch offen.
+//
+// @@unique([userId, preventionId]):
+//   Verhindert, dass ein User die gleiche Vorsorge doppelt hat.
+//   Bei Status-Änderung wird der bestehende Eintrag aktualisiert.
+
+model UserPrevention {
+  id            Int       @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  userId        Int       @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Fremdschlüssel zu PreventionSchedule ───────────────────
+  preventionId  Int       @map("prevention_id")
+  prevention    PreventionSchedule @relation(fields: [preventionId], references: [id], onDelete: Cascade)
+
+  // ── Status-Daten ───────────────────────────────────────────
+  status        String    @default("open")      // "open" | "completed"
+  completedAt   DateTime? @map("completed_at")  // Wann erledigt? (null = offen)
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // ── Unique: Ein User hat pro Vorsorge genau EINEN Eintrag ──
+  @@unique([userId, preventionId])
+  @@map("user_preventions")
 }

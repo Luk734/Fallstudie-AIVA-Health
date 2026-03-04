@@ -11,6 +11,7 @@ import userRoutes from './src/routes/user.routes.js';
 import consentRoutes from './src/routes/consent.routes.js';
 import appointmentRoutes from './src/routes/appointment.routes.js';
 import doctorRoutes from './src/routes/doctor.routes.js';
+import preventionRoutes from './src/routes/prevention.routes.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
 const app = express();
@@ -64,6 +65,11 @@ app.use('/api/appointments', appointmentRoutes);
 // Doctor-Routen: Arztliste unter /api/doctors/* (US-15)
 // GET / = Alle Ärzte abrufen (für Dropdown im Termin-Formular)
 app.use('/api/doctors', doctorRoutes);
+
+// Prevention-Routen: Vorsorge-Empfehlungen unter /api/prevention/* (US-17)
+// GET / = Passende Vorsorgen für den User (gefiltert nach Alter + Geschlecht)
+// PATCH /:id/status = Status ändern (open ↔ completed)
+app.use('/api/prevention', preventionRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
