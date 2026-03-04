@@ -1,4 +1,4 @@
-// src/components/care/AppointmentDetail.jsx — Termin-Detail-Ansicht (US-14, TASK-54)
+// src/components/care/AppointmentDetail.jsx — Termin-Detail-Ansicht (US-14 + US-16)
 //
 // Zeigt alle Details eines einzelnen Arzttermins an.
 // Der User erreicht diese Komponente durch Klick auf eine AppointmentCard
@@ -11,8 +11,13 @@
 //   Notizen-Card (wenn vorhanden)
 //   Action-Buttons: Karte öffnen, Bearbeiten, Stornieren
 //
+// US-16: Bearbeiten + Stornieren sind jetzt aktiv!
+//   - "Bearbeiten" → navigiert zu /care/appointments/:id/edit
+//   - "Stornieren" → öffnet ConfirmDialog → DELETE /api/appointments/:id
+//   - Beide Buttons nur bei Status "scheduled" sichtbar
+//
 // Nutzt UI-Primitives aus US-12:
-//   PageContainer, Card, Badge, Button, Alert, Spinner
+//   PageContainer, Card, Badge, Button, Alert, Spinner, ConfirmDialog
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -23,6 +28,7 @@ import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
 import Spinner from '../ui/Spinner';
+import ConfirmDialog from '../ui/ConfirmDialog';
 import '../../styles/components/care/AppointmentDetail.css';
 
 // ── API-URL ──────────────────────────────────────────────────────────────
@@ -64,6 +70,10 @@ export default function AppointmentDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ── Stornierung-State (US-16) ─────────────────────────────────────────
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
   // ── Termin laden ──────────────────────────────────────────────────────
   useEffect(() => {
     async function fetchAppointment() {
@@ -103,6 +113,37 @@ export default function AppointmentDetail() {
   function handleOpenMap() {
     const query = encodeURIComponent(appointment.location);
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+  }
+
+  // ── Termin stornieren (US-16, TASK-60) ────────────────────────────────
+  // Sendet DELETE /api/appointments/:id an das Backend.
+  // Das Backend macht ein Soft Delete (Status → "cancelled").
+  // Nach Erfolg wird der lokale State aktualisiert, sodass die Seite
+  // sofort den neuen Status "Abgesagt" anzeigt.
+  async function handleCancelAppointment() {
+    setCancelling(true);
+
+    try {
+      const res = await fetch(`${API_URL}/api/appointments/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || 'Termin konnte nicht storniert werden.');
+        return;
+      }
+
+      const data = await res.json();
+      // Lokalen State aktualisieren → UI zeigt sofort "Abgesagt"
+      setAppointment(data.appointment);
+    } catch {
+      setError('Verbindung zum Server fehlgeschlagen.');
+    } finally {
+      setCancelling(false);
+      setShowCancelDialog(false);
+    }
   }
 
   // ── Loading-State ─────────────────────────────────────────────────────
@@ -206,28 +247,39 @@ export default function AppointmentDetail() {
           🗺️ In Karte öffnen
         </Button>
 
-        {/* Bearbeiten + Stornieren: Buttons schon sichtbar,
-            Logik kommt in US-15 (Termin anlegen) / US-16 (Termin bearbeiten).
-            Bis dahin sind sie disabled mit Tooltip-Hinweis. */}
-        <div className="detail-actions__row">
-          <Button
-            variant="primary"
-            fullWidth
-            disabled
-            title="Kommt in einer zukünftigen Version"
-          >
-            ✏️ Bearbeiten
-          </Button>
-          <Button
-            variant="danger"
-            fullWidth
-            disabled
-            title="Kommt in einer zukünftigen Version"
-          >
-            ❌ Stornieren
-          </Button>
-        </div>
+        {/* Bearbeiten + Stornieren nur bei geplanten Terminen (US-16) */}
+        {appointment.status === 'scheduled' && (
+          <div className="detail-actions__row">
+            <Button
+              variant="primary"
+              fullWidth
+              onClick={() => navigate(`/care/appointments/${id}/edit`)}
+            >
+              ✏️ Bearbeiten
+            </Button>
+            <Button
+              variant="danger"
+              fullWidth
+              onClick={() => setShowCancelDialog(true)}
+            >
+              ❌ Stornieren
+            </Button>
+          </div>
+        )}
       </div>
+
+      {/* ── ConfirmDialog für Stornierung (US-16) ──────────────────── */}
+      <ConfirmDialog
+        open={showCancelDialog}
+        title="Termin stornieren?"
+        message={`Möchtest du den Termin „${appointment.title}" wirklich absagen? Der Termin wird als „Abgesagt" markiert und erscheint im Verlauf.`}
+        confirmLabel="Ja, stornieren"
+        cancelLabel="Abbrechen"
+        variant="danger"
+        onConfirm={handleCancelAppointment}
+        onCancel={() => setShowCancelDialog(false)}
+        loading={cancelling}
+      />
     </PageContainer>
   );
 }

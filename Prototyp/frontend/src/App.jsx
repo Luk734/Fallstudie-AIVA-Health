@@ -42,6 +42,7 @@ import PrivacySettingsPage from './pages/core/PrivacySettingsPage';
 import CarePage from './pages/modules/care/CarePage';
 import AppointmentDetailPage from './pages/modules/care/AppointmentDetailPage';
 import AppointmentCreatePage from './pages/modules/care/AppointmentCreatePage';
+import AppointmentEditPage from './pages/modules/care/AppointmentEditPage';
 import LabsPage from './pages/modules/labs/LabsPage';
 import CoachPage from './pages/modules/coach/CoachPage';
 import FamilyPage from './pages/modules/family/FamilyPage';
@@ -141,6 +142,18 @@ export default function App() {
               <PrivateRoute>
                 <AppLayout>
                   <AppointmentCreatePage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Care — Termin bearbeiten (US-16) */}
+          <Route
+            path="/care/appointments/:id/edit"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <AppointmentEditPage />
                 </AppLayout>
               </PrivateRoute>
             }

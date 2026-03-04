@@ -1,6 +1,10 @@
-// src/components/care/AppointmentForm.jsx — Termin-Formular (US-15, TASK-57)
+// src/components/care/AppointmentForm.jsx — Termin-Formular (US-15 + US-16)
 //
-// Wiederverwendbares Formular zum Erstellen (und später Bearbeiten) von Terminen.
+// Wiederverwendbares Formular zum Erstellen UND Bearbeiten von Terminen.
+//
+// Props:
+//   appointment? — Wenn vorhanden: Edit-Modus (Felder vorausgefüllt, PUT statt POST)
+//                  Wenn nicht: Create-Modus (leere Felder, POST)
 //
 // Features:
 //   - Arzt-Auswahl aus DB-Liste (GET /api/doctors) + "Anderer Arzt" Option
@@ -8,7 +12,7 @@
 //   - Felder dennoch manuell editierbar
 //   - Client-seitige Validierung (gleiche Regeln wie Backend)
 //   - Loading-State beim Absenden
-//   - Erfolg → Navigation zurück zu /care
+//   - Erfolg → Navigation zurück zu /care (Create) oder Detail-Seite (Edit)
 //   - Fehler → Alert mit Fehlermeldung
 //
 // Nutzt UI-Primitives aus US-12:
@@ -29,23 +33,40 @@ import '../../styles/components/care/AppointmentForm.css';
 // ── API-URL ──────────────────────────────────────────────────────────────
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export default function AppointmentForm() {
+export default function AppointmentForm({ appointment: existingAppointment }) {
   const navigate = useNavigate();
   const { token } = useAuth();
+
+  // ── Edit-Modus erkennen ─────────────────────────────────────────────
+  // Wenn ein appointment-Prop übergeben wird, sind wir im Edit-Modus.
+  const isEditMode = Boolean(existingAppointment);
+
+  // ── Hilfsfunktion: Datum/Uhrzeit aus ISO-String extrahieren ─────────
+  // Wird im Edit-Modus gebraucht, um die date/time-Inputs vorzufüllen.
+  function extractDateAndTime(isoString) {
+    if (!isoString) return { date: '', time: '' };
+    const dt = new Date(isoString);
+    const date = dt.toISOString().split('T')[0]; // "2026-03-15"
+    const time = dt.toTimeString().slice(0, 5);   // "10:30"
+    return { date, time };
+  }
 
   // ── Arztliste aus der Datenbank ─────────────────────────────────────
   const [doctors, setDoctors] = useState([]);
   const [doctorsLoading, setDoctorsLoading] = useState(true);
 
   // ── Formular-State ──────────────────────────────────────────────────
+  // Im Edit-Modus werden die Felder mit den bestehenden Werten vorausgefüllt.
+  const initial = isEditMode ? extractDateAndTime(existingAppointment.datetime) : { date: '', time: '' };
+
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
-  const [title, setTitle] = useState('');
-  const [doctor, setDoctor] = useState('');
-  const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [notes, setNotes] = useState('');
+  const [title, setTitle] = useState(isEditMode ? existingAppointment.title : '');
+  const [doctor, setDoctor] = useState(isEditMode ? existingAppointment.doctor : '');
+  const [phone, setPhone] = useState(isEditMode ? (existingAppointment.phone || '') : '');
+  const [location, setLocation] = useState(isEditMode ? existingAppointment.location : '');
+  const [date, setDate] = useState(initial.date);
+  const [time, setTime] = useState(initial.time);
+  const [notes, setNotes] = useState(isEditMode ? (existingAppointment.notes || '') : '');
 
   // ── UI-State ────────────────────────────────────────────────────────
   const [errors, setErrors] = useState({});
@@ -151,8 +172,16 @@ export default function AppointmentForm() {
       // Datum + Uhrzeit zu ISO-String zusammenbauen
       const datetime = new Date(`${date}T${time}`).toISOString();
 
-      const res = await fetch(`${API_URL}/api/appointments`, {
-        method: 'POST',
+      // Edit-Modus: PUT an /api/appointments/:id
+      // Create-Modus: POST an /api/appointments
+      const url = isEditMode
+        ? `${API_URL}/api/appointments/${existingAppointment.id}`
+        : `${API_URL}/api/appointments`;
+
+      const method = isEditMode ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -173,13 +202,21 @@ export default function AppointmentForm() {
         if (data.errors) {
           setServerError(data.errors.join(' '));
         } else {
-          setServerError(data.error || 'Termin konnte nicht erstellt werden.');
+          setServerError(data.error || (isEditMode
+            ? 'Termin konnte nicht aktualisiert werden.'
+            : 'Termin konnte nicht erstellt werden.'));
         }
         return;
       }
 
-      // Erfolg → zurück zur Termin-Liste
-      navigate('/care');
+      // Erfolg:
+      //   Edit-Modus → zurück zur Detail-Seite
+      //   Create-Modus → zurück zur Termin-Liste
+      if (isEditMode) {
+        navigate(`/care/appointments/${existingAppointment.id}`);
+      } else {
+        navigate('/care');
+      }
     } catch {
       setServerError('Verbindung zum Server fehlgeschlagen.');
     } finally {
@@ -188,6 +225,8 @@ export default function AppointmentForm() {
   }
 
   // ── Mindestdatum: heute (damit der native Datepicker keine Vergangenheit erlaubt)
+  // Im Edit-Modus: Kein Mindestdatum erzwingen, damit das vorhandene Datum
+  // angezeigt werden kann (besonders bei nahen Terminen).
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -195,15 +234,21 @@ export default function AppointmentForm() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => navigate('/care')}
+        onClick={() => isEditMode
+          ? navigate(`/care/appointments/${existingAppointment.id}`)
+          : navigate('/care')
+        }
         className="appointment-form__back"
       >
-        ← Zurück zur Übersicht
+        {isEditMode ? '← Zurück zum Termin' : '← Zurück zur Übersicht'}
       </Button>
 
       <PageHeader
-        title="Neuer Termin"
-        subtitle="Erstelle einen neuen Arzttermin"
+        title={isEditMode ? 'Termin bearbeiten' : 'Neuer Termin'}
+        subtitle={isEditMode
+          ? 'Ändere die Details deines Arzttermins'
+          : 'Erstelle einen neuen Arzttermin'
+        }
       />
 
       {/* ── Fehlermeldung vom Server ───────────────────────────────── */}
@@ -325,7 +370,7 @@ export default function AppointmentForm() {
             fullWidth
             loading={submitting}
           >
-            📅 Termin erstellen
+            {isEditMode ? '💾 Änderungen speichern' : '📅 Termin erstellen'}
           </Button>
         </form>
       </Card>
