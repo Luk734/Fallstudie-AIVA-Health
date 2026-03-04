@@ -28,6 +28,7 @@ import Badge from '../../components/ui/Badge';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import '../../styles/pages/core/PrivacySettingsPage.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -61,6 +62,11 @@ export default function PrivacySettingsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // ── Confirm-Dialog für Widerruf (DSGVO-Sicherheit) ─────────────────────
+  // Widerruf einer Einwilligung kann weitreichende Folgen haben
+  // (z.B. Gesundheitsdaten-Löschung). Daher Bestätigung per Dialog.
+  const [revokeTarget, setRevokeTarget] = useState(null);
+
   // ── useEffect: Consents beim Seitenaufruf laden ─────────────────────────
   useEffect(() => {
     async function loadConsents() {
@@ -85,10 +91,22 @@ export default function PrivacySettingsPage() {
     loadConsents();
   }, [token]);
 
+  // ── Widerruf-Anfrage: Bei Widerruf erst bestätigen, bei Erteilen direkt ──
+  function requestToggle(consent, info) {
+    if (consent.granted) {
+      // Widerruf → ConfirmDialog zeigen
+      setRevokeTarget({ id: consent.id, label: info.label });
+    } else {
+      // Erteilen → keine Bestätigung nötig, direkt ausführen
+      handleToggle(consent.id, consent.granted);
+    }
+  }
+
   // ── handleToggle: Einzelne Einwilligung ändern ──────────────────────────
   async function handleToggle(consentId, currentGranted) {
     setError('');
     setSuccess('');
+    setRevokeTarget(null); // Dialog schließen
 
     const newGranted = !currentGranted;
 
@@ -207,7 +225,7 @@ export default function PrivacySettingsPage() {
                 <Button
                   variant={consent.granted ? 'danger' : 'success'}
                   size="sm"
-                  onClick={() => handleToggle(consent.id, consent.granted)}
+                  onClick={() => requestToggle(consent, info)}
                 >
                   {consent.granted ? 'Widerrufen' : 'Erteilen'}
                 </Button>
@@ -233,6 +251,22 @@ export default function PrivacySettingsPage() {
       >
         ← Zurück zum Dashboard
       </Button>
+
+      {/* ── ConfirmDialog für Widerruf ─────────────────────────────── */}
+      <ConfirmDialog
+        open={Boolean(revokeTarget)}
+        title="Einwilligung widerrufen?"
+        message={`Möchtest du die Einwilligung „${revokeTarget?.label}" wirklich widerrufen? Bereits gespeicherte Daten können dadurch gelöscht werden.`}
+        confirmLabel="Ja, widerrufen"
+        cancelLabel="Abbrechen"
+        variant="danger"
+        onConfirm={() => {
+          if (revokeTarget) {
+            handleToggle(revokeTarget.id, true);
+          }
+        }}
+        onCancel={() => setRevokeTarget(null)}
+      />
     </PageContainer>
   );
 }

@@ -15,16 +15,21 @@
 //   useAuth()     → user (Avatar, Name), logout (Token löschen)
 //   useNavigate() → Navigation zu /profile und /datenschutz
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ConfirmDialog from './ui/ConfirmDialog';
 import '../styles/components/AppHeader.css';
 
 export default function AppHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // ── Logout-Handler ───────────────────────────────────────────────────
-  // Token + User aus Context und localStorage löschen, dann zur Login-Seite.
+  // ── Logout-Bestätigung (ConfirmDialog) ───────────────────────────────
+  // Statt sofort auszuloggen, fragen wir zuerst nach — damit ein
+  // versehentlicher Tap auf 🚪 nicht zum ungewollten Logout führt.
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
   function handleLogout() {
     logout();
     navigate('/login');
@@ -64,12 +69,24 @@ export default function AppHeader() {
         {/* Ausloggen */}
         <button
           className="app-header__btn app-header__btn--logout"
-          onClick={handleLogout}
+          onClick={() => setShowLogoutDialog(true)}
           title="Ausloggen"
         >
           🚪
         </button>
       </div>
+
+      {/* ── Logout-Bestätigung ───────────────────────────────────── */}
+      <ConfirmDialog
+        open={showLogoutDialog}
+        title="Abmelden?"
+        message="Möchtest du dich wirklich von AIVA Health abmelden?"
+        confirmLabel="Ja, abmelden"
+        cancelLabel="Abbrechen"
+        variant="danger"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutDialog(false)}
+      />
     </header>
   );
 }
