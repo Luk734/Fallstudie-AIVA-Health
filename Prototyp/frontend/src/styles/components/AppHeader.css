@@ -1,0 +1,72 @@
+/* src/styles/components/AppHeader.css — Globaler App-Header
+ *
+ * Dezente Leiste oben: Logo links, Action-Buttons rechts.
+ * Vorher als .dashboard-header in DashboardPage.css — jetzt eigenständig,
+ * da der Header auf JEDER geschützten Seite erscheint (via AppLayout).
+ *
+ * Klassennamen umbenannt: dashboard-header → app-header
+ * (weil es kein Dashboard-spezifisches Element mehr ist)
+ */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-slate-200);
+  background-color: var(--color-bg-nav);
+  max-width: var(--max-width-page);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.app-header__logo {
+  font-size: 1.375rem;
+}
+
+.app-header__app-name {
+  font-size: var(--font-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-slate-800);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.app-header__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--min-touch-target);
+  height: var(--min-touch-target);
+  border-radius: var(--radius-md);
+  font-size: 1.2rem;
+  color: var(--color-slate-500);
+  background-color: transparent;
+  transition: background-color var(--transition-normal);
+}
+
+.app-header__btn:hover {
+  background-color: var(--color-slate-100);
+}
+
+.app-header__btn--logout:hover {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+}
+
+.app-header__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}

@@ -1,0 +1,62 @@
+/* src/styles/components/care/AppointmentCard.css — Termin-Karte (US-13, TASK-52)
+ *
+ * Nur Layout-Styling — Basis-Karten-Styles (bg, radius, shadow, accent)
+ * kommen von der <Card> UI-Komponente. Hier regeln wir:
+ *   - Interne Abstände zwischen den Sektionen
+ *   - Typografie für Datum, Titel, Details
+ *   - Responsive Anpassungen
+ */
+
+/* ── Karte: Cursor bei onClick ─────────────────────────────────────────── */
+.appointment-card {
+  cursor: default;
+}
+
+.appointment-card[role="button"] {
+  cursor: pointer;
+}
+
+/* ── Datum + Uhrzeit ───────────────────────────────────────────────────── */
+.appointment-card__datetime {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+}
+
+.appointment-card__time {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-care);
+}
+
+/* ── Titel ─────────────────────────────────────────────────────────────── */
+.appointment-card__title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-800);
+  margin: 0 0 var(--space-2);
+  line-height: var(--leading-tight);
+}
+
+/* ── Arzt + Ort ────────────────────────────────────────────────────────── */
+.appointment-card__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  margin-bottom: var(--space-3);
+}
+
+.appointment-card__separator {
+  color: var(--color-slate-400);
+}
+
+/* ── Footer: Status-Badge ──────────────────────────────────────────────── */
+.appointment-card__footer {
+  display: flex;
+  justify-content: flex-end;
+}

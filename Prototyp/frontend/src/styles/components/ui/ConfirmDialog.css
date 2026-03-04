@@ -1,0 +1,76 @@
+/* ConfirmDialog.css — Bestätigungsdialog-Styles (US-16, TASK-62)
+ *
+ * Nutzt das native <dialog>-Element mit ::backdrop für den Overlay-Effekt.
+ * Das ist moderner und zugänglicher als ein selbstgebauter Modal-Wrapper. */
+
+/* ── Dialog-Element (nativ) ──────────────────────────────────────────── */
+/* <dialog> ist standardmäßig display:none, wird erst durch showModal()
+   sichtbar. Das Browser-Default-Styling wird hier überschrieben. */
+.confirm-dialog {
+  border: none;
+  border-radius: var(--radius-lg, 12px);
+  padding: 0;
+  max-width: 400px;
+  width: calc(100% - 2rem);
+  background: var(--color-surface, #ffffff);
+  box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.15));
+  animation: confirm-dialog-enter 0.2s ease-out;
+}
+
+/* ── Backdrop (Hintergrund-Overlay) ──────────────────────────────────── */
+/* ::backdrop ist ein Pseudo-Element des nativen <dialog>.
+   Es wird automatisch über den gesamten Viewport gelegt.
+   Wir machen es halbtransparent-schwarz für den typischen Modal-Effekt. */
+.confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  animation: confirm-dialog-backdrop 0.2s ease-out;
+}
+
+/* ── Inhalt ──────────────────────────────────────────────────────────── */
+.confirm-dialog__content {
+  padding: var(--spacing-xl, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 1rem);
+}
+
+/* ── Titel ───────────────────────────────────────────────────────────── */
+.confirm-dialog__title {
+  font-size: var(--font-size-lg, 1.25rem);
+  font-weight: 700;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+/* ── Nachricht ───────────────────────────────────────────────────────── */
+.confirm-dialog__message {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-text-secondary, #64748b);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm, 0.5rem);
+  margin-top: var(--spacing-sm, 0.5rem);
+}
+
+/* ── Animationen ─────────────────────────────────────────────────────── */
+@keyframes confirm-dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes confirm-dialog-backdrop {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

@@ -1,30 +1,16 @@
-// src/pages/CarePage.jsx — Platzhalter für das AIVA Care Modul (US-09)
+// src/pages/modules/care/CarePage.jsx — AIVA Care Modul (US-13)
 //
-// Dieses Modul wird später folgende Features enthalten:
-//   - Terminübersicht (US-13)
+// Dieses Modul zeigt die Termin-Übersicht.
+// Die eigentliche Logik steckt in der AppointmentList-Komponente.
+// CarePage ist nur der "Rahmen" (Seite), der die Komponente einbettet.
+//
+// Zukünftige Erweiterungen (in späteren User Stories):
 //   - Termin erstellen/bearbeiten (US-15, US-16)
 //   - Vorsorge-Kalender (US-17)
 //   - Termin-Erinnerungen (US-18)
-//
-// Aktuell ist es nur ein Platzhalter, damit die Navigation
-// bereits funktioniert und man zwischen den Tabs wechseln kann.
 
-import '../../../styles/pages/modules/care/CarePage.css';
+import AppointmentList from '../../../components/care/AppointmentList';
 
 export default function CarePage() {
-  return (
-    <div className="care-page">
-      <div className="care-container">
-        <h1 className="care-heading">📅 AIVA Care</h1>
-        <p className="care-description">
-          Termine, Vorsorge & Erinnerungen — hier entsteht bald dein
-          persönlicher Gesundheitskalender.
-        </p>
-        <div className="care-placeholder">
-          <span className="care-placeholder-icon">🚧</span>
-          <p>Dieses Modul wird in den nächsten Stories implementiert.</p>
-        </div>
-      </div>
-    </div>
-  );
+  return <AppointmentList />;
 }

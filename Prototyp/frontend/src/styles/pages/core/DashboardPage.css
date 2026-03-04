@@ -1,7 +1,10 @@
 /* src/styles/pages/core/DashboardPage.css — Dashboard-Layout (US-10, US-11 Tokens) */
 /*
  * Alle Werte nutzen Design Tokens aus tokens.css.
- * Layout: Header → GreetingCard → (Profil-Hinweis) → SummaryCards → QuickActions
+ * Layout: GreetingCard → (Profil-Hinweis) → SummaryCards → QuickActions
+ *
+ * Hinweis: Der Dashboard-Header wurde in AppHeader.css verschoben,
+ * da er jetzt auf JEDER geschützten Seite angezeigt wird (via AppLayout).
  */
 
 .dashboard-page {
@@ -11,67 +14,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-}
-
-/* ── Dashboard-Header ──────────────────────────────────────────────────── */
-
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--color-slate-200);
-}
-
-.dashboard-header__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.dashboard-header__logo {
-  font-size: 1.375rem;
-}
-
-.dashboard-header__app-name {
-  font-size: var(--font-lg);
-  font-weight: var(--font-bold);
-  color: var(--color-slate-800);
-}
-
-.dashboard-header__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.dashboard-header__btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--min-touch-target);
-  height: var(--min-touch-target);
-  border-radius: var(--radius-md);
-  font-size: 1.2rem;
-  color: var(--color-slate-500);
-  background-color: transparent;
-  transition: background-color var(--transition-normal);
-}
-
-.dashboard-header__btn:hover {
-  background-color: var(--color-slate-100);
-}
-
-.dashboard-header__btn--logout:hover {
-  background-color: var(--color-red-light);
-  color: var(--color-red);
-}
-
-.dashboard-header__avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  object-fit: cover;
 }
 
 /* ── Karten-Container ──────────────────────────────────────────────────── */
