@@ -22,65 +22,34 @@ Stand: 04.03.2026
 - US-16 Termin bearbeiten + ConfirmDialog
 - US-17 Vorsorge-Kalender (GKV, PreventionSchedule/UserPrevention)
 
+## In Arbeit (auf feat/termin-erinnerungen Branch)
+- US-18 Termin-Erinnerungen - FERTIG (committed, noch nicht gemerged)
+
 ## Merge-History (main)
-- merge: feat/auth-consent → US-01 bis US-08
-- merge: feat/navigation-dashboard → US-09, US-10
-- merge: feat/design-system → US-11, US-12
-- merge: feat/termine-anzeigen → US-13 bis US-16
-- merge: feat/vorsorge-erinnerungen → US-17 + Unified Care Page
+- merge: feat/auth-consent -> US-01 bis US-08
+- merge: feat/navigation-dashboard -> US-09, US-10
+- merge: feat/design-system -> US-11, US-12
+- merge: feat/termine-anzeigen -> US-13 bis US-16
+- merge: feat/vorsorge-erinnerungen -> US-17 + Unified Care Page
 
 ## Tech-Stack
 - Backend: Express + Prisma ORM + PostgreSQL (localhost:5433)
 - Frontend: React + Vite (localhost:5173)
 - Auth: JWT (bcrypt + jsonwebtoken)
-- DB: Docker PostgreSQL Container "aiva-postgres"
+- DB: Docker PostgreSQL Container aiva-postgres
 
 ## DB Models (Prisma)
-- User (id, email, password, firstName, lastName, birthDate, gender, createdAt)
-- Consent (id, userId, consentType, accepted, updatedAt)
-- Appointment (id, userId, title, doctor, phone, location, datetime, notes, status, createdAt, updatedAt)
-- Doctor (id, name, fachrichtung, telefon, adresse, createdAt)
-- PreventionSchedule (id, type, description, gender, ageFrom, ageTo, frequencyMonths)
-- UserPrevention (id, userId, preventionId, status [open/completed], completedAt)
+- User, Consent, Appointment, Doctor, PreventionSchedule, UserPrevention
+- Notification (id, userId, type, title, message, relatedId, read, createdAt) NEU US-18
 
-## API-Endpunkte
-- POST /api/auth/register, POST /api/auth/login
-- GET/PUT /api/user/profile
-- GET/POST /api/consent
-- GET/POST /api/appointments, GET/PUT/DELETE /api/appointments/:id
-- GET /api/doctors
-- GET /api/prevention, PATCH /api/prevention/:id/status
+## API-Endpunkte (NEU US-18)
+- GET /api/notifications
+- PATCH /api/notifications/:id/read
+- PATCH /api/notifications/read-all
 
-## Frontend Routing (App.jsx)
-- / → /dashboard (redirect)
-- /login → LoginPage
-- /consent → ConsentPage (PrivateRoute, ohne Nav)
-- /dashboard → DashboardPage
-- /profile → ProfilePage
-- /datenschutz → PrivacySettingsPage
-- /care → CarePage (unified: Termine + Vorsorge)
-- /care/appointments/:id → AppointmentDetailPage
-- /care/new → AppointmentCreatePage
-- /care/appointments/:id/edit → AppointmentEditPage
-- /labs → LabsPage (Platzhalter)
-- /coach → CoachPage (Platzhalter)
-- /family → FamilyPage (Platzhalter)
+## Frontend (NEU US-18)
+- NotificationBell.jsx im AppHeader (Polling 60s, Badge-Zaehler)
+- NotificationsPage.jsx unter /notifications
+- Cron-Job (node-cron) alle 15 Min fuer 24h + 1h Erinnerungen
 
-## Frontend Komponenten (care/)
-- AppointmentCard.jsx — Termin-Karte (Datum, Titel, Arzt, Ort, Status-Badge)
-- AppointmentDetail.jsx — Termin-Detailansicht
-- AppointmentForm.jsx — Erstellen/Bearbeiten (mit Arzt-Dropdown, Validierung, ?title= Query-Param)
-- PreventionCard.jsx — Vorsorge-Karte (Status-Toggle mit ConfirmDialog)
-
-## Frontend Seiten (care/)
-- CarePage.jsx — UNIFIED: 4 Sektionen (Vorsorge-Fortschritt, Anstehende Termine, Vorsorge gruppiert, Vergangene Termine)
-- AppointmentDetailPage, AppointmentCreatePage, AppointmentEditPage
-
-## Testdaten (Seed)
-- Laura Müller (33, female, laura@example.com / Test1234!)
-  - 3 Vorsorgen, 5 Termine (3 upcoming, 2 past)
-- Thomas Wagner (56, male, thomas@example.com / Test1234!)
-  - 6 Vorsorgen, Termine + Consents
-
-## Nächste User Story: US-18 (Termin-Erinnerungen)
-Branch: feat/termin-erinnerungen (bereits erstellt, noch leer)
+## Naechste User Story: US-19 (Medikament hinzufuegen) - AIVA Labs Modul

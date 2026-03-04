@@ -29,7 +29,7 @@ import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
 import Spinner from '../../components/ui/Spinner';
 import Alert from '../../components/ui/Alert';
-import '../../styles/pages/NotificationsPage.css';
+import '../../styles/pages/core/NotificationsPage.css';
 
 export default function NotificationsPage() {
   const { token } = useAuth();
