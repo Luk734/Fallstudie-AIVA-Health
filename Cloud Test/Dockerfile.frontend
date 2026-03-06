@@ -1,0 +1,109 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Dockerfile.frontend — Baut die React-App und liefert sie per Nginx aus
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# Dies ist ein "Multi-Stage Build" (Mehr-Phasen-Build):
+#
+#   Phase 1 (build):  Node.js + Vite kompilieren die React-App
+#                     → Ergebnis: statische HTML/JS/CSS-Dateien im Ordner "dist/"
+#
+#   Phase 2 (nginx):  NUR diese fertigen Dateien werden in ein Nginx-Image kopiert
+#                     → Node.js, npm, node_modules werden NICHT uebernommen
+#
+# Warum Multi-Stage?
+# ──────────────────
+# - Phase 1 braucht Node.js (~150 MB) + node_modules (~300 MB) = ~450 MB
+# - Phase 2 braucht nur Nginx (~25 MB) + unsere dist/-Dateien (~2 MB)
+# → Das finale Image ist nur ~27 MB statt ~450 MB!
+#
+# In Produktion laeuft KEIN Vite-Dev-Server mehr.
+# Stattdessen werden die fertigen Dateien von Nginx direkt ausgeliefert.
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PHASE 1: React-App bauen
+# ══════════════════════════════════════════════════════════════════════════════
+# "AS build" gibt dieser Phase einen Namen, damit wir spaeter
+# mit "COPY --from=build" darauf zugreifen koennen.
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+# Dependencies installieren (gecached, siehe Dockerfile.backend fuer Erklaerung)
+COPY package*.json ./
+RUN npm ci
+
+# Quellcode kopieren
+COPY . .
+
+# ─── API-URL FUER PRODUKTION ANPASSEN ────────────────────────────────────────
+# Problem:
+# Im lokalen Entwicklungsmodus nutzen einige Seiten diesen Code:
+#
+#   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+#   fetch(`${API_URL}/api/auth/login`, ...)
+#
+# Das funktioniert lokal, weil auf DEINEM Rechner auch das Backend laeuft.
+# In der Cloud ist das anders:
+#   - Der Nutzer oeffnet http://192.168.x.x im Browser
+#   - fetch('http://localhost:3001/...') wuerde auf dem Rechner des NUTZERS
+#     nach Port 3001 suchen — dort laeuft aber nichts!
+#
+# Loesung:
+# Nginx ist ein Reverse Proxy: ALLE Anfragen gehen ueber Port 80.
+# Nginx leitet /api/* automatisch an das Backend weiter.
+# Dafuer muessen die fetch-Aufrufe RELATIVE URLs nutzen:
+#   fetch('/api/auth/login')  →  geht an Nginx  →  wird an Backend weitergeleitet
+#
+# Der sed-Befehl unten ersetzt den localhost-Fallback durch einen leeren String:
+#   VORHER:  import.meta.env.VITE_API_URL || 'http://localhost:3001'
+#   NACHHER: ''
+# Dadurch wird: fetch(`${''}/api/...`)  →  fetch('/api/...')  →  relativ  →  korrekt!
+#
+# sed erklaert:
+#   find src -name "*.jsx"         → alle JSX-Dateien im src-Ordner finden
+#   -exec sed -i "s#ALT#NEU#g"    → in jeder Datei ALT durch NEU ersetzen
+#   s#...#...#g                    → s = substitute, g = global (alle Vorkommen)
+#   # wird als Trennzeichen statt / genutzt (weil die URL selbst / enthaelt)
+RUN find src -name "*.jsx" -exec sed -i \
+    "s#import\.meta\.env\.VITE_API_URL || 'http://localhost:3001'#''#g" \
+    {} +
+
+# Vite-Build: Kompiliert React + JSX → optimierte HTML/JS/CSS-Dateien.
+# - JSX wird zu normalem JavaScript transpiliert
+# - CSS wird minimiert (Leerzeichen + Kommentare entfernt)
+# - JavaScript wird minimiert + gebundled (eine grosse Datei)
+# - Ergebnis landet im Ordner "dist/"
+RUN npm run build
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PHASE 2: Nginx Webserver
+# ══════════════════════════════════════════════════════════════════════════════
+# Wir starten mit einem frischen Image — NUR Nginx, kein Node.js!
+# Alles aus Phase 1 (node_modules, Quellcode, etc.) wird verworfen.
+FROM nginx:alpine
+
+# NUR die fertig gebauten Dateien aus Phase 1 kopieren.
+# --from=build = greift auf die "build"-Phase oben zu.
+# /app/dist → die von Vite erstellten HTML/JS/CSS-Dateien
+# /usr/share/nginx/html → Standard-Verzeichnis fuer Nginx-Webseiten
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Die nginx.conf wird NICHT hier kopiert!
+# Stattdessen wird sie per Volume in docker-compose.yml gemountet:
+#   volumes:
+#     - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+#
+# Vorteil: Nginx-Konfiguration aendern = nur Container neustarten,
+# nicht das gesamte Image neu bauen.
+
+EXPOSE 80
+
+# Nginx im Vordergrund starten.
+# Normalerweise laeuft Nginx als Daemon (Hintergrund-Prozess).
+# Docker erwartet aber, dass der Haupt-Prozess im Vordergrund laeuft,
+# sonst denkt Docker der Container ist fertig und beendet ihn.
+# "daemon off;" verhindert das.
+CMD ["nginx", "-g", "daemon off;"]

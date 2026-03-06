@@ -1,0 +1,142 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# docker-compose.yml — Startet ALLE 3 Services mit EINEM Befehl
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# Was ist Docker Compose?
+# ──────────────────────
+# Docker Compose ist ein Tool, das mehrere Docker-Container gleichzeitig
+# verwaltet. Statt jeden Container einzeln zu starten, definieren wir hier
+# alle Services und ihre Verbindungen zueinander.
+#
+# Befehle (alle im Ordner "Cloud Test/" ausfuehren):
+#   docker compose up --build -d   → Alle Container bauen + starten
+#   docker compose down             → Alle Container stoppen + entfernen
+#   docker compose logs -f          → Live-Logs aller Container anzeigen
+#   docker compose logs backend -f  → Nur Backend-Logs anzeigen
+#   docker compose ps               → Status aller Container anzeigen
+#
+# Architektur:
+# ────────────
+#   Internet/Browser
+#        │
+#        ▼ Port 80
+#   ┌─────────┐      /api/*       ┌─────────┐        ┌────────┐
+#   │  Nginx  │ ──────────────▶  │ Backend │ ─────▶ │   DB   │
+#   │ (React) │                   │(Express)│        │(Postgres)│
+#   └─────────┘                   └─────────┘        └────────┘
+#     Port 80                      Port 3001          Port 5432
+#   (von aussen                  (nur intern)       (nur intern)
+#    erreichbar)
+#
+# ══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ─── 1. DATENBANK (PostgreSQL) ────────────────────────────────────────────
+  # Wir nutzen das offizielle PostgreSQL 16 Image von Docker Hub.
+  # "alpine" = minimale Linux-Variante (kleiner + schneller als Ubuntu).
+  #
+  # Die Datenbank ist NUR intern erreichbar (kein "ports:" Eintrag).
+  # Das ist ein Sicherheits-Feature: Von aussen kann niemand direkt
+  # auf die Datenbank zugreifen — nur das Backend kann sie erreichen.
+  db:
+    image: postgres:16-alpine
+    container_name: aiva-db
+    # restart: unless-stopped → Container startet automatisch neu,
+    # wenn er abstuerzt oder die VM neustartet (ausser man stoppt ihn manuell).
+    restart: unless-stopped
+    environment:
+      # Diese Variablen werden beim ERSTEN Start genutzt,
+      # um den DB-User und die Datenbank automatisch zu erstellen.
+      # ${DB_USER:-aiva_user} bedeutet:
+      #   → Nimm den Wert aus der .env-Datei (DB_USER)
+      #   → Falls nicht gesetzt, nutze "aiva_user" als Fallback
+      POSTGRES_USER: ${DB_USER:-aiva_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-aiva_password}
+      POSTGRES_DB: ${DB_NAME:-aiva_health}
+    volumes:
+      # Named Volume = persistenter Speicher.
+      # Ohne Volume wuerden ALLE Daten verloren gehen, wenn der
+      # Container neu gestartet wird! Das Volume speichert die
+      # DB-Dateien auf der Festplatte der VM.
+      - pgdata:/var/lib/postgresql/data
+    # Healthcheck: Docker prueft regelmaessig, ob die DB bereit ist.
+    # Das Backend wartet (depends_on + condition), bis dieser Check
+    # erfolgreich ist, bevor es startet.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-aiva_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── 2. BACKEND (Express API) ────────────────────────────────────────────
+  # Wird aus unserem Dockerfile.backend gebaut.
+  # Der Build-Context ist der backend/-Ordner im Prototyp.
+  backend:
+    build:
+      # context = das Verzeichnis, aus dem Docker die Dateien kopiert.
+      # Relativ zu diesem docker-compose.yml (das in "Cloud Test/" liegt).
+      context: ../Prototyp/backend
+      # dockerfile = Pfad zum Dockerfile, RELATIV zum context.
+      # Von ../Prototyp/backend aus: ../../Cloud Test/Dockerfile.backend
+      dockerfile: "../../Cloud Test/Dockerfile.backend"
+    container_name: aiva-backend
+    restart: unless-stopped
+    environment:
+      # ─── DATABASE_URL erklaert ─────────────────────────────────────────
+      # Format: postgresql://USER:PASSWORT@HOST:PORT/DATENBANKNAME
+      #
+      # WICHTIG: Der Host ist "db" (= der Service-Name oben), NICHT "localhost"!
+      # Docker Compose erstellt ein internes Netzwerk. Darin koennen sich
+      # Container ueber ihre Service-Namen erreichen:
+      #   backend → "db" → wird zu 172.x.x.x aufgeloest (interne Docker-IP)
+      #
+      # Der Port ist 5432 (PostgreSQL-Standard INNERHALB des Containers),
+      # nicht 5433 wie in der lokalen Entwicklung!
+      DATABASE_URL: postgresql://${DB_USER:-aiva_user}:${DB_PASSWORD:-aiva_password}@db:5432/${DB_NAME:-aiva_health}
+      JWT_SECRET: ${JWT_SECRET:-aiva-cloud-secret-bitte-aendern}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      PORT: 3001
+      NODE_ENV: production
+    depends_on:
+      # Das Backend startet ERST, wenn die DB "healthy" ist.
+      # Ohne diese Bedingung wuerde das Backend abstuerzen, weil
+      # die DB noch nicht bereit ist → Prisma kann sich nicht verbinden.
+      db:
+        condition: service_healthy
+    # KEIN "ports:" hier! Das Backend ist nur intern erreichbar.
+    # Nginx leitet /api-Anfragen an "backend:3001" weiter.
+
+  # ─── 3. FRONTEND (React + Nginx) ─────────────────────────────────────────
+  # Zwei-Phasen-Build (Multi-Stage):
+  #   Phase 1: React-App mit Vite kompilieren → statische HTML/JS/CSS-Dateien
+  #   Phase 2: Diese Dateien per Nginx-Webserver ausliefern
+  #
+  # Nginx dient gleichzeitig als Reverse Proxy:
+  #   Anfrage an /api/* → wird an das Backend weitergeleitet
+  #   Anfrage an /*     → liefert die React-App aus
+  frontend:
+    build:
+      context: ../Prototyp/frontend
+      dockerfile: "../../Cloud Test/Dockerfile.frontend"
+    container_name: aiva-frontend
+    restart: unless-stopped
+    volumes:
+      # Die nginx.conf aus diesem Ordner wird in den Container gemountet.
+      # So koennen wir die Nginx-Konfiguration aendern, ohne das Image
+      # neu zu bauen — einfach Container neustarten.
+      # ":ro" = read-only (Sicherheit: Nginx soll die Datei nur lesen).
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      # Port 80 ist der EINZIGE Port, der von aussen erreichbar ist!
+      # Alle Anfragen (Frontend + API) gehen ueber Port 80 rein.
+      # Links: Port auf der VM, Rechts: Port im Container
+      - "80:80"
+    depends_on:
+      - backend
+
+# ─── PERSISTENTE SPEICHER (Volumes) ────────────────────────────────────────
+# Named Volumes werden von Docker verwaltet. Sie ueberleben Container-Neustarts
+# und sogar "docker compose down". Erst "docker compose down -v" loescht sie.
+volumes:
+  pgdata:

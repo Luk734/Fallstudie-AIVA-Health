@@ -1,0 +1,3 @@
+# .gitignore fuer Cloud Test
+# Die .env enthaelt Passwoerter → NIEMALS committen!
+.env

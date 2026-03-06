@@ -1,0 +1,81 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Dockerfile.backend — Packt das Express-Backend in einen Docker-Container
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# Was ist ein Dockerfile?
+# ───────────────────────
+# Ein Dockerfile ist eine Bauanleitung fuer ein Docker-Image.
+# Jede Zeile (FROM, COPY, RUN, ...) ist ein Schritt, der eine neue
+# "Schicht" (Layer) im Image erstellt. Docker cached diese Schichten:
+# Wenn sich nur der Code aendert (aber nicht die Dependencies),
+# wird der "npm ci"-Schritt uebersprungen → Build ist viel schneller!
+#
+# Dieses Dockerfile wird NICHT direkt aufgerufen.
+# docker-compose.yml nutzt es automatisch (siehe: build.dockerfile).
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─── BASIS-IMAGE ──────────────────────────────────────────────────────────────
+# node:20-alpine = Node.js Version 20 (LTS) auf Alpine Linux.
+# Alpine ist eine SEHR kleine Linux-Distribution (~5 MB).
+# → Das fertige Backend-Image wird nur ~150 MB statt ~900 MB (Ubuntu).
+FROM node:20-alpine
+
+# ─── ARBEITSVERZEICHNIS ──────────────────────────────────────────────────────
+# Alle folgenden Befehle (COPY, RUN, CMD) werden in /app ausgefuehrt.
+# Docker erstellt den Ordner automatisch, falls er nicht existiert.
+WORKDIR /app
+
+# ─── SCHRITT 1: Dependencies installieren ────────────────────────────────────
+# TRICK: Wir kopieren zuerst NUR package.json und package-lock.json.
+#
+# Warum nicht gleich alles kopieren?
+# Docker cached jeden Layer. Wenn sich nur der Quellcode aendert,
+# aber NICHT die Dependencies, ueberspringt Docker den "npm ci"-Schritt
+# komplett und nutzt den Cache. Das spart bei jedem Re-Build Minuten!
+#
+# package*.json = kopiert sowohl package.json als auch package-lock.json
+COPY package*.json ./
+
+# npm ci = "Clean Install"
+#   - Loescht vorhandene node_modules komplett
+#   - Installiert EXAKT die Versionen aus package-lock.json
+#   - Reproduzierbar: Jeder Build bekommt identische Dependencies
+#
+# --omit=dev = Ueberspringt devDependencies (eslint, etc.)
+#   In Produktion brauchen wir keine Entwicklungs-Tools.
+RUN npm ci --omit=dev
+
+# ─── SCHRITT 2: Prisma Client generieren ────────────────────────────────────
+# Prisma braucht einen "generierten Client" — das ist JavaScript-Code,
+# der aus dem Prisma-Schema automatisch erstellt wird und typsichere
+# Datenbankabfragen ermoeglicht (z.B. prisma.user.findMany()).
+#
+# Wir kopieren das Schema separat VOR dem restlichen Code,
+# damit der Cache aktiv bleibt, solange sich das Schema nicht aendert.
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# ─── SCHRITT 3: Restlichen Quellcode kopieren ───────────────────────────────
+# Jetzt erst den gesamten Code (src/, server.js, .env, etc.) kopieren.
+# Dieser Layer wird bei jeder Code-Aenderung neu gebaut,
+# aber die teuren Schritte (npm ci, prisma generate) bleiben gecached.
+COPY . .
+
+# ─── PORT DOKUMENTIEREN ──────────────────────────────────────────────────────
+# EXPOSE ist NUR Dokumentation — es oeffnet KEINEN Port.
+# Der tatsaechliche Port wird durch die PORT-Umgebungsvariable
+# in docker-compose.yml gesteuert (PORT: 3001).
+EXPOSE 3001
+
+# ─── START-BEFEHL ─────────────────────────────────────────────────────────────
+# CMD = der Befehl, der beim Container-Start ausgefuehrt wird.
+#
+# Ablauf:
+# 1. "npx prisma migrate deploy" → wendet alle DB-Migrationen an
+#    (erstellt Tabellen, aendert Spalten, etc.)
+#    Falls die DB bereits aktuell ist, passiert nichts (idempotent).
+# 2. "node server.js" → startet den Express-Server
+#
+# "sh -c" wird benoetigt, damit wir zwei Befehle mit && verketten koennen.
+# && = der zweite Befehl laeuft NUR, wenn der erste erfolgreich war.
+CMD sh -c "npx prisma migrate deploy && node server.js"
