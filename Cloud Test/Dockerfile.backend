@@ -20,6 +20,11 @@
 # → Das fertige Backend-Image wird nur ~150 MB statt ~900 MB (Ubuntu).
 FROM node:20-alpine
 
+# ─── OPENSSL INSTALLIEREN (Pflicht fuer Prisma auf Alpine) ───────────────────
+# Prisma benoetigt OpenSSL um die DB-Verbindung zu verschluesseln.
+# Alpine hat es nicht vorinstalliert → muss explizit nachinstalliert werden.
+RUN apk add --no-cache openssl
+
 # ─── ARBEITSVERZEICHNIS ──────────────────────────────────────────────────────
 # Alle folgenden Befehle (COPY, RUN, CMD) werden in /app ausgefuehrt.
 # Docker erstellt den Ordner automatisch, falls er nicht existiert.
