@@ -26,10 +26,18 @@ const PORT = process.env.PORT || 3001;
 // Middleware = Funktionen, die bei JEDER Anfrage ausgeführt werden, bevor
 // der eigentliche Route-Handler aufgerufen wird.
 
-// 1. CORS: Erlaubt unserem Frontend (localhost:5173) die API aufzurufen.
-//    Ohne CORS würde der Browser die Anfrage blockieren (Security-Feature).
+// 1. CORS: Erlaubt unserem Frontend (localhost:5173) und der Android-App
+//    die API aufzurufen. Ohne CORS würde der Browser/WebView die Anfrage
+//    blockieren (Security-Feature).
+//    - http://localhost:5173  = Vite Dev-Server (Entwicklung)
+//    - https://localhost      = Capacitor Android-App (APK)
+//    - capacitor://localhost  = Capacitor iOS-App (falls später benötigt)
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    'https://localhost',
+    'capacitor://localhost',
+  ],
   credentials: true,
 }));
 
@@ -86,8 +94,10 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/medications', medicationRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🚀 AIVA Backend läuft auf http://localhost:${PORT}`);
+// '0.0.0.0' = Server lauscht auf ALLEN Netzwerk-Interfaces,
+// nicht nur localhost. Dadurch kann die Android-App über WLAN zugreifen.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 AIVA Backend läuft auf http://0.0.0.0:${PORT}`);
   console.log(`   Health-Check: http://localhost:${PORT}/api/health`);
 
   // ─── CRON-JOB: Termin-Erinnerungen (US-18) ─────────────────────────────
