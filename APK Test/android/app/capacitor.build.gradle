@@ -1,0 +1,31 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// capacitor.build.gradle — Capacitor-Plugin-Konfiguration und Java-Version
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Was macht diese Datei?
+// ──────────────────────
+// Diese Datei wird von app/build.gradle per "apply from" geladen.
+// Sie konfiguriert zwei Dinge:
+//
+// 1. Java-Kompatibilitaet: Capacitor benoetigt mindestens Java 17.
+//    sourceCompatibility = mit welcher Java-Version der Quellcode geschrieben ist
+//    targetCompatibility = fuer welche Java-Version kompiliert wird
+//
+// 2. Plugin-Dependencies: Wenn spaeter Capacitor-Plugins installiert werden
+//    (z.B. @capacitor/camera, @capacitor/push-notifications), fuegt "npx cap sync"
+//    deren Gradle-Abhaengigkeiten automatisch hier ein.
+//    Aktuell sind KEINE Plugins installiert ("none currently").
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Aktuell keine Capacitor-Plugin-Abhaengigkeiten vorhanden.
+// Bei Installation von Plugins wuerde hier z.B. stehen:
+//   dependencies {
+//       implementation project(':capacitor-camera')
+//   }
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

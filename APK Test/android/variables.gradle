@@ -1,0 +1,48 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// variables.gradle — Zentrale Versions-Variablen fuer das gesamte Projekt
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Warum eine separate Datei fuer Versionen?
+// ──────────────────────────────────────────
+// Wenn mehrere Module (app, capacitor-cordova-android-plugins) die gleichen
+// Library-Versionen nutzen, definieren wir sie hier EINMAL zentral.
+// Aenderungen muessen dann nur an dieser einen Stelle vorgenommen werden,
+// statt in jeder build.gradle einzeln.
+//
+// "ext { ... }" = Extra-Properties, die in allen build.gradle-Dateien
+// ueber "rootProject.ext.variablenName" verfuegbar sind.
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+ext {
+    // ─── ANDROID SDK VERSIONEN ──────────────────────────────────────────────
+    // minSdkVersion 22     → Aelteste unterstuetze Android-Version (Android 5.1 Lollipop)
+    //                        ~99% aller Android-Geraete werden damit abgedeckt.
+    // compileSdkVersion 34 → SDK-Version, gegen die kompiliert wird (Android 14)
+    // targetSdkVersion 34  → Ziel-SDK, fuer das die App optimiert ist (Android 14)
+    minSdkVersion = 22
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+
+    // ─── ANDROIDX LIBRARY VERSIONEN ─────────────────────────────────────────
+    // AndroidX = Moderne Support-Libraries von Google (Nachfolger der alten
+    // "support-v4/v7" Libraries). Stellen Kompatibilitaet mit aelteren
+    // Android-Versionen sicher.
+    androidxActivityVersion = '1.8.0'             // Activity-Lifecycle-Management
+    androidxAppCompatVersion = '1.6.1'            // Abwaertskompatible UI-Komponenten
+    androidxCoordinatorLayoutVersion = '1.2.0'    // Layout fuer verschachtelte Scroll-Effekte
+    androidxCoreVersion = '1.12.0'                // Kern-Utilities (Notifications, Permissions etc.)
+    androidxFragmentVersion = '1.6.2'             // Fragment-Management (UI-Bausteine)
+    coreSplashScreenVersion = '1.0.1'             // Splash-Screen-API (Ladebildschirm beim App-Start)
+    androidxWebkitVersion = '1.9.0'               // WebView-Erweiterungen (wichtig fuer Capacitor!)
+
+    // ─── TEST LIBRARY VERSIONEN ─────────────────────────────────────────────
+    junitVersion = '4.13.2'                       // Unit-Test-Framework
+    androidxJunitVersion = '1.1.5'                // AndroidX JUnit-Erweiterungen
+    androidxEspressoCoreVersion = '3.5.1'         // UI-Test-Framework (automatisierte Klick-Tests)
+
+    // ─── CORDOVA KOMPATIBILITAET ────────────────────────────────────────────
+    // Cordova-Version fuer das Platzhalter-Plugin-Modul.
+    // Wird von Capacitor fuer Rueckwaerts-Kompatibilitaet mit Cordova-Plugins benoetigt.
+    cordovaAndroidVersion = '10.1.1'
+}

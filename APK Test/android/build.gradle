@@ -1,0 +1,65 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// build.gradle (Projekt-Ebene) — Zentrale Build-Konfiguration fuer ALLE Module
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Was ist diese Datei?
+// ────────────────────
+// Dies ist die "Top-Level" build.gradle. Sie gilt fuer das GESAMTE Projekt,
+// nicht nur fuer ein einzelnes Modul. Hier werden globale Einstellungen
+// definiert, die alle Untermodule (":app" und ":capacitor-cordova-android-plugins")
+// gemeinsam nutzen.
+//
+// Aufbau:
+//   1. buildscript   → Plugins/Tools fuer den Build-Prozess selbst laden
+//   2. apply from    → Externe Gradle-Dateien einbinden (variables.gradle)
+//   3. allprojects   → Repositories, die ALLE Module zum Laden von Libraries nutzen
+//   4. clean-Task    → Loescht den gesamten Build-Output
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+
+// ─── BUILDSCRIPT ────────────────────────────────────────────────────────────
+// Hier werden die Gradle-Plugins geladen, die der Build-Prozess selbst braucht.
+// WICHTIG: Das sind KEINE App-Abhaengigkeiten! App-Libraries gehoeren in
+// die jeweilige app/build.gradle.
+buildscript {
+    
+    // Repositories = Quellen, aus denen Gradle die Plugins herunterlaed
+    repositories {
+        google()       // Google's Maven-Repository (Android Gradle Plugin, Firebase etc.)
+        mavenCentral() // Zentrales Java/Kotlin-Repository (Open-Source-Libraries)
+    }
+    dependencies {
+        // Android Gradle Plugin 8.2.1 — Ermoeglicht das Bauen von Android-Apps mit Gradle.
+        // Ohne dieses Plugin wuesste Gradle nicht, wie man APKs erzeugt.
+        classpath 'com.android.tools.build:gradle:8.2.1'
+
+        // Google Services Plugin 4.4.0 — Wird fuer Firebase/Push-Notifications benoetigt.
+        // Liest die google-services.json aus und konfiguriert Firebase automatisch.
+        // Aktuell haben wir KEINE google-services.json, daher ist das Plugin inaktiv
+        // (siehe Fallback-Logik in app/build.gradle ganz unten).
+        classpath 'com.google.gms:google-services:4.4.0'
+    }
+}
+
+// ─── VARIABLEN LADEN ────────────────────────────────────────────────────────
+// Laedt variables.gradle, die zentrale SDK-Versionen und Library-Versionen definiert.
+// Dadurch muessen Versionsnummern nur an EINER Stelle geaendert werden.
+apply from: "variables.gradle"
+
+// ─── REPOSITORIES FUER ALLE MODULE ─────────────────────────────────────────
+// Alle Untermodule (:app, :capacitor-cordova-android-plugins, :capacitor-android)
+// koennen Libraries aus diesen Repositories laden.
+allprojects {
+    repositories {
+        google()       // Android SDK, AndroidX, Firebase etc.
+        mavenCentral() // Alles andere (Open-Source Java/Kotlin Libraries)
+    }
+}
+
+// ─── CLEAN TASK ─────────────────────────────────────────────────────────────
+// "gradlew clean" loescht den gesamten Build-Output (build/-Ordner).
+// Nuetzlich, wenn der Build-Cache korrupt ist oder man einen frischen Build will.
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

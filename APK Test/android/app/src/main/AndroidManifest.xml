@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ══════════════════════════════════════════════════════════════════════════════
+  AndroidManifest.xml — Zentrale Konfiguration der AIVA Health Android-App
+  ══════════════════════════════════════════════════════════════════════════════
+
+  Was ist das AndroidManifest?
+  ────────────────────────────
+  Das Manifest ist die "Visitenkarte" der App gegenueber dem Android-System.
+  Es definiert:
+    - Welche Activities (Bildschirme) die App hat
+    - Welche Berechtigungen die App braucht (Internet, Kamera etc.)
+    - App-Name, Icon und Theme
+    - Wie die App gestartet wird (Launcher-Intent)
+
+  Ohne AndroidManifest.xml kann Android die App NICHT installieren oder starten.
+
+  ══════════════════════════════════════════════════════════════════════════════
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/AppTheme">
+        <!--
+          allowBackup:         Erlaubt Android, App-Daten in der Cloud zu sichern
+          icon/roundIcon:      App-Icon (normal und rund) aus den mipmap-Ordnern
+          label:               App-Name "AIVA Health" (aus strings.xml)
+          supportsRtl:         Unterstuetzt Rechts-nach-Links-Sprachen (Arabisch etc.)
+          usesCleartextTraffic: Erlaubt HTTP-Verbindungen (nicht nur HTTPS).
+                               Noetig, weil Capacitor die Web-App lokal per HTTP laedt.
+          theme:               Visuelles Theme der App (aus styles.xml)
+        -->
+
+        <!--
+          ─── MAIN ACTIVITY ───────────────────────────────────────────────────
+          Die MainActivity ist der einzige Bildschirm der App.
+          Sie erbt von Capacitor's BridgeActivity und zeigt die WebView
+          mit unserer React-App an.
+        -->
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true">
+            <!--
+              configChanges:  Bei diesen Aenderungen wird die Activity NICHT neu erstellt,
+                              sondern nur benachrichtigt. Verhindert, dass die WebView bei
+                              Bildschirmdrehung komplett neu laed.
+              launchMode:     "singleTask" = Es gibt immer nur EINE Instanz dieser Activity.
+                              Verhindert, dass die App mehrfach im Hintergrund laeuft.
+              exported:       Muss "true" sein fuer die Launcher-Activity, damit Android
+                              die App vom Home-Screen starten kann.
+            -->
+
+            <!-- Intent-Filter: Macht diese Activity zur Launcher-Activity.
+                 D.h. sie erscheint im App-Drawer und wird beim App-Start geoeffnet. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <!--
+          ─── FILE PROVIDER ───────────────────────────────────────────────────
+          Der FileProvider ermoeglicht es, Dateien sicher mit anderen Apps zu teilen
+          (z.B. fuer Kamera-Fotos, Datei-Uploads). Er stellt geschuetzte URIs bereit,
+          statt den direkten Dateipfad offenzulegen.
+          Die erlaubten Pfade sind in xml/file_paths.xml definiert.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!--
+      ─── BERECHTIGUNGEN (Permissions) ────────────────────────────────────────
+      Hier werden die Berechtigungen definiert, die die App benoetigt.
+      INTERNET: Ermoeglicht der App, Netzwerkverbindungen herzustellen.
+      Wird benoetigt, damit die WebView HTTP-Anfragen an unser Backend senden kann.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

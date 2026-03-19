@@ -1,0 +1,28 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// settings.gradle — Definiert die Modul-Struktur des Android-Projekts
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Was macht diese Datei?
+// ──────────────────────
+// Gradle muss wissen, aus welchen Modulen (= Teilprojekten) das Projekt besteht.
+// Jedes "include" registriert ein Modul, das seine eigene build.gradle hat.
+//
+// Unser Projekt hat 3 Module:
+//   :app                                → Die eigentliche AIVA Health Android-App
+//   :capacitor-cordova-android-plugins  → Leeres Platzhalter-Modul fuer Cordova-Plugins
+//   :capacitor-android                  → Capacitor-Kernbibliothek (aus node_modules)
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Modul 1: Unsere App (android/app/)
+include ':app'
+
+// Modul 2: Cordova-Plugin-Platzhalter (android/capacitor-cordova-android-plugins/)
+// Dieses Modul ist aktuell leer, wird aber von Capacitor erwartet.
+// Wenn man spaeter Cordova-Plugins nutzt, werden sie hier eingebunden.
+include ':capacitor-cordova-android-plugins'
+project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+
+// Modul 3: Capacitor-Android-Kernbibliothek (aus node_modules geladen)
+// → Wird in capacitor.settings.gradle definiert
+apply from: 'capacitor.settings.gradle'

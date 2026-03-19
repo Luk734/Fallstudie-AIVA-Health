@@ -1,0 +1,158 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// app/build.gradle — Build-Konfiguration fuer die AIVA Health Android-App
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Was macht diese Datei?
+// ──────────────────────
+// Dies ist die WICHTIGSTE Build-Datei im Projekt. Sie definiert:
+//   - App-ID und Versionen (was im Play Store erscheint)
+//   - SDK-Versionen (welche Android-Versionen unterstuetzt werden)
+//   - Signing-Konfiguration (wie die APK signiert wird)
+//   - Dependencies (welche Libraries die App braucht)
+//
+// Befehl zum Bauen:
+//   ./gradlew assembleRelease   → Signierte Release-APK erstellen
+//   ./gradlew assembleDebug     → Debug-APK erstellen (ohne Signierung)
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Dieses Plugin macht aus dem Modul eine Android-App (statt einer Library).
+// Ohne dieses Plugin wuesste Gradle nicht, dass hier eine APK gebaut werden soll.
+apply plugin: 'com.android.application'
+
+android {
+    // ─── APP-IDENTITAET ─────────────────────────────────────────────────────
+    // Namespace = Java-Paketname fuer generierten Code (R.java, BuildConfig)
+    namespace "de.aiva.health"
+
+    // compileSdk = Android-SDK-Version, gegen die kompiliert wird.
+    // Kommt aus variables.gradle (aktuell: 34 = Android 14).
+    compileSdk rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        // applicationId = Eindeutige ID der App im Play Store und auf dem Geraet.
+        // WICHTIG: Diese ID darf sich NIEMALS aendern, sonst erkennt Android
+        // die App nicht als Update, sondern als komplett neue App!
+        applicationId "de.aiva.health"
+
+        // minSdkVersion = Aelteste Android-Version, auf der die App laeuft.
+        // 22 = Android 5.1 Lollipop (~99% aller Geraete)
+        minSdkVersion rootProject.ext.minSdkVersion
+
+        // targetSdkVersion = Android-Version, fuer die die App optimiert/getestet ist.
+        // 34 = Android 14. Google verlangt, dass neue Apps immer nahe am aktuellen
+        // API-Level sind, sonst wird die App im Play Store abgelehnt.
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        // Version der App: versionCode ist eine fortlaufende Zahl (fuer Play Store),
+        // versionName ist das, was der Nutzer sieht (z.B. "1.0").
+        versionCode 1
+        versionName "1.0"
+
+        // Test-Runner fuer instrumentierte Tests (Tests, die auf einem Geraet laufen)
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        aaptOptions {
+             // AAPT (Android Asset Packaging Tool) verpackt alle Assets in die APK.
+             // Dieses Pattern definiert, welche Dateien dabei IGNORIERT werden sollen.
+             // Standardmaessig werden .svn, .git, .ds_store etc. ausgeschlossen.
+             // Die Anpassung hier stellt sicher, dass Web-App-Dateien (z.B. Dateien
+             // mit Punkt am Anfang wie .htaccess) NICHT faelschlicherweise ignoriert werden.
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+
+    // ─── SIGNIERUNG ─────────────────────────────────────────────────────────
+    // Jede Android-APK muss signiert sein, damit sie installiert werden kann.
+    // Debug-Builds werden automatisch mit einem Debug-Key signiert.
+    // Release-Builds brauchen einen eigenen Keystore (= kryptographischer Schluessel).
+    //
+    // Unser Keystore liegt unter: APK Test/aiva-health-release.keystore
+    // Der Pfad '../../aiva-health-release.keystore' geht 2 Ebenen hoch:
+    //   android/app/ → android/ → APK Test/ (dort liegt der Keystore)
+    signingConfigs {
+        release {
+            storeFile file('../../aiva-health-release.keystore')
+            storePassword 'aiva2026'
+            keyAlias 'aiva-health'
+            keyPassword 'aiva2026'
+        }
+    }
+
+    // ─── BUILD-TYPEN ────────────────────────────────────────────────────────
+    // Android kennt verschiedene Build-Typen: debug (zum Entwickeln) und
+    // release (fuer Endnutzer). Hier konfigurieren wir den Release-Build.
+    buildTypes {
+        release {
+            // minifyEnabled false → ProGuard/R8 Code-Verkleinerung ist DEAKTIVIERT.
+            // Bei Web-Apps in einer WebView bringt Minification nichts, weil der
+            // eigentliche Code (JS/CSS) bereits von Vite minimiert wurde.
+            minifyEnabled false
+
+            // ProGuard-Regeln (aktuell irrelevant, da minifyEnabled = false)
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // Release-Builds mit unserem Keystore signieren
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+// ─── LOKALE LIBRARY-ORDNER ──────────────────────────────────────────────────
+// Ermoeglicht das Laden von .jar/.aar-Dateien aus lokalen Ordnern
+// (statt aus Maven/Google). Wird fuer Cordova-Plugin-Libraries benoetigt.
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+// ─── ABHAENGIGKEITEN (DEPENDENCIES) ────────────────────────────────────────
+// Hier werden alle Libraries aufgelistet, die unsere App braucht.
+// "implementation" = wird in die APK eingebaut und ist zur Laufzeit verfuegbar.
+// "testImplementation" = nur fuer Unit-Tests verfuegbar (nicht in der APK).
+// "androidTestImplementation" = nur fuer instrumentierte Tests auf dem Geraet.
+dependencies {
+    // Lokale .jar-Dateien aus dem libs/-Ordner einbinden (falls vorhanden)
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    // AndroidX AppCompat — Stellt moderne UI-Elemente auch auf aelteren Android-Versionen bereit
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+
+    // CoordinatorLayout — Layout-Container fuer koordinierte Scroll-Animationen
+    // Wird fuer das activity_main.xml Layout benoetigt
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+
+    // SplashScreen API — Zeigt den Ladebildschirm beim App-Start an
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+
+    // ★ Capacitor-Android — Die Kernbibliothek, die die WebView-Bridge bereitstellt!
+    // Ohne diese Library wuerde die Web-App nicht in der Android-App laufen.
+    implementation project(':capacitor-android')
+
+    // Test-Abhaengigkeiten (werden NICHT in die APK eingebaut)
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+
+    // Cordova-Plugin-Modul (aktuell leer, aber von Capacitor erwartet)
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+// ─── CAPACITOR BUILD-ERWEITERUNG ────────────────────────────────────────────
+// Laedt capacitor.build.gradle, die Java-17-Kompatibilitaet konfiguriert
+// und Platz fuer Capacitor-Plugin-Abhaengigkeiten bietet.
+apply from: 'capacitor.build.gradle'
+
+// ─── GOOGLE SERVICES (OPTIONAL) ─────────────────────────────────────────────
+// Versucht, das Google-Services-Plugin zu aktivieren (fuer Firebase/Push-Notifications).
+// Wenn KEINE google-services.json vorhanden ist, wird das Plugin einfach uebersprungen.
+// Das ist ein sicherer Fallback: Die App funktioniert auch ohne Firebase.
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json nicht gefunden — Google-Services-Plugin nicht aktiviert. Push-Notifications sind nicht verfuegbar.")
+}

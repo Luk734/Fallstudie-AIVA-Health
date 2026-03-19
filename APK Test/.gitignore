@@ -1,16 +1,50 @@
-node_modules/
+# ══════════════════════════════════════════════════════════════════════════════
+# .gitignore — Dateien, die Git NICHT versionieren soll
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# Diese Datei sagt Git, welche Dateien/Ordner beim Commit ignoriert werden.
+# Das sind typischerweise:
+#   - Generierte Dateien (Build-Output, Caches)
+#   - Maschinenspezifische Dateien (lokale Pfade)
+#   - Grosse Binaries, die sich regenerieren lassen
+#
+# Regel: Alles, was sich automatisch regenerieren laesst, gehoert NICHT
+# ins Repository. Das spart Speicher und vermeidet Merge-Konflikte.
+#
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─── NPM-Abhaengigkeiten ─────────────────────────────────────────────────────
+# ACHTUNG: Normalerweise gehoert node_modules hier rein, ABER bei diesem
+# Projekt gibt es kein package.json! Daher koennen die Module nicht mit
+# npm install regeneriert werden und muessen versioniert bleiben.
+# Deshalb ist node_modules hier NICHT aufgefuehrt.
+
+# ─── GRADLE BUILD-CACHE ──────────────────────────────────────────────────────
+# Gradle-interner Cache (Task-Outputs, Dependency-Resolution etc.)
+# Wird bei jedem Build automatisch neu erstellt.
 android/.gradle/
+
+# ─── BUILD-OUTPUT (App) ──────────────────────────────────────────────────────
+# Kompilierte Klassen, generierter Code (R.java, BuildConfig etc.)
 android/app/build/intermediates/
 android/app/build/generated/
 android/app/build/tmp/
 android/app/build/.transforms/
+
+# Fertige APK-Dateien (Debug + Release) — koennen jederzeit neu gebaut werden
 android/app/build/outputs/apk/debug/app-debug.apk
 android/app/build/outputs/apk/release/app-release.apk
+
+# Build-Metadaten (von Gradle generiert)
 android/app/build/outputs/apk/debug/output-metadata.json
 android/app/build/outputs/apk/release/output-metadata.json
 android/app/build/outputs/logs/
 android/app/build/outputs/sdk-dependencies/
 android/app/build/.npmkeep
+
+# ─── CAPACITOR GENERIERTE DATEIEN ───────────────────────────────────────────
+# Diese Dateien werden von "npx cap copy" / "npx cap sync" erzeugt.
+# Sie kopieren die gebaute Web-App und Capacitor-Konfiguration nach Android.
 android/app/src/main/assets/capacitor.config.json
 android/app/src/main/assets/capacitor.plugins.json
 android/app/src/main/assets/public/assets/
@@ -18,7 +52,21 @@ android/app/src/main/assets/public/avatars/
 android/app/src/main/assets/public/cordova.js
 android/app/src/main/assets/public/cordova_plugins.js
 android/app/src/main/assets/public/vite.svg
+
+# ─── ANDROID RESSOURCEN (Icons, Splash, Themes etc.) ──────────────────────
+# HINWEIS: res/ ist hier aufgefuehrt, obwohl es wichtige Dateien enthaelt.
+# Das liegt daran, dass Capacitor die Ressourcen bei "cap sync" regeneriert.
 android/app/src/main/res/
+
+# ─── CORDOVA-PLUGIN-MODUL ────────────────────────────────────────────────────
+# Das gesamte Cordova-Plugin-Modul wird von Capacitor generiert.
 android/capacitor-cordova-android-plugins/
+
+# ─── MASCHINENSPEZIFISCHE DATEIEN ───────────────────────────────────────────
+# Enthaelt den lokalen Android-SDK-Pfad (unterschiedlich pro Entwickler-PC).
+# Wird von Android Studio automatisch erzeugt.
 android/local.properties
+
+# ─── APK-SIGNATUR-DATEIEN ────────────────────────────────────────────────────
+# .idsig-Dateien werden bei der APK-Signierung erzeugt und sind nicht noetig.
 *.idsig

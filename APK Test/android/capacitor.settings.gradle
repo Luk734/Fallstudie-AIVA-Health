@@ -1,0 +1,23 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// capacitor.settings.gradle — Bindet die Capacitor-Android-Kernbibliothek ein
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Was ist Capacitor?
+// ──────────────────
+// Capacitor ist ein Framework von Ionic, das eine Web-App (HTML/CSS/JS) in eine
+// native Android-Huelle verpackt. Die Web-App laeuft in einer WebView, und
+// Capacitor stellt die Bruecke (Bridge) zwischen JavaScript und nativem Code bereit.
+//
+// Warum liegt das in node_modules?
+// ────────────────────────────────
+// Die Capacitor-Android-Library ist ein NPM-Paket (@capacitor/android).
+// Sie wird ueber node_modules referenziert, damit alle Entwickler die gleiche
+// Version nutzen. Der Pfad "../node_modules/" geht eine Ebene hoch aus dem
+// android/-Ordner in den APK Test/-Ordner, wo node_modules liegt.
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Capacitor-Android-Kernbibliothek als Gradle-Modul einbinden.
+// Diese stellt die BridgeActivity bereit, von der unsere MainActivity erbt.
+include ':capacitor-android'
+project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
