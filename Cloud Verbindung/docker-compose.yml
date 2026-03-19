@@ -8,7 +8,7 @@
 # verwaltet. Statt jeden Container einzeln zu starten, definieren wir hier
 # alle Services und ihre Verbindungen zueinander.
 #
-# Befehle (alle im Ordner "Cloud Test/" ausfuehren):
+# Befehle (alle im Ordner "Cloud Verbindung/" ausfuehren):
 #   docker compose up --build -d   → Alle Container bauen + starten
 #   docker compose down             → Alle Container stoppen + entfernen
 #   docker compose logs -f          → Live-Logs aller Container anzeigen
@@ -75,11 +75,11 @@ services:
   backend:
     build:
       # context = das Verzeichnis, aus dem Docker die Dateien kopiert.
-      # Relativ zu diesem docker-compose.yml (das in "Cloud Test/" liegt).
+      # Relativ zu diesem docker-compose.yml (das in "Cloud Verbindung/" liegt).
       context: ../Prototyp/backend
       # dockerfile = Pfad zum Dockerfile, RELATIV zum context.
-      # Von ../Prototyp/backend aus: ../../Cloud Test/Dockerfile.backend
-      dockerfile: "../../Cloud Test/Dockerfile.backend"
+      # Von ../Prototyp/backend aus: ../../Cloud Verbindung/Dockerfile.backend
+      dockerfile: "../../Cloud Verbindung/Dockerfile.backend"
     container_name: aiva-backend
     restart: unless-stopped
     environment:
@@ -118,7 +118,7 @@ services:
   frontend:
     build:
       context: ../Prototyp/frontend
-      dockerfile: "../../Cloud Test/Dockerfile.frontend"
+      dockerfile: "../../Cloud Verbindung/Dockerfile.frontend"
     container_name: aiva-frontend
     restart: unless-stopped
     volumes:
