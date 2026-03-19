@@ -131,7 +131,11 @@ services:
       # Port 80 ist der EINZIGE Port, der von aussen erreichbar ist!
       # Alle Anfragen (Frontend + API) gehen ueber Port 80 rein.
       # Links: Port auf der VM, Rechts: Port im Container
-      - "80:80"
+      #
+      # "[::]:80:80" bindet auf IPv6 (und meist auch IPv4).
+      # Seit die BW-Cloud keine Floating IPs (IPv4) mehr vergibt,
+      # laeuft der Zugriff ausschliesslich ueber IPv6.
+      - "[::]:80:80"
     depends_on:
       - backend
 
