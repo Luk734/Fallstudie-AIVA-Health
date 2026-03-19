@@ -1,55 +1,75 @@
-# AIVA Health - Entwicklungsfortschritt
-Stand: 04.03.2026
+# AIVA Health – Fortschritt (Stand: 19.03.2026)
 
-## Aktueller Branch: feat/termin-erinnerungen (von main abgezweigt)
+## Projekt-Setup
+- Repo: https://github.com/Luk734/Fallstudie-AIVA-Health.git
+- Hauptbranch: `main` (Prototyp), `cloud` (Cloud-Deployment + APK)
+- Workspace: `C:\\Users\\KUENSTL\\Fallstudie_Bima_20026`
 
-## Abgeschlossene User Stories (alle in main gemerged)
-- US-01 Registrierung
-- US-02 Login
-- US-03 Logout
-- US-04 Session-Persistenz
-- US-05 Profil anlegen
-- US-06 Profil bearbeiten
-- US-07 Einwilligungen Onboarding (DSGVO)
-- US-08 Einwilligungen verwalten
-- US-09 Haupt-Navigation (Bottom-Nav + AppLayout)
-- US-10 Dashboard
-- US-11 Farben + Typografie (Design Tokens)
-- US-12 Basis-Komponenten (Card, Badge, Button, Input, Alert, Spinner, ConfirmDialog, PageContainer, PageHeader)
-- US-13 Termine anzeigen (Termin-Übersicht)
-- US-14 Termin-Detail
-- US-15 Termin anlegen
-- US-16 Termin bearbeiten + ConfirmDialog
-- US-17 Vorsorge-Kalender (GKV, PreventionSchedule/UserPrevention)
+---
 
-## In Arbeit (auf feat/termin-erinnerungen Branch)
-- US-18 Termin-Erinnerungen - FERTIG (committed, noch nicht gemerged)
+## ✅ Erledigtes
 
-## Merge-History (main)
-- merge: feat/auth-consent -> US-01 bis US-08
-- merge: feat/navigation-dashboard -> US-09, US-10
-- merge: feat/design-system -> US-11, US-12
-- merge: feat/termine-anzeigen -> US-13 bis US-16
-- merge: feat/vorsorge-erinnerungen -> US-17 + Unified Care Page
+### IPv6-Umstellung (19.03.2026)
+- **Grund:** BW-Cloud Floating IPs (IPv4) bis Mai nicht verfügbar
+- **nginx.conf:** `listen [::]:80;` hinzugefügt → Nginx akzeptiert IPv6-Anfragen
+- **docker-compose.yml:** Port-Binding auf `[::]:80:80` → Docker bindet auf IPv6
+- **Commit:** 83d3ecb (auf GitHub gepusht)
+- **VM:** Dateien per SCP kopiert (git pull geht nicht, s.u.), Container neugestartet
+- **Status:** App über IPv6 erreichbar ✅
+  - Frontend: `http://[2001:7c0:2320:2:f816:3eff:fe02:fae7]/` → React-HTML ✅
+  - API: `http://[2001:7c0:2320:2:f816:3eff:fe02:fae7]/api/health` → OK ✅
+  - IPv4 intern (localhost): ✅ funktioniert auch noch
 
-## Tech-Stack
-- Backend: Express + Prisma ORM + PostgreSQL (localhost:5433)
-- Frontend: React + Vite (localhost:5173)
-- Auth: JWT (bcrypt + jsonwebtoken)
-- DB: Docker PostgreSQL Container aiva-postgres
+### WICHTIG: Git Pull auf VM funktioniert NICHT
+- GitHub hat nur IPv4-Adressen (140.82.121.4)
+- VM hat kein IPv4 Internet (nur IPv6)
+- BW-Cloud hat KEIN DNS64/NAT64
+- **Workaround:** Dateien lokal ändern → `git push` → `scp DATEI aiva-health:~/aiva-health/PFAD`
 
-## DB Models (Prisma)
-- User, Consent, Appointment, Doctor, PreventionSchedule, UserPrevention
-- Notification (id, userId, type, title, message, relatedId, read, createdAt) NEU US-18
+### Cloud-Deployment (BWCloud / OpenStack)
+- VM `aiva-health` (Ubuntu 22.04, m1.tiny) auf BWCloud
+- Floating IP: **NICHT VERFÜGBAR** (bis Mai 2026 gesperrt)
+- Zugriff NUR über IPv6: `2001:7c0:2320:2:f816:3eff:fe02:fae7`
+- Interface: `ens3` = public-belwue-v6only
+- Docker 28.2.2 + Docker Compose 2.37.1
+- Repo auf VM: `~/aiva-health` (branch `cloud`)
+- `.env` auf VM: `DB_USER=aiva_user, DB_PASSWORD=admin, DB_NAME=aiva_health, JWT_SECRET=aiva-cloud-prod-secret-2026`
+- Login: `laura@example.com` / `Test1234!` oder `thomas@example.com` / `Test1234!`
 
-## API-Endpunkte (NEU US-18)
-- GET /api/notifications
-- PATCH /api/notifications/:id/read
-- PATCH /api/notifications/read-all
+### Sicherheits-Maßnahmen
+- fail2ban: 3 Fehlversuche → 48h Ban
+- SSH gehärtet: PermitRootLogin no, PasswordAuthentication no, MaxAuthTries 3
+- Docker: nur Port 80 extern, DB + Backend nur intern
 
-## Frontend (NEU US-18)
-- NotificationBell.jsx im AppHeader (Polling 60s, Badge-Zaehler)
-- NotificationsPage.jsx unter /notifications
-- Cron-Job (node-cron) alle 15 Min fuer 24h + 1h Erinnerungen
+### Android APK
+- APK nutzte `VITE_API_URL=http://134.155.108.96` (alte Floating IP)
+- **APK funktioniert NICHT** bis Floating IP wieder da (Mai)
 
-## Naechste User Story: US-19 (Medikament hinzufuegen) - AIVA Labs Modul
+## Git-Commits (cloud branch)
+- 83d3ecb: fix(cloud): IPv6-Support fuer nginx und docker-compose
+- 437c6bf: fix(nginx): resolver fuer Docker DNS
+- 8d79384: fix(cloud): OpenSSL fuer Prisma auf Alpine
+- 5ef2fc2: feat(cloud): Docker Compose Setup
+
+## SSH Config (lokal ~/.ssh/config)
+```
+Host aiva-health
+    HostName 2001:7c0:2320:2:f816:3eff:fe02:fae7
+    User ubuntu
+    IdentityFile ~/.ssh/id_rsa
+    StrictHostKeyChecking no
+```
+
+## Deployment-Workflow (SCP statt git pull)
+```bash
+# 1. Lokal ändern + committen + pushen
+git add . && git commit -m "..." && git push origin cloud
+
+# 2. Dateien per SCP auf VM kopieren
+scp "Cloud Test/datei" aiva-health:~/aiva-health/"Cloud Test/"
+
+# 3. Container neustarten (OHNE --build!)
+ssh aiva-health "cd ~/aiva-health/'Cloud Test' && sudo docker compose down && sudo docker compose up -d"
+```
+ACHTUNG: `docker compose up --build` schlägt fehl (kein IPv4 Internet für npm/apk).
+Nur `docker compose up -d` (ohne --build) nutzen!

@@ -66,6 +66,12 @@ model User {
   // aktiv/inaktiv-Status (Soft-Delete beim Absetzen).
   medications  Medication[]
 
+  // ── Relation zu MedicationLogs (US-20) ─────────────────────
+  // Ein User kann beliebig viele Einnahme-Protokoll-Einträge haben.
+  // Jeder Eintrag dokumentiert ob ein Medikament zu einer bestimmten
+  // Tageszeit eingenommen oder übersprungen wurde.
+  medicationLogs MedicationLog[]
+
   @@map("users")
 }
 
@@ -324,5 +330,58 @@ model Medication {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
+  // ── Relation zu MedicationLogs (US-20) ─────────────────────
+  // Einnahme-Protokoll: Jeder Log-Eintrag dokumentiert ob dieses
+  // Medikament an einem bestimmten Tag/Zeit eingenommen wurde.
+  logs        MedicationLog[]
+
   @@map("medications")
+}
+
+// ─── EPIC-03 / US-20: Einnahme-Protokoll ─────────────────────────────────
+// Tabelle: medication_logs
+// Protokolliert jede einzelne Medikamenten-Einnahme (oder Nicht-Einnahme).
+//
+// Thomas nimmt morgens Ramipril + ASS und abends Amlodipin.
+// Für jeden Tag entstehen also 3 Einträge (1 pro Medikament+Zeit).
+// Wenn er morgens auf ✅ klickt, wird der Eintrag auf "taken" gesetzt.
+//
+// scheduledDate: Das Datum, für das die Einnahme geplant ist (z.B. heute).
+//   Wird als DateTime mit Uhrzeit 00:00:00 gespeichert (Date-only wäre besser,
+//   aber Prisma/PostgreSQL verwenden DateTime für Kompatibilität).
+//
+// scheduledTime: Die Tageszeit ("morgens"/"mittags"/"abends"/"nachts").
+//   Kommt aus dem times-Feld des Medikaments.
+//
+// status:
+//   "pending"  → noch nicht eingenommen (Standard)
+//   "taken"    → eingenommen (User hat ✅ geklickt)
+//   "skipped"  → übersprungen (User hat ⏭️ geklickt)
+//
+// @@unique([medicationId, scheduledDate, scheduledTime]):
+//   Pro Medikament+Tag+Zeit darf es nur EINEN Eintrag geben.
+//   Das verhindert versehentliche Doppel-Einträge.
+
+model MedicationLog {
+  id             Int       @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  userId         Int       @map("user_id")
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Fremdschlüssel zu Medication ───────────────────────────
+  medicationId   Int       @map("medication_id")
+  medication     Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  // ── Log-Daten ──────────────────────────────────────────────
+  scheduledDate  DateTime  @map("scheduled_date")   // Datum der geplanten Einnahme
+  scheduledTime  String    @map("scheduled_time")   // "morgens" | "mittags" | "abends" | "nachts"
+  status         String    @default("pending")       // "pending" | "taken" | "skipped"
+  takenAt        DateTime? @map("taken_at")          // Zeitpunkt der Einnahme (null = noch offen)
+
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  // ── Unique: Pro Medikament+Tag+Zeit nur EIN Eintrag ────────
+  @@unique([medicationId, scheduledDate, scheduledTime])
+  @@map("medication_logs")
 }

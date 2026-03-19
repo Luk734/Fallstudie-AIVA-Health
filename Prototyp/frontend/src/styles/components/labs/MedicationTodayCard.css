@@ -1,0 +1,138 @@
+/* src/styles/components/labs/MedicationTodayCard.css — Einnahme-Zeile (US-20)
+ *
+ * Jede Zeile zeigt ein Medikament + Einnahmezeit + Status/Buttons.
+ * Layout: [Farbpunkt] [Name+Dosierung | Zeit] [✅ ⏭️]
+ *
+ * Drei Zustände:
+ *   --pending: Normal, Aktions-Buttons sichtbar
+ *   --taken:   Grüner Hintergrund, durchgestrichen, Zeitstempel
+ *   --skipped: Grauer Hintergrund, "Übersprungen"-Label
+ */
+
+/* ── Basis-Zeile ───────────────────────────────────────────────────── */
+.medication-today-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-slate-200);
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* ── Status: Eingenommen → grüner Hintergrund ─────────────────────── */
+.medication-today-card--taken {
+  background: var(--color-success-light, #f0fdf4);
+  border-color: var(--color-success, #22c55e);
+}
+
+/* Name durchgestrichen bei "taken" */
+.medication-today-card--taken .medication-today-card__name {
+  text-decoration: line-through;
+  color: var(--color-slate-400);
+}
+
+/* ── Status: Übersprungen → grauer Hintergrund ────────────────────── */
+.medication-today-card--skipped {
+  background: var(--color-slate-50);
+  opacity: 0.7;
+}
+
+.medication-today-card--skipped .medication-today-card__name {
+  text-decoration: line-through;
+  color: var(--color-slate-400);
+}
+
+/* ── Farbiger Punkt (Medikament-Identifikation) ───────────────────── */
+.medication-today-card__dot {
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  border-radius: 50%;
+  background-color: var(--med-color, var(--color-labs));
+}
+
+/* ── Info-Bereich (Name + Zeit) ───────────────────────────────────── */
+.medication-today-card__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0; /* Damit Text korrekt umbricht */
+}
+
+.medication-today-card__name {
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-slate-800);
+  line-height: var(--leading-tight);
+}
+
+.medication-today-card__dosage {
+  font-weight: var(--font-weight-normal);
+  color: var(--color-slate-500);
+}
+
+.medication-today-card__time {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+}
+
+/* ── Aktions-Bereich (rechts) ─────────────────────────────────────── */
+.medication-today-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* ── Status-Label (taken/skipped) ─────────────────────────────────── */
+.medication-today-card__status {
+  font-size: var(--font-sm);
+  white-space: nowrap;
+}
+
+.medication-today-card__status--taken {
+  color: var(--color-success, #22c55e);
+}
+
+.medication-today-card__status--skipped {
+  color: var(--color-slate-400);
+}
+
+/* ── Aktions-Buttons (pending) ────────────────────────────────────── */
+.medication-today-card__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.medication-today-card__btn:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.medication-today-card__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Take-Button: grüner Hover */
+.medication-today-card__btn--take:hover:not(:disabled) {
+  background: var(--color-success-light, #f0fdf4);
+  border-color: var(--color-success, #22c55e);
+}
+
+/* Skip-Button: grauer Hover */
+.medication-today-card__btn--skip:hover:not(:disabled) {
+  background: var(--color-slate-100);
+  border-color: var(--color-slate-300);
+}

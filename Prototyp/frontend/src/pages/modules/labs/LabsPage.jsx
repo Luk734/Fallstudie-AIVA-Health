@@ -1,18 +1,17 @@
-// src/pages/modules/labs/LabsPage.jsx — AIVA Labs: Medikamenten-Liste (US-19)
+// src/pages/modules/labs/LabsPage.jsx — AIVA Labs: Medikamente + Einnahmen (US-19, US-20)
 //
-// Zeigt alle aktiven Medikamente des Nutzers als MedicationCard-Liste an.
-// Bietet einen "Medikament hinzufügen"-Button und eine optionale Umschaltung
-// auf "Alle anzeigen" (inkl. deaktivierte).
+// Zwei Hauptbereiche:
+//   1. MedicationTodaySection (US-20) — Heutige Einnahmen mit ✅/⏭️ Buttons
+//   2. Medikamenten-Liste (US-19) — CRUD-Verwaltung mit MedicationCards
 //
 // Datenabruf:
 //   GET /api/medications         → nur aktive (Standard)
 //   GET /api/medications?active=all → auch deaktivierte
+//   GET /api/medications/today   → heutige Einnahmen (in MedicationTodaySection)
 //
-// Kinder-Komponente: MedicationCard (Bearbeiten + Deaktivieren pro Karte)
-//
-// Spätere Erweiterungen (Platzhalter-Sektionen):
-//   - Laborbefunde (US-22)
-//   - Medikamenten-Erinnerung (US-21)
+// Kinder-Komponenten:
+//   MedicationTodaySection — Tagesübersicht mit Fortschrittsbalken
+//   MedicationCard — Einzelkarte mit Bearbeiten + Deaktivieren
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +22,7 @@ import Button from '../../../components/ui/Button';
 import Alert from '../../../components/ui/Alert';
 import Spinner from '../../../components/ui/Spinner';
 import MedicationCard from '../../../components/labs/MedicationCard';
+import MedicationTodaySection from '../../../components/labs/MedicationTodaySection';
 import '../../../styles/pages/modules/labs/LabsPage.css';
 
 export default function LabsPage() {
@@ -79,6 +79,9 @@ export default function LabsPage() {
         title="💊 Medikamente"
         subtitle="Deine aktuelle Medikamentenliste"
       />
+
+      {/* ── US-20: Heutige Einnahmen (Fortschritt + Checkboxen) ──── */}
+      <MedicationTodaySection />
 
       {/* ── Aktions-Leiste ─────────────────────────────────────────── */}
       <div className="labs-page__actions">

@@ -510,6 +510,61 @@ async function main() {
 
   console.log('   ✅ Medikamente Laura: 1 Eintrag');
 
+  // ── US-20: Einnahme-Logs (Testdaten) ─────────────────────────────────
+  // Erstellt Einnahme-Einträge für Thomas, damit die Tagesansicht
+  // beim Login sofort Daten zeigt.
+  //
+  // Thomas nimmt morgens Ramipril + ASS und abends Amlodipin.
+  // Wir simulieren: morgens schon eingenommen, abends noch offen.
+  await prisma.medicationLog.deleteMany({});
+
+  // Thomas-Medikamente laden (wir brauchen die IDs)
+  const thomasMeds = await prisma.medication.findMany({
+    where: { userId: user2.id, active: true },
+  });
+
+  // Heute als Date (Uhrzeit auf 00:00:00 normalisiert für scheduledDate)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Gestern (für Historie-Test)
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const medicationLogs = [];
+
+  for (const med of thomasMeds) {
+    const timesList = med.times.split(',');
+
+    for (const time of timesList) {
+      // Heute: morgens-Medikamente als "taken", abends als "pending"
+      medicationLogs.push({
+        userId: user2.id,
+        medicationId: med.id,
+        scheduledDate: today,
+        scheduledTime: time,
+        status: time === 'morgens' ? 'taken' : 'pending',
+        takenAt: time === 'morgens' ? new Date() : null,
+      });
+
+      // Gestern: alles eingenommen (für Historie)
+      medicationLogs.push({
+        userId: user2.id,
+        medicationId: med.id,
+        scheduledDate: yesterday,
+        scheduledTime: time,
+        status: 'taken',
+        takenAt: yesterday,
+      });
+    }
+  }
+
+  if (medicationLogs.length > 0) {
+    await prisma.medicationLog.createMany({ data: medicationLogs });
+  }
+
+  console.log(`   ✅ Einnahme-Logs Thomas: ${medicationLogs.length} Einträge (heute + gestern)`);
+
   // ── US-18: Test-Benachrichtigungen (Termin-Erinnerungen) ────────────
   // Erstelle einige Beispiel-Notifications für Laura, damit beim
   // ersten Login sofort etwas in der Benachrichtigungs-Ansicht sichtbar ist.
