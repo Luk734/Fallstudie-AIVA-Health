@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Avatar 6: Gehirn / Mental Health -->
+  <circle cx="60" cy="60" r="58" fill="#FAF5FF" stroke="#7C3AED" stroke-width="2"/>
+  <path d="M60 28c-16 0-26 12-26 24 0 8 4 14 10 18l2 16h28l2-16c6-4 10-10 10-18 0-12-10-24-26-24z" fill="#DDD6FE" stroke="#7C3AED" stroke-width="2.5"/>
+  <path d="M60 28v58" stroke="#7C3AED" stroke-width="2"/>
+  <path d="M46 44c8 4 8 12 0 16" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M74 44c-8 4-8 12 0 16" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M48 92h24" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
+  <path d="M50 98h20" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
+</svg>

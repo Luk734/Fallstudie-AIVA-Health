@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Avatar 8: Familie / Gemeinsam gesund -->
+  <circle cx="60" cy="60" r="58" fill="#FFF1F2" stroke="#EC4899" stroke-width="2"/>
+  <circle cx="40" cy="40" r="10" fill="#EC4899"/>
+  <path d="M40 50v16c0 4-2 8-6 10" stroke="#EC4899" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M40 50v16c0 4 2 8 6 10" stroke="#EC4899" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <circle cx="80" cy="40" r="10" fill="#8B5CF6"/>
+  <path d="M80 50v16c0 4-2 8-6 10" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M80 50v16c0 4 2 8 6 10" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <circle cx="60" cy="60" r="8" fill="#F472B6"/>
+  <path d="M60 68v12c0 3-2 6-4 8" stroke="#F472B6" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M60 68v12c0 3 2 6 4 8" stroke="#F472B6" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>

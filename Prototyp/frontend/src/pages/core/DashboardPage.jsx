@@ -1,21 +1,15 @@
-// src/pages/core/DashboardPage.jsx — Dashboard / Startseite (US-10, US-12, US-13)
+// src/pages/core/DashboardPage.jsx — Dashboard / Startseite
 //
 // Die zentrale Übersichtsseite der App. Zeigt dem User auf einen Blick:
 //   1. Persönliche Begrüßung (tageszeitabhängig)
-//   2. Nächster Termin (AIVA Care) — US-13: echte API-Daten
-//   3. Täglicher Check-in Status (AIVA Coach)
-//   4. Nächste Medikamenteneinnahme (AIVA Labs)
-//   5. Quick-Action Buttons für die wichtigsten Aktionen
+//   2. Nächster Termin (AIVA Care) — echte API-Daten (US-13)
+//   3. Täglicher Check-in Status (AIVA Coach) — echte API-Daten (US-24)
+//   4. Nächste Medikamenteneinnahme (AIVA Labs) — echte API-Daten (US-19/20)
+//   5. Wearable-Metriken (AIVA Coach) — echte API-Daten (US-27)
+//   6. Quick-Action Buttons für die wichtigsten Aktionen
 //
-// US-12 Migration:
-//   - .dashboard-profile-hint → <Alert variant="warning">
-//   - .dashboard-profile-hint__btn → <Button variant="primary" size="sm">
-//
-// US-13 Integration:
-//   - Mock-Termin → echte Daten von GET /api/appointments/upcoming
-//
-// Header: Wurde in AppHeader.jsx extrahiert und wird über AppLayout
-// auf JEDER geschützten Seite angezeigt (nicht mehr nur hier).
+// Alle Karten laden ihre Daten beim Mount via useEffect vom Backend.
+// Bei Fehlern wird ein Fallback-Text angezeigt (kein Crash).
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,17 +24,8 @@ import '../../styles/pages/core/DashboardPage.css';
 // ── API-URL ──────────────────────────────────────────────────────────────────
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-// ── Mock-Daten (Coach + Labs — werden in späteren US ersetzt) ─────────────
-const mockCheckin = {
-  erledigt: false,
-  letzter: 'Gestern, 18:30',
-};
-
-const mockMedikament = {
-  name: 'Ibuprofen 400mg',
-  uhrzeit: '14:00 Uhr',
-  hinweis: 'Nach dem Essen einnehmen',
-};
+// ── Mood-Emoji-Mapping (wie in MoodTrend.jsx) ────────────────────────────────
+const MOOD_EMOJI = { 1: '😞', 2: '😐', 3: '🙂', 4: '😊', 5: '😄' };
 
 // ── Datum-Formatierung für Dashboard-Anzeige ──────────────────────────────
 function formatTerminKurz(isoString) {
@@ -59,45 +44,64 @@ function formatTerminKurz(isoString) {
 }
 
 export default function DashboardPage() {
-  // user + token aus dem AuthContext holen
-  // user → Vornamen für Begrüßung
-  // token → für authentifizierte API-Calls (Termine laden)
-  // Hinweis: logout + Header-Buttons sind jetzt in AppHeader.jsx
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
-  // ── Nächste Termine vom Backend laden (US-13) ────────────────────────────
+  // ── State für alle Dashboard-Karten ──────────────────────────────────────
   const [upcomingTermine, setUpcomingTermine] = useState([]);
+  const [todayCheckin, setTodayCheckin] = useState(null);     // null = noch nicht geladen
+  const [streak, setStreak] = useState(0);
+  const [medToday, setMedToday] = useState(null);             // null = noch nicht geladen
+  const [latestMetric, setLatestMetric] = useState(null);     // null = noch nicht geladen
 
+  // ── Alle Daten parallel vom Backend laden ────────────────────────────────
+  // Ein einziger useEffect für alle API-Calls (unabhängig voneinander).
+  // Promise.allSettled: Wenn ein Call fehlschlägt, laufen die anderen weiter.
   useEffect(() => {
     if (!token) return;
 
-    async function fetchUpcoming() {
-      try {
-        const res = await fetch(`${API_URL}/api/appointments?time=upcoming&limit=3`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUpcomingTermine(data.appointments);
-        }
-      } catch {
-        // Dashboard-Termin-Karte zeigt bei Fehler einfach den Fallback-Text
-      }
-    }
+    const headers = { Authorization: `Bearer ${token}` };
 
-    fetchUpcoming();
+    // 1. Nächste Termine (US-13)
+    fetch(`${API_URL}/api/appointments?time=upcoming&limit=3`, { headers })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setUpcomingTermine(data.appointments); })
+      .catch(() => {});
+
+    // 2. Heutiger Check-in (US-24)
+    fetch(`${API_URL}/api/checkins/today`, { headers })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setTodayCheckin(data.checkin || false); })
+      .catch(() => { setTodayCheckin(false); });
+
+    // 3. Check-in-Streak (US-24)
+    fetch(`${API_URL}/api/checkins/streak`, { headers })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setStreak(data.streak); })
+      .catch(() => {});
+
+    // 4. Heutige Medikamente (US-19/20)
+    fetch(`${API_URL}/api/medications/today`, { headers })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setMedToday(data); })
+      .catch(() => { setMedToday({ entries: [], progress: { taken: 0, total: 0, percent: 0 } }); });
+
+    // 5. Aktuellste Wearable-Metriken (US-27)
+    fetch(`${API_URL}/api/metrics/latest`, { headers })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setLatestMetric(data.metric); })
+      .catch(() => {});
   }, [token]);
+
+  // ── Nächste ausstehende Medikamenten-Einnahme finden ─────────────────────
+  const nextPending = medToday?.entries?.find((e) => e.status === 'pending');
 
   return (
     <div className="dashboard-page">
       {/* ── 1. Persönliche Begrüßung ─────────────────────────────────── */}
-      {/* GreetingCard liest den Vornamen und zeigt z.B.                  */}
-      {/* "Guten Morgen, Laura 👋" + das heutige Datum                   */}
       <GreetingCard firstName={user?.firstName} />
 
       {/* ── Profil-Hinweis (wenn noch kein Profil angelegt) ──────────── */}
-      {/* Alert variant="warning" + Button — ersetzt .dashboard-profile-hint */}
       {!user?.firstName && (
         <Alert variant="warning" className="dashboard-profile-hint">
           <p>
@@ -116,11 +120,9 @@ export default function DashboardPage() {
       )}
 
       {/* ── 2. Summary-Karten ────────────────────────────────────────── */}
-      {/* Drei Karten in einem vertikalen Stack. Jede zeigt eine          */}
-      {/* Zusammenfassung aus einem der drei Haupt-Module.                */}
       <div className="dashboard-cards">
 
-        {/* ── Nächster Termin (AIVA Care) — US-13: echte Daten ────── */}
+        {/* ── Nächster Termin (AIVA Care) — echte Daten (US-13) ──── */}
         <SummaryCard
           icon="📅"
           title="Nächster Termin"
@@ -145,41 +147,89 @@ export default function DashboardPage() {
           )}
         </SummaryCard>
 
-        {/* ── Täglicher Check-in (AIVA Coach) ──────────────────────── */}
+        {/* ── Täglicher Check-in (AIVA Coach) — echte Daten (US-24) ── */}
         <SummaryCard
-          icon={mockCheckin.erledigt ? '✅' : '💚'}
+          icon={todayCheckin ? '✅' : '💚'}
           title="Täglicher Check-in"
           variant="coach"
-          actionLabel={mockCheckin.erledigt ? 'Ergebnis ansehen' : 'Jetzt ausfüllen'}
+          actionLabel={todayCheckin ? 'Zum Coach' : 'Jetzt ausfüllen'}
           onAction={() => navigate('/coach')}
         >
-          {mockCheckin.erledigt ? (
-            <p>Heute bereits ausgefüllt ✓</p>
+          {todayCheckin ? (
+            <>
+              <p>
+                <strong>Heute: {MOOD_EMOJI[todayCheckin.moodScore]} {
+                  ['', 'Schlecht', 'Mittelmäßig', 'Okay', 'Gut', 'Super'][todayCheckin.moodScore]
+                }</strong>
+              </p>
+              {todayCheckin.note && (
+                <p className="dashboard-cards__hint">„{todayCheckin.note}"</p>
+              )}
+            </>
           ) : (
             <>
               <p><strong>Noch nicht ausgefüllt</strong></p>
-              <p className="dashboard-cards__hint">Letzter: {mockCheckin.letzter}</p>
+              {streak > 0 && (
+                <p className="dashboard-cards__hint">🔥 {streak} Tage Streak — nicht abreißen!</p>
+              )}
             </>
           )}
         </SummaryCard>
 
-        {/* ── Nächste Medikamenteneinnahme (AIVA Labs) ─────────────── */}
+        {/* ── Medikamente (AIVA Labs) — echte Daten (US-19/20) ────── */}
         <SummaryCard
           icon="💊"
-          title="Nächste Einnahme"
+          title="Medikamente heute"
           variant="labs"
           actionLabel="Medikamentenplan"
           onAction={() => navigate('/labs')}
         >
-          <p>
-            <strong>{mockMedikament.name}</strong> — {mockMedikament.uhrzeit}
-          </p>
-          <p className="dashboard-cards__hint">{mockMedikament.hinweis}</p>
+          {medToday === null ? (
+            <p className="dashboard-cards__hint">Lade…</p>
+          ) : medToday.progress.total === 0 ? (
+            <p className="dashboard-cards__hint">Keine Medikamente hinterlegt</p>
+          ) : medToday.progress.taken === medToday.progress.total ? (
+            <p><strong>✅ Alle {medToday.progress.total} Einnahmen erledigt</strong></p>
+          ) : (
+            <>
+              {nextPending && (
+                <p>
+                  <strong>{nextPending.medicationName} {nextPending.dosage}</strong> — {nextPending.scheduledTime}
+                </p>
+              )}
+              <p className="dashboard-cards__hint">
+                {medToday.progress.taken}/{medToday.progress.total} eingenommen ({medToday.progress.percent}%)
+              </p>
+            </>
+          )}
+        </SummaryCard>
+
+        {/* ── Wearable-Metriken (AIVA Coach) — echte Daten (US-27) ── */}
+        <SummaryCard
+          icon="⌚"
+          title="Wearable-Daten"
+          variant="coach"
+          actionLabel="Alle Metriken"
+          onAction={() => navigate('/coach')}
+        >
+          {latestMetric ? (
+            <>
+              <p>
+                <strong>🚶 {latestMetric.steps.toLocaleString('de-DE')}</strong> Schritte
+                {' · '}
+                <strong>❤️ Ø {latestMetric.heartRateAvg}</strong> bpm
+              </p>
+              <p className="dashboard-cards__hint">
+                😴 {latestMetric.sleepHours}h Schlaf · Demo-Daten
+              </p>
+            </>
+          ) : (
+            <p className="dashboard-cards__hint">Noch keine Wearable-Daten</p>
+          )}
         </SummaryCard>
       </div>
 
       {/* ── 3. Quick-Action Buttons ──────────────────────────────────── */}
-      {/* Zwei prominente Buttons: "Check-in starten" + "Termin buchen"  */}
       <QuickActions />
     </div>
   );

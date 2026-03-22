@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Avatar 1: Herz-Gesundheit (Puls-Linie + Herz) -->
+  <circle cx="60" cy="60" r="58" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+  <path d="M60 85c-1.5 0-3-.6-4-1.8C48 74 30 60 30 48c0-8 6-14 14-14 4.5 0 8.7 2.1 11.4 5.4L60 45l4.6-5.6C67.3 36.1 71.5 34 76 34c8 0 14 6 14 14 0 12-18 26-26 35.2-1 1.2-2.5 1.8-4 1.8z" fill="#EF4444"/>
+  <path d="M20 62h15l5-12 8 24 6-18 5 10h14" stroke="#DC2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Avatar 7: Schild / Schutz & Vorsorge -->
+  <circle cx="60" cy="60" r="58" fill="#ECFEFF" stroke="#06B6D4" stroke-width="2"/>
+  <path d="M60 22L30 36v20c0 20 13 34 30 42 17-8 30-22 30-42V36L60 22z" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2.5"/>
+  <path d="M48 60l8 8 16-16" stroke="#06B6D4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
