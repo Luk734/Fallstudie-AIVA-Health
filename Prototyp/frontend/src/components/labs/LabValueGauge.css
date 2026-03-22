@@ -1,0 +1,147 @@
+/* LabValueGauge.css — Ampel-Skala für Laborwerte (US-23) */
+/* Zeigt einen horizontalen Balken mit 5 farbigen Zonen + Pfeil-Marker */
+
+.lab-gauge {
+  padding: var(--spacing-sm) 0;
+}
+
+/* ── Status-Zeile ────────────────────────────────────────────────── */
+.lab-gauge__status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.lab-gauge__emoji {
+  font-size: 1.1rem;
+}
+
+.lab-gauge__status-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* Farbe des Status-Labels je nach Zustand */
+.lab-gauge--normal .lab-gauge__status-label { color: var(--color-success, #16a34a); }
+.lab-gauge--borderline-low .lab-gauge__status-label,
+.lab-gauge--borderline-high .lab-gauge__status-label { color: var(--color-warning, #d97706); }
+.lab-gauge--low .lab-gauge__status-label,
+.lab-gauge--high .lab-gauge__status-label { color: var(--color-error, #dc2626); }
+
+/* ── Skala (der farbige Balken) ──────────────────────────────────── */
+.lab-gauge__scale {
+  position: relative;
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: visible; /* Marker darf rausragen */
+  margin: 20px 0 var(--spacing-xs);
+}
+
+/* Farbige Zonen: 5 Segmente mit festen Proportionen */
+.lab-gauge__zone {
+  height: 100%;
+}
+
+.lab-gauge__zone--low {
+  flex: 1;
+  background: var(--color-error, #dc2626);
+  border-radius: 5px 0 0 5px;
+}
+
+.lab-gauge__zone--borderline-low {
+  flex: 0.5;
+  background: var(--color-warning, #d97706);
+}
+
+.lab-gauge__zone--normal {
+  flex: 2;
+  background: var(--color-success, #16a34a);
+}
+
+.lab-gauge__zone--borderline-high {
+  flex: 0.5;
+  background: var(--color-warning, #d97706);
+}
+
+.lab-gauge__zone--high {
+  flex: 1;
+  background: var(--color-error, #dc2626);
+  border-radius: 0 5px 5px 0;
+}
+
+/* ── Pfeil-Marker ────────────────────────────────────────────────── */
+.lab-gauge__marker {
+  position: absolute;
+  top: -18px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.lab-gauge__marker-arrow {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.lab-gauge__marker-value {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #1e293b);
+  position: absolute;
+  top: -14px;
+  white-space: nowrap;
+}
+
+/* ── Referenzbereich-Beschriftung ────────────────────────────────── */
+.lab-gauge__ref-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #94a3b8);
+  margin-top: 2px;
+}
+
+.lab-gauge__ref-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Erklärung ───────────────────────────────────────────────────── */
+.lab-gauge__explanation {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-tertiary, #f1f5f9);
+  border-radius: var(--border-radius-md, 8px);
+  font-size: var(--font-size-sm, 0.85rem);
+  line-height: 1.5;
+}
+
+.lab-gauge__description {
+  margin: 0;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.lab-gauge__hint {
+  margin: var(--spacing-xs) 0 0;
+  font-weight: 500;
+}
+
+/* Hint-Farbe je nach Status */
+.lab-gauge--normal .lab-gauge__hint { color: var(--color-success, #16a34a); }
+.lab-gauge--borderline-low .lab-gauge__hint,
+.lab-gauge--borderline-high .lab-gauge__hint { color: var(--color-warning, #d97706); }
+.lab-gauge--low .lab-gauge__hint,
+.lab-gauge--high .lab-gauge__hint { color: var(--color-error, #dc2626); }
+
+.lab-gauge--unknown .lab-gauge__no-ref {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted, #94a3b8);
+  font-style: italic;
+}

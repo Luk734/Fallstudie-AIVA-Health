@@ -85,3 +85,67 @@ export async function getLabReportById(req, res) {
     res.status(500).json({ error: 'Laborbefund konnte nicht geladen werden.' });
   }
 }
+
+// ─── GET /api/labs/history/:parameter ────────────────────────────────
+// Gibt die letzten 3 Messwerte eines bestimmten Parameters zurück.
+//
+// Beispiel: GET /api/labs/history/Hämoglobin
+// → Liefert die letzten 3 Hämoglobin-Werte aus verschiedenen Befunden.
+//
+// Warum brauchen wir das? (US-23, Akzeptanzkriterium 3)
+//   Thomas möchte den Trend sehen: "Wird mein Hämoglobin besser oder schlechter?"
+//   Dafür zeigen wir die letzten 3 Messungen als Mini-Balkendiagramm.
+//
+// SQL-Logik:
+//   1. Alle LabValues mit passendem Parameter-Namen finden
+//   2. NUR aus Befunden des eingeloggten Users (Sicherheit!)
+//   3. Sortiert nach Befunddatum (neueste zuerst)
+//   4. Limitiert auf 3 Einträge
+//
+// Response: { parameter: "Hämoglobin", history: [{ value, date, reportTitle }, ...] }
+
+export async function getLabValueHistory(req, res) {
+  try {
+    const parameterName = decodeURIComponent(req.params.parameter);
+
+    // LabValues finden, die zum eingeloggten User gehören
+    // → Über die Relation: LabValue → LabReport → userId
+    const values = await prisma.labValue.findMany({
+      where: {
+        parameter: parameterName,
+        report: {
+          userId: req.user.userId,
+        },
+      },
+      include: {
+        report: {
+          select: {
+            reportDate: true,
+            title: true,
+          },
+        },
+      },
+      orderBy: {
+        report: {
+          reportDate: 'desc',
+        },
+      },
+      take: 3,
+    });
+
+    // Rückgabe: Vereinfachtes Format für das Frontend
+    const history = values.map((v) => ({
+      value: v.value,
+      unit: v.unit,
+      referenceMin: v.referenceMin,
+      referenceMax: v.referenceMax,
+      date: v.report.reportDate,
+      reportTitle: v.report.title,
+    }));
+
+    res.json({ parameter: parameterName, history });
+  } catch (err) {
+    console.error('Fehler beim Laden der Laborwert-Historie:', err);
+    res.status(500).json({ error: 'Historie konnte nicht geladen werden.' });
+  }
+}

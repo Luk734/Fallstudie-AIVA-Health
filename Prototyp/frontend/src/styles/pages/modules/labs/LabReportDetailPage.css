@@ -195,6 +195,53 @@
   gap: var(--space-2);
 }
 
+/* ── US-23: Hinweis "Tippe auf einen Wert" ─────────────────────────── */
+.lab-detail__section-hint {
+  font-size: var(--font-xs);
+  color: var(--color-slate-400);
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+}
+
+/* ── US-23: Klickbare Zeilen ───────────────────────────────────────── */
+.lab-detail__row--clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.lab-detail__row--clickable:hover {
+  background-color: var(--color-slate-50);
+}
+
+.lab-detail__row--expanded {
+  background-color: var(--color-slate-50);
+}
+
+/* ── US-23: Aufklappbare Detail-Zeile ──────────────────────────────── */
+.lab-detail__expand-row {
+  background-color: var(--color-slate-50);
+}
+
+.lab-detail__expand-cell {
+  padding: var(--space-4) var(--space-4) var(--space-5) !important;
+  border-top: none !important;
+}
+
+/* ── US-23: Disclaimer (Hinweis: keine ärztliche Beratung) ─────────── */
+.lab-detail__disclaimer {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-slate-50);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-warning);
+}
+
+.lab-detail__disclaimer p {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-slate-500);
+  line-height: 1.5;
+}
+
 /* ── Responsive: Mobile ────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .lab-detail__info-grid {

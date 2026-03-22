@@ -17,16 +17,21 @@
 | US-19 | Medikament hinzufügen (CRUD) | ✅ |
 | US-20 | Einnahme bestätigen (MedicationLog) | ✅ |
 | US-21 | Medikamenten-Erinnerung (Cron + Quick-Action) | ✅ |
+| US-22 | Laborbefunde anzeigen (Liste + Detail) | ✅ |
 
-## Nächste anstehende User Story: US-22
+## Nächste anstehende User Story: US-23 oder US-24
 
-**US-22: Laborbefunde anzeigen** (Feature F-12 AIVA Labs)
-- Laborbefunde als Liste anzeigen
-- Neues Prisma-Model `LabResult` nötig (+ Migration)
-- Neuer Controller + Routes + Frontend-Seite
-- Akzeptanzkriterien: siehe planning/user-stories/US-22_laborbefunde-anzeigen.md
+**US-23: Laborwert verstehen** (Feature F-13, SHOULD, Größe M)
+- Ampel-System: Normal/Grenzwertig/Auffällig
+- Skala-Visualisierung mit Pfeil-Marker (LabValueGauge)
+- Mini-Diagramm Verlauf letzte 3 Messungen (LabValueHistory)
+- Erklärungstexte für Parameter in verständlicher Sprache (JSON)
+- Baut direkt auf US-22 auf (gleiche DB-Struktur)
 
-Danach: US-23 (Laborwert verstehen / Referenzbereiche)
+**US-24: Befinden eintragen** (Feature F-14, MUST, Größe M)
+- Check-in mit 5-stufiger Emoji-Skala, eröffnet Coach-Modul
+- Neue DB-Tabelle checkins, neue API-Endpunkte
+- Höchste Priorität (MUST) unter den offenen Stories
 
 ## Architektur-Überblick
 
@@ -36,30 +41,28 @@ Danach: US-23 (Laborwert verstehen / Referenzbereiche)
 - **DB**: PostgreSQL auf localhost:5433
 - **Test-User**: laura@example.com / thomas@example.com (PW: Test1234!)
 - **Vite-Proxy**: `/api` → `http://localhost:3001` (vite.config.js)
-- **Cron**: node-cron, alle 15 Min → Termin-Erinnerungen + Medikamenten-Erinnerungen
+- **Cron**: node-cron, alle 15 Min → Termin + Medikamenten-Erinnerungen
+
+## DB-Modelle (Prisma)
+
+User, Consent, Appointment, Doctor, PreventionSchedule, UserPrevention, Notification, Medication, MedicationLog, LabReport, LabValue
+
+## API-Routen
+
+/api/auth, /api/users, /api/consents, /api/appointments, /api/doctors, /api/prevention, /api/notifications, /api/medications, /api/labs
 
 ## Wichtige Patterns
 
+- **Branch-Workflow**: `feat/feature-name` → merge in main mit `merge: feat/... (US-XX ...)`
 - **CRUD-Pattern**: Prisma Model → Controller → Routes → Components → Page → App.jsx Route
-- **Soft-Delete**: active-Flag statt echtem Löschen (DSGVO)
-- **Conventional Commits**: feat(modul): US-XX Beschreibung
-- **Notification-System**: Cron alle 15 Min → DB-Notification → Frontend pollt alle 60s (NotificationBell)
-- **Zurück-Button**: `<Button variant="ghost" size="sm">` mit `navigate(-1)` oder expliziter Route
 - **Studi-Projekt**: Immer erklären was/warum geändert wird, bevor Code geschrieben wird
-- **Design-Tokens**: CSS-Variablen aus US-11 werden überall genutzt
-- **UI-Primitives**: Card, Badge, Button, Alert, Spinner, PageContainer, PageHeader aus US-12
+- **Neustart**: `Stop-Process -Name node -Force` → `npx prisma generate` → `node server.js` (backend/) → `npx vite --host` (frontend/)
+- **Prisma DLL-Lock**: Vor `npx prisma generate` alle Node-Prozesse beenden
 
-## Bekannte Hinweise
+## Letzte Session: US-22 (22.03.2026)
 
-- **Frontend .env**: `VITE_API_URL=http://localhost:3001` (ist in .gitignore, bei frischem Clone manuell erstellen)
-- **Seed**: `npx prisma db seed` ändert User-IDs → danach neu einloggen
-- **Test-Notifications**: 4 Test-Notifications für Thomas manuell erstellt (22.03.2026) — 2 ungelesene Medikamenten-Erinnerungen, 1 gelesene, 1 Termin-Erinnerung
+Branch: feat/laborbefunde → merged in main
+Commit: `63bab6e merge: feat/laborbefunde (US-22 Laborbefunde anzeigen)`
 
-## Letzte Session: US-21 (22.03.2026)
-
-Geänderte Dateien:
-- `backend/src/config/cron.js` — `generateMedicationReminders()` + `startReminderCron()` erweitert
-- `frontend/src/pages/core/NotificationsPage.jsx` — Icon-Logik (📅/💊/🔔), Quick-Action-Button, Zurück-Button, typ-abhängige Navigation
-- `frontend/src/styles/pages/core/NotificationsPage.css` — .notifications-back, .notification-item__quick-take
-
-Letzter Commit: `cba2e25 feat(labs): US-21 Medikamenten-Erinnerung (Cron + Notifications + Quick-Action)`
+Neue Dateien: lab.controller.js, lab.routes.js, LabReportCard.jsx, LabReportSection.jsx, LabReportDetailPage.jsx + CSS
+Geänderte: schema.prisma (+LabReport +LabValue), seed.js (+3 Befunde/18 Werte für Thomas), server.js, App.jsx, LabsPage.jsx

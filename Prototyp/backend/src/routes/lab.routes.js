@@ -17,6 +17,7 @@ import { authenticateToken } from '../middleware/auth.middleware.js';
 import {
   getLabReports,
   getLabReportById,
+  getLabValueHistory,
 } from '../controllers/lab.controller.js';
 
 const router = Router();
@@ -25,6 +26,11 @@ const router = Router();
 // Alle Laborbefunde des Users (Liste, neueste zuerst).
 // Jeder Eintrag enthält: Titel, Labor, Arzt, Datum, Anzahl Parameter.
 router.get('/', authenticateToken, getLabReports);
+
+// ── GET /api/labs/history/:parameter ────────────────────────────────
+// Letzte 3 Messwerte eines Parameters (für Mini-Verlaufsdiagramm, US-23).
+// MUSS VOR /:id stehen, sonst interpretiert Express "history" als ID!
+router.get('/history/:parameter', authenticateToken, getLabValueHistory);
 
 // ── GET /api/labs/:id ────────────────────────────────────────────────
 // Einzelner Laborbefund mit allen Messwerten (Detail-Ansicht).

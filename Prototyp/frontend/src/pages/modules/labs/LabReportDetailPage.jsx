@@ -24,6 +24,9 @@ import Badge from '../../../components/ui/Badge';
 import Alert from '../../../components/ui/Alert';
 import Spinner from '../../../components/ui/Spinner';
 import Button from '../../../components/ui/Button';
+import LabValueGauge from '../../../components/labs/LabValueGauge';
+import LabValueHistory from '../../../components/labs/LabValueHistory';
+import labExplanations from '../../../data/labExplanations.json';
 import '../../../styles/pages/modules/labs/LabReportDetailPage.css';
 
 // ── Datum-Formatierung ───────────────────────────────────────────────
@@ -54,6 +57,8 @@ export default function LabReportDetailPage() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // US-23: Welche Zeilen sind aufgeklappt? (Set von LabValue-IDs)
+  const [expandedIds, setExpandedIds] = useState(new Set());
 
   // ── Befund laden ───────────────────────────────────────────────────
   useEffect(() => {
@@ -162,9 +167,17 @@ export default function LabReportDetailPage() {
         )}
       </Card>
 
-      {/* ── Werte-Tabelle ───────────────────────────────────────────── */}
+      {/* ── Werte-Tabelle mit aufklappbarer Detail-Ansicht (US-23) ──── */}
+      {/* Jede Zeile zeigt: Parameter, Wert, Einheit, Referenz, Status  */}
+      {/* Klick auf eine Zeile klappt die Detail-Ansicht auf:           */}
+      {/*   → LabValueGauge (Ampel-Skala mit Pfeil)                     */}
+      {/*   → LabValueHistory (Mini-Balkendiagramm, letzte 3 Werte)     */}
+      {/*   → Erklärungstext aus labExplanations.json                   */}
       <section className="lab-detail__values-section">
         <h2 className="lab-detail__section-title">Laborwerte</h2>
+        <p className="lab-detail__section-hint">
+          Tippe auf einen Wert für Details und Erklärung
+        </p>
         <div className="lab-detail__table-wrapper">
           <table className="lab-detail__table">
             <thead>
@@ -179,23 +192,64 @@ export default function LabReportDetailPage() {
             <tbody>
               {report.values.map((val) => {
                 const status = getValueStatus(val.value, val.referenceMin, val.referenceMax);
+                const isExpanded = expandedIds.has(val.id);
+                const explanation = labExplanations[val.parameter] || null;
+
                 return (
-                  <tr key={val.id} className={`lab-detail__row lab-detail__row--${status}`}>
-                    <td className="lab-detail__param">{val.parameter}</td>
-                    <td className="lab-detail__value">{val.value}</td>
-                    <td className="lab-detail__unit">{val.unit}</td>
-                    <td className="lab-detail__reference">
-                      {val.referenceMin != null && val.referenceMax != null
-                        ? `${val.referenceMin} – ${val.referenceMax}`
-                        : '–'}
-                    </td>
-                    <td className="lab-detail__status">
-                      {status === 'normal' && <span className="lab-detail__status-dot lab-detail__status-dot--normal">●</span>}
-                      {status === 'high' && <span className="lab-detail__status-dot lab-detail__status-dot--high">▲</span>}
-                      {status === 'low' && <span className="lab-detail__status-dot lab-detail__status-dot--low">▼</span>}
-                      {status === 'unknown' && <span className="lab-detail__status-dot lab-detail__status-dot--unknown">–</span>}
-                    </td>
-                  </tr>
+                  <>
+                    {/* ── Kompakte Zeile (klickbar) ────────────────── */}
+                    <tr
+                      key={val.id}
+                      className={`lab-detail__row lab-detail__row--${status} lab-detail__row--clickable ${isExpanded ? 'lab-detail__row--expanded' : ''}`}
+                      onClick={() => {
+                        setExpandedIds((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(val.id)) next.delete(val.id);
+                          else next.add(val.id);
+                          return next;
+                        });
+                      }}
+                    >
+                      <td className="lab-detail__param">
+                        {isExpanded ? '▾' : '▸'} {val.parameter}
+                      </td>
+                      <td className="lab-detail__value">{val.value}</td>
+                      <td className="lab-detail__unit">{val.unit}</td>
+                      <td className="lab-detail__reference">
+                        {val.referenceMin != null && val.referenceMax != null
+                          ? `${val.referenceMin} – ${val.referenceMax}`
+                          : '–'}
+                      </td>
+                      <td className="lab-detail__status">
+                        {status === 'normal' && <span className="lab-detail__status-dot lab-detail__status-dot--normal">●</span>}
+                        {status === 'high' && <span className="lab-detail__status-dot lab-detail__status-dot--high">▲</span>}
+                        {status === 'low' && <span className="lab-detail__status-dot lab-detail__status-dot--low">▼</span>}
+                        {status === 'unknown' && <span className="lab-detail__status-dot lab-detail__status-dot--unknown">–</span>}
+                      </td>
+                    </tr>
+
+                    {/* ── Aufklappbare Detail-Zeile (US-23) ────────── */}
+                    {isExpanded && (
+                      <tr key={`${val.id}-detail`} className="lab-detail__expand-row">
+                        <td colSpan={5} className="lab-detail__expand-cell">
+                          {/* Ampel-Skala mit Pfeil-Marker */}
+                          <LabValueGauge
+                            value={val.value}
+                            min={val.referenceMin}
+                            max={val.referenceMax}
+                            unit={val.unit}
+                            parameter={val.parameter}
+                            explanation={explanation}
+                          />
+                          {/* Mini-Verlaufsdiagramm (letzte 3 Werte) */}
+                          <LabValueHistory
+                            parameter={val.parameter}
+                            token={token}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 );
               })}
             </tbody>
@@ -203,10 +257,10 @@ export default function LabReportDetailPage() {
         </div>
       </section>
 
-      {/* ── Legende ─────────────────────────────────────────────────── */}
+      {/* ── Legende (erweitert mit Grenzwertig) ─────────────────────── */}
       <div className="lab-detail__legend">
         <span className="lab-detail__legend-item">
-          <span className="lab-detail__status-dot lab-detail__status-dot--normal">●</span> Im Normalbereich
+          <span className="lab-detail__status-dot lab-detail__status-dot--normal">●</span> Normal
         </span>
         <span className="lab-detail__legend-item">
           <span className="lab-detail__status-dot lab-detail__status-dot--high">▲</span> Erhöht
@@ -214,6 +268,11 @@ export default function LabReportDetailPage() {
         <span className="lab-detail__legend-item">
           <span className="lab-detail__status-dot lab-detail__status-dot--low">▼</span> Erniedrigt
         </span>
+      </div>
+
+      {/* ── Hinweis: Keine ärztliche Beratung ──────────────────────── */}
+      <div className="lab-detail__disclaimer">
+        <p>⚕️ Diese Erklärungen dienen der Orientierung und ersetzen keine ärztliche Beratung. Besprich auffällige Werte immer mit deinem Arzt.</p>
       </div>
     </PageContainer>
   );

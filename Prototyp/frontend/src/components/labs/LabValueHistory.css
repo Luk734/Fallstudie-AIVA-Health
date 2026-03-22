@@ -1,0 +1,71 @@
+/* LabValueHistory.css — Mini-Balkendiagramm (US-23) */
+/* Zeigt bis zu 3 vertikale Balken für den Werteverlauf */
+
+.lab-history {
+  margin-top: var(--spacing-sm);
+}
+
+.lab-history__title {
+  font-size: var(--font-size-sm, 0.85rem);
+  font-weight: 600;
+  color: var(--color-text-secondary, #64748b);
+}
+
+/* ── Chart-Container ─────────────────────────────────────────────── */
+.lab-history__chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  height: 60px;
+  margin-top: var(--spacing-xs);
+  padding: 0 var(--spacing-xs);
+}
+
+/* ── Einzelner Balken mit Label ──────────────────────────────────── */
+.lab-history__bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.lab-history__bar-value {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #1e293b);
+  margin-bottom: 2px;
+}
+
+.lab-history__bar {
+  width: 100%;
+  max-width: 32px;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}
+
+/* Balken-Farben je nach Status */
+.lab-history__bar--normal {
+  background: var(--color-success, #16a34a);
+}
+
+.lab-history__bar--borderline {
+  background: var(--color-warning, #d97706);
+}
+
+.lab-history__bar--low,
+.lab-history__bar--high {
+  background: var(--color-error, #dc2626);
+}
+
+.lab-history__bar--unknown {
+  background: var(--color-text-muted, #94a3b8);
+}
+
+.lab-history__bar-date {
+  font-size: 0.6rem;
+  color: var(--color-text-muted, #94a3b8);
+  margin-top: 3px;
+  white-space: nowrap;
+}
