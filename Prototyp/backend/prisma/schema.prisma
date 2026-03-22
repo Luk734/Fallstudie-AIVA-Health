@@ -82,6 +82,12 @@ model User {
   // Pro Tag ist nur ein Eintrag erlaubt (@@unique in Checkin).
   checkins     Checkin[]
 
+  // ── Relation zu HealthMetrics (US-27) ──────────────────────
+  // Ein User kann tägliche Wearable-Metriken haben (1:N).
+  // Im MVP sind das simulierte Daten (Mock-Wearable).
+  // Pro Tag ist nur ein Eintrag erlaubt (@@unique in HealthMetric).
+  healthMetrics HealthMetric[]
+
   @@map("users")
 }
 
@@ -529,4 +535,57 @@ model Checkin {
   // ── Unique: Pro User+Tag nur EIN Check-in ──────────────────
   @@unique([userId, date])
   @@map("checkins")
+}
+
+// ─── EPIC-04 / US-27: Wearable-Gesundheitsmetriken ───────────────────────
+// Tabelle: health_metrics
+// Speichert tägliche Gesundheitsdaten vom Wearable (Mock im MVP).
+//
+// Laura (32, Apple Watch) möchte ihre Gesundheitsdaten in AIVA sehen.
+// Im MVP werden die Daten per Cron-Job simuliert (kein echtes SDK).
+// Später könnte hier eine echte Apple Health / Google Fit API angebunden werden.
+//
+// Pro User pro Tag gibt es genau EINEN Eintrag (@@unique wie bei Checkin).
+// Die Daten umfassen:
+//   - Schritte (steps)
+//   - Herzfrequenz (Durchschnitt, Minimum, Maximum)
+//   - Schlaf (Stunden + Qualitäts-Bewertung)
+//
+// sleepQuality: Textuelle Bewertung der Schlafqualität
+//   "poor"      → < 5h Schlaf
+//   "fair"      → 5–6h Schlaf
+//   "good"      → 6–7.5h Schlaf
+//   "excellent" → > 7.5h Schlaf
+
+model HealthMetric {
+  id            Int      @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  // Jede Metrik gehört zu genau einem User.
+  // onDelete: Cascade → User gelöscht = Metriken weg.
+  userId        Int      @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Zeitstempel ────────────────────────────────────────────
+  // Datum der Messung (00:00:00 UTC, wie bei Checkin).
+  // Zusammen mit userId als @@unique → max 1 Eintrag pro Tag.
+  date          DateTime
+
+  // ── Schritte ───────────────────────────────────────────────
+  steps         Int                               // Tagesschritte (z.B. 8432)
+
+  // ── Herzfrequenz (bpm) ─────────────────────────────────────
+  heartRateAvg  Int      @map("heart_rate_avg")   // Tagesdurchschnitt (z.B. 72)
+  heartRateMin  Int      @map("heart_rate_min")   // Tagesminimum (z.B. 58)
+  heartRateMax  Int      @map("heart_rate_max")   // Tagesmaximum (z.B. 142)
+
+  // ── Schlaf ─────────────────────────────────────────────────
+  sleepHours    Float    @map("sleep_hours")      // Schlafdauer in Stunden (z.B. 7.5)
+  sleepQuality  String   @map("sleep_quality")    // "poor" | "fair" | "good" | "excellent"
+
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // ── Unique: Pro User+Tag nur EIN Eintrag ───────────────────
+  @@unique([userId, date])
+  @@map("health_metrics")
 }

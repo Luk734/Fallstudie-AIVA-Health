@@ -326,25 +326,111 @@ export async function generateMedicationReminders() {
   }
 }
 
-// ── Cron-Job starten ──────────────────────────────────────────────────
+// ── Wearable-Mock-Daten generieren (US-27, TASK-105) ───────────────────
+//
+// Generiert täglich realistische simulierte Wearable-Daten für ALLE User.
+// Im MVP gibt es keine echte Apple Health / Google Fit Anbindung,
+// deshalb simulieren wir die Daten über diesen Cron-Job.
+//
+// Für jeden User wird pro Tag genau EIN Eintrag in health_metrics erstellt.
+// Wenn heute schon Metriken existieren → wird nichts gemacht (Duplikat-Schutz).
+//
+// Wertebereiche (medizinisch plausibel):
+//   Schritte:         3.000 – 15.000 (WHO empfiehlt 8.000–10.000)
+//   Herzfrequenz Avg:  60 – 90 bpm (Ruhe-HF Erwachsene)
+//   Herzfrequenz Min:  Avg - 10 bis Avg - 20 (Schlaf/Ruhe)
+//   Herzfrequenz Max:  Avg + 30 bis Avg + 60 (Sport/Stress)
+//   Schlaf:            5.0 – 9.0 Stunden
+//   Schlafqualität:    Abhängig von Schlafdauer (siehe Code)
+export async function generateHealthMetrics() {
+  try {
+    // Heutiges Datum als 00:00:00 UTC (gleiche Logik wie bei Checkin)
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+
+    // Alle User holen (nur IDs, wir brauchen keine weiteren Daten)
+    const users = await prisma.user.findMany({ select: { id: true } });
+
+    let createdCount = 0;
+
+    for (const user of users) {
+      // ── Duplikat-Check: Heute schon Metriken vorhanden? ────────
+      const existing = await prisma.healthMetric.findUnique({
+        where: { userId_date: { userId: user.id, date: today } },
+      });
+      if (existing) continue;
+
+      // ── Realistische Zufallswerte generieren ───────────────────
+      // Math.random() gibt 0–1, wir skalieren auf den gewünschten Bereich.
+      // Math.round() rundet auf ganze Zahlen (für Schritte/HF).
+      const steps = Math.round(3000 + Math.random() * 12000);         // 3.000–15.000
+      const heartRateAvg = Math.round(60 + Math.random() * 30);       // 60–90 bpm
+      const heartRateMin = heartRateAvg - Math.round(10 + Math.random() * 10); // Avg-10 bis Avg-20
+      const heartRateMax = heartRateAvg + Math.round(30 + Math.random() * 30); // Avg+30 bis Avg+60
+
+      // Schlaf: 1 Dezimalstelle (z.B. 7.3 Stunden)
+      const sleepHours = Math.round((5 + Math.random() * 4) * 10) / 10; // 5.0–9.0h
+
+      // Schlafqualität basierend auf Stunden
+      // < 5h = "poor", 5–6h = "fair", 6–7.5h = "good", > 7.5h = "excellent"
+      let sleepQuality;
+      if (sleepHours < 5) sleepQuality = 'poor';
+      else if (sleepHours < 6) sleepQuality = 'fair';
+      else if (sleepHours < 7.5) sleepQuality = 'good';
+      else sleepQuality = 'excellent';
+
+      // ── Metrik in DB speichern ─────────────────────────────────
+      await prisma.healthMetric.create({
+        data: {
+          userId: user.id,
+          date: today,
+          steps,
+          heartRateAvg,
+          heartRateMin,
+          heartRateMax,
+          sleepHours,
+          sleepQuality,
+        },
+      });
+      createdCount++;
+    }
+
+    if (createdCount > 0) {
+      console.log(`⌨️ ${createdCount} Wearable-Metrik(en) generiert`);
+    }
+  } catch (error) {
+    console.error('❌ Fehler beim Generieren der Wearable-Metriken:', error);
+  }
+}
+
+// ── Cron-Jobs starten ─────────────────────────────────────────────────
 // Diese Funktion wird in server.js aufgerufen, wenn der Server startet.
 // Sie:
-//   1. Führt beide Reminder-Funktionen sofort aus
-//   2. Plant den Cron-Job für alle 15 Minuten
+//   1. Führt alle Generator-Funktionen sofort aus
+//   2. Plant die Cron-Jobs für regelmäßige Wiederholung
 //
-// Beide Funktionen laufen unabhängig voneinander:
-//   - generateReminders() → Termin-Erinnerungen (US-18)
-//   - generateMedicationReminders() → Medikamenten-Erinnerungen (US-21)
+// Drei unabhängige Cron-Jobs:
+//   - generateReminders()            → Termin-Erinnerungen alle 15 Min (US-18)
+//   - generateMedicationReminders()  → Medikamenten-Erinnerungen alle 15 Min (US-21)
+//   - generateHealthMetrics()        → Wearable-Mock-Daten täglich 00:05 UTC (US-27)
 export function startReminderCron() {
-  // Sofort beim Start einmal ausführen
-  console.log('⏰ Erinnerungs-Cron gestartet (alle 15 Minuten)');
+  // Sofort beim Start einmal ausführen (alle drei)
+  console.log('⏰ Cron-Jobs gestartet (Erinnerungen + Wearable-Metriken)');
   generateReminders();
   generateMedicationReminders();
+  generateHealthMetrics();
 
-  // Dann alle 15 Minuten wiederholen
+  // Erinnerungen: alle 15 Minuten
   // '*/15 * * * *' = "jede 15. Minute jeder Stunde jedes Tages"
   cron.schedule('*/15 * * * *', () => {
     generateReminders();
     generateMedicationReminders();
+  });
+
+  // Wearable-Metriken: täglich um 00:05 UTC
+  // '5 0 * * *' = "Minute 5, Stunde 0, jeden Tag"
+  // Läuft nur 1x pro Tag, weil pro User+Tag eh nur 1 Eintrag möglich ist.
+  cron.schedule('5 0 * * *', () => {
+    generateHealthMetrics();
   });
 }
