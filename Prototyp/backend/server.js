@@ -15,6 +15,7 @@ import preventionRoutes from './src/routes/prevention.routes.js';
 import notificationRoutes from './src/routes/notification.routes.js';
 import medicationRoutes from './src/routes/medication.routes.js';
 import labRoutes from './src/routes/lab.routes.js';
+import checkinRoutes from './src/routes/checkin.routes.js';
 import { startReminderCron } from './src/config/cron.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
@@ -98,6 +99,12 @@ app.use('/api/medications', medicationRoutes);
 // GET / = Alle Laborbefunde (neueste zuerst, mit Parameteranzahl)
 // GET /:id = Einzelner Befund mit allen Messwerten (Detail)
 app.use('/api/labs', labRoutes);
+
+// Checkin-Routen: Täglicher Befinden-Check-in unter /api/checkins/* (US-24)
+// POST / = Neuen Check-in erstellen (max. 1 pro Tag)
+// GET /today = Heutigen Check-in abrufen
+// GET /streak = Aktuelle Streak berechnen
+app.use('/api/checkins', checkinRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 // '0.0.0.0' = Server lauscht auf ALLEN Netzwerk-Interfaces,

@@ -77,6 +77,11 @@ model User {
   // Jeder Befund enthält mehrere Messwerte (lab_values).
   labReports   LabReport[]
 
+  // ── Relation zu Checkins (US-24) ───────────────────────────
+  // Ein User kann täglich einen Befinden-Check-in machen (1:N).
+  // Pro Tag ist nur ein Eintrag erlaubt (@@unique in Checkin).
+  checkins     Checkin[]
+
   @@map("users")
 }
 
@@ -485,4 +490,43 @@ model LabExplanation {
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@map("lab_explanations")
+}
+
+// ─── EPIC-04 / US-24: Täglicher Befinden-Check-in ────────────────────────
+// Tabelle: checkins
+// Speichert den täglichen Befinden-Check-in eines Nutzers.
+//
+// Laura (32) möchte täglich in 10 Sekunden ihr Befinden eintragen.
+// Sie wählt einen von 5 Emojis (😞😐🙂😊😄) — der wird als moodScore
+// (1–5) gespeichert. Optional kann sie eine kurze Notiz ergänzen.
+//
+// moodScore: Ganzzahl 1–5
+//   1 = 😞 Schlecht, 2 = 😐 Mittelmäßig, 3 = 🙂 Okay, 4 = 😊 Gut, 5 = 😄 Super
+//
+// date: Nur das Datum (Uhrzeit immer 00:00:00 UTC).
+//   Zusammen mit userId als @@unique → max 1 Check-in pro Tag pro User.
+//   Das ist die wichtigste Geschäftsregel dieser User Story.
+//
+// note: Optionaler Freitext ("Was beschäftigt dich heute?").
+//   Im Controller auf max 500 Zeichen begrenzt.
+
+model Checkin {
+  id        Int      @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  // Jeder Check-in gehört zu genau einem User.
+  // onDelete: Cascade → User gelöscht = Check-ins weg.
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Check-in-Daten ─────────────────────────────────────────
+  date      DateTime                              // Datum des Check-ins (00:00:00 UTC)
+  moodScore Int      @map("mood_score")           // 1=😞, 2=😐, 3=🙂, 4=😊, 5=😄
+  note      String?                               // Optionaler Freitext
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // ── Unique: Pro User+Tag nur EIN Check-in ──────────────────
+  @@unique([userId, date])
+  @@map("checkins")
 }

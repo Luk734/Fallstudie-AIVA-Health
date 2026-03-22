@@ -18,20 +18,20 @@
 | US-20 | Einnahme bestätigen (MedicationLog) | ✅ |
 | US-21 | Medikamenten-Erinnerung (Cron + Quick-Action) | ✅ |
 | US-22 | Laborbefunde anzeigen (Liste + Detail) | ✅ |
+| US-23 | Laborwert verstehen (Ampel + History + Erklärungen) | ✅ |
 
-## Nächste anstehende User Story: US-23 oder US-24
-
-**US-23: Laborwert verstehen** (Feature F-13, SHOULD, Größe M)
-- Ampel-System: Normal/Grenzwertig/Auffällig
-- Skala-Visualisierung mit Pfeil-Marker (LabValueGauge)
-- Mini-Diagramm Verlauf letzte 3 Messungen (LabValueHistory)
-- Erklärungstexte für Parameter in verständlicher Sprache (JSON)
-- Baut direkt auf US-22 auf (gleiche DB-Struktur)
+## Nächste anstehende User Stories: US-24, US-27, US-28
 
 **US-24: Befinden eintragen** (Feature F-14, MUST, Größe M)
 - Check-in mit 5-stufiger Emoji-Skala, eröffnet Coach-Modul
 - Neue DB-Tabelle checkins, neue API-Endpunkte
-- Höchste Priorität (MUST) unter den offenen Stories
+
+**US-27: Wearable-Metriken** (Feature F-16, SHOULD, Größe M)
+- Mock-Gesundheitsdaten (Schritte, Herzfrequenz, Schlaf)
+- Neue DB-Tabelle health_metrics + Cron-Job für Mock-Daten
+
+**US-28: Metriken-Dashboard** (Feature F-17, COULD, Größe M)
+- Coach-Dashboard mit Kacheln + Mini-Charts + Ampel
 
 ## Architektur-Überblick
 
@@ -45,24 +45,27 @@
 
 ## DB-Modelle (Prisma)
 
-User, Consent, Appointment, Doctor, PreventionSchedule, UserPrevention, Notification, Medication, MedicationLog, LabReport, LabValue
+User, Consent, Appointment, Doctor, PreventionSchedule, UserPrevention, Notification, Medication, MedicationLog, LabReport, LabValue, LabExplanation
 
 ## API-Routen
 
-/api/auth, /api/users, /api/consents, /api/appointments, /api/doctors, /api/prevention, /api/notifications, /api/medications, /api/labs
+/api/auth, /api/users, /api/consents, /api/appointments, /api/doctors, /api/prevention, /api/notifications, /api/medications, /api/labs (inkl. /explanations, /history/:parameter)
 
 ## Wichtige Patterns
 
-- **Branch-Workflow**: `feat/feature-name` → merge in main mit `merge: feat/... (US-XX ...)`
-- **CRUD-Pattern**: Prisma Model → Controller → Routes → Components → Page → App.jsx Route
-- **Studi-Projekt**: Immer erklären was/warum geändert wird, bevor Code geschrieben wird
-- **Neustart**: `Stop-Process -Name node -Force` → `npx prisma generate` → `node server.js` (backend/) → `npx vite --host` (frontend/)
-- **Prisma DLL-Lock**: Vor `npx prisma generate` alle Node-Prozesse beenden
+- **Branch-Workflow**: `feat/feature-name` → merge in main
+- **CSS-Konvention**: CSS-Dateien IMMER in `styles/`, NIE neben Komponenten
+- **Daten-Konvention**: Alle Daten in DB + Seed, KEINE JSON-Dateien im Frontend
+- **Studi-Projekt**: Immer erklären was/warum geändert wird
+- **Neustart**: Stop node → prisma generate → node server.js → npx vite --host
+- **Prisma DLL-Lock**: Vor prisma generate alle Node-Prozesse beenden
 
-## Letzte Session: US-22 (22.03.2026)
+## Letzte Session: US-23 (22.03.2026)
 
-Branch: feat/laborbefunde → merged in main
-Commit: `63bab6e merge: feat/laborbefunde (US-22 Laborbefunde anzeigen)`
+Branch: feat/laborwert-visualisierung → merged in main
+Commit: `2de03eb`
 
-Neue Dateien: lab.controller.js, lab.routes.js, LabReportCard.jsx, LabReportSection.jsx, LabReportDetailPage.jsx + CSS
-Geänderte: schema.prisma (+LabReport +LabValue), seed.js (+3 Befunde/18 Werte für Thomas), server.js, App.jsx, LabsPage.jsx
+Neue Dateien: LabValueGauge.jsx+CSS, LabValueHistory.jsx+CSS, LabExplanation DB-Modell
+Geänderte: lab.controller.js, lab.routes.js, LabReportDetailPage.jsx+CSS, schema.prisma, seed.js
+
+**Hinweis:** LabValueHistory braucht ≥2 Werte pro Parameter. Seed hat je nur 1 → History leer.
