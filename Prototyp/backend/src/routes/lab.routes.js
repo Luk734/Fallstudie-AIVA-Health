@@ -18,6 +18,7 @@ import {
   getLabReports,
   getLabReportById,
   getLabValueHistory,
+  getLabExplanations,
 } from '../controllers/lab.controller.js';
 
 const router = Router();
@@ -26,6 +27,12 @@ const router = Router();
 // Alle Laborbefunde des Users (Liste, neueste zuerst).
 // Jeder Eintrag enthält: Titel, Labor, Arzt, Datum, Anzahl Parameter.
 router.get('/', authenticateToken, getLabReports);
+
+// ── GET /api/labs/explanations ───────────────────────────────────────
+// Erklärungstexte für häufige Laborparameter (US-23).
+// Liefert ein Objekt: { "Hämoglobin": { description, lowHint, highHint }, ... }
+// MUSS VOR /:id stehen, sonst interpretiert Express "explanations" als ID!
+router.get('/explanations', authenticateToken, getLabExplanations);
 
 // ── GET /api/labs/history/:parameter ────────────────────────────────
 // Letzte 3 Messwerte eines Parameters (für Mini-Verlaufsdiagramm, US-23).

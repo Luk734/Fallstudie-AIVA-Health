@@ -1,12 +1,14 @@
-// src/controllers/lab.controller.js — Laborbefund-Endpunkte (US-22)
+// src/controllers/lab.controller.js — Laborbefund-Endpunkte (US-22, US-23)
 //
 // Dieser Controller liefert Laborbefunde für den eingeloggten User.
 // Alle Handler sind mit authenticateToken geschützt — die userId
 // kommt aus dem JWT-Token (req.user.userId).
 //
 // Endpunkte:
-//   GET /api/labs      → Alle Laborbefunde (Liste, neueste zuerst)
-//   GET /api/labs/:id  → Einzelner Befund mit allen Laborwerten
+//   GET /api/labs              → Alle Laborbefunde (Liste, neueste zuerst)
+//   GET /api/labs/:id          → Einzelner Befund mit allen Laborwerten
+//   GET /api/labs/explanations → Erklärungstexte für Laborparameter (US-23)
+//   GET /api/labs/history/:p   → Letzte 3 Werte eines Parameters (US-23)
 //
 // Im MVP werden die Daten per Seed befüllt (Mock-Daten).
 // Es gibt keine POST/PUT/DELETE-Endpunkte, weil Laborbefunde
@@ -95,12 +97,38 @@ export async function getLabReportById(req, res) {
 // Warum brauchen wir das? (US-23, Akzeptanzkriterium 3)
 //   Thomas möchte den Trend sehen: "Wird mein Hämoglobin besser oder schlechter?"
 //   Dafür zeigen wir die letzten 3 Messungen als Mini-Balkendiagramm.
+// ─── GET /api/labs/explanations ───────────────────────────────────────
+// Gibt alle Laborwert-Erklärungen aus der DB zurück (US-23).
 //
-// SQL-Logik:
-//   1. Alle LabValues mit passendem Parameter-Namen finden
-//   2. NUR aus Befunden des eingeloggten Users (Sicherheit!)
-//   3. Sortiert nach Befunddatum (neueste zuerst)
-//   4. Limitiert auf 3 Einträge
+// Warum als Objekt statt Array?
+//   Das Frontend braucht die Erklärungen nach Parameter-Name.
+//   Als Objekt kann es direkt explanations["Hämoglobin"] machen,
+//   ohne über ein Array iterieren zu müssen.
+//
+// Response: { explanations: { "Hämoglobin": { description, lowHint, highHint }, ... } }
+
+export async function getLabExplanations(req, res) {
+  try {
+    const rows = await prisma.labExplanation.findMany();
+
+    // Array → Objekt: { "Hämoglobin": { description, lowHint, highHint }, ... }
+    const explanations = {};
+    for (const row of rows) {
+      explanations[row.parameter] = {
+        description: row.description,
+        lowHint: row.lowHint,
+        highHint: row.highHint,
+      };
+    }
+
+    res.json({ explanations });
+  } catch (err) {
+    console.error('Fehler beim Laden der Laborwert-Erklärungen:', err);
+    res.status(500).json({ error: 'Erklärungen konnten nicht geladen werden.' });
+  }
+}
+
+// ─── GET /api/labs/history/:parameter ────────────────────────────────
 //
 // Response: { parameter: "Hämoglobin", history: [{ value, date, reportTitle }, ...] }
 

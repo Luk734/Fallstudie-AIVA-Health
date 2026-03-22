@@ -459,3 +459,30 @@ model LabValue {
 
   @@map("lab_values")
 }
+
+// ─── EPIC-03 / US-23: Laborwert-Erklärungen ─────────────────────────────
+// Tabelle: lab_explanations
+// Speichert verständliche Erklärungstexte für häufige Laborparameter.
+//
+// Thomas (56, kein Mediziner) soll auf einen Blick verstehen, was
+// z.B. "Hämoglobin" bedeutet — ohne medizinische Fachsprache.
+// Zusätzlich gibt es Hinweistexte für zu niedrige/hohe Werte.
+//
+// Die Daten werden per Seed befüllt (wie Arzt- und Vorsorge-Katalog).
+// Später könnten Ärzte oder Admins eigene Erklärungen hinzufügen.
+//
+// parameter ist @unique: Pro Laborparameter gibt es genau eine Erklärung.
+
+model LabExplanation {
+  id          Int      @id @default(autoincrement())
+
+  // ── Erklärungsdaten ────────────────────────────────────────
+  parameter   String   @unique                    // "Hämoglobin" (muss exakt zum LabValue.parameter passen)
+  description String                              // Verständliche Erklärung: "Der rote Blutfarbstoff..."
+  lowHint     String   @map("low_hint")           // Was ein zu niedriger Wert bedeuten könnte
+  highHint    String   @map("high_hint")          // Was ein zu hoher Wert bedeuten könnte
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("lab_explanations")
+}

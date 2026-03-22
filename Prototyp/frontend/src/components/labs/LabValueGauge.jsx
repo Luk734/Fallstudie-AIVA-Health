@@ -18,7 +18,7 @@
 //   parameter    – Name des Parameters (z.B. "Hämoglobin")
 //   explanation  – Objekt aus labExplanations.json { description, lowHint, highHint }
 
-import './LabValueGauge.css';
+import '../../styles/components/labs/LabValueGauge.css';
 
 export default function LabValueGauge({ value, min, max, unit, parameter, explanation }) {
   // Wenn keine Referenzwerte vorhanden → kein Gauge möglich

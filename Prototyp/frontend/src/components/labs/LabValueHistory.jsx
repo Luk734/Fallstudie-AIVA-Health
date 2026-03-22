@@ -20,7 +20,7 @@
 //   token     – JWT-Token für den API-Aufruf
 
 import { useState, useEffect } from 'react';
-import './LabValueHistory.css';
+import '../../styles/components/labs/LabValueHistory.css';
 
 // Kurzes Datum: "15.01.26"
 function formatShortDate(isoString) {

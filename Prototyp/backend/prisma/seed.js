@@ -709,6 +709,43 @@ async function main() {
 
   console.log(`   ✅ Laborbefund 3: ${cholesterin.title} (${cholesterin.reportDate.toLocaleDateString('de-DE')}) → 4 Werte`);
 
+  // ─── US-23: Laborwert-Erklärungen (verständliche Sprache) ──────────
+  // Werden in der LabReportDetailPage angezeigt, wenn der User eine
+  // Zeile aufklappt. Kein Medizinjargon — für Thomas (kein Mediziner).
+  console.log('\n📖 Laborwert-Erklärungen...');
+
+  const explanations = [
+    { parameter: 'Hämoglobin',         description: 'Der rote Blutfarbstoff – transportiert Sauerstoff von der Lunge zu allen Organen.', lowHint: 'Zu wenig kann auf Blutarmut hindeuten. Du fühlst dich vielleicht müde oder schlapp.', highHint: 'Zu viel kann auf Flüssigkeitsmangel oder andere Ursachen hinweisen.' },
+    { parameter: 'Hämatokrit',         description: 'Anteil der roten Blutkörperchen am gesamten Blut – zeigt, wie \'dick\' dein Blut ist.', lowHint: 'Ein niedriger Wert kann auf Blutarmut oder zu viel Flüssigkeit im Blut hindeuten.', highHint: 'Ein hoher Wert kann auf Flüssigkeitsmangel hinweisen.' },
+    { parameter: 'Erythrozyten',       description: 'Die roten Blutkörperchen – sie transportieren Sauerstoff durch deinen Körper.', lowHint: 'Zu wenige können auf Blutarmut hindeuten.', highHint: 'Zu viele können verschiedene Ursachen haben – dein Arzt kann das einordnen.' },
+    { parameter: 'Leukozyten',         description: 'Die weißen Blutkörperchen – deine Abwehrtruppe gegen Infektionen und Krankheiten.', lowHint: 'Zu wenige können bedeuten, dass dein Immunsystem geschwächt ist.', highHint: 'Zu viele sind oft ein Zeichen, dass dein Körper gerade eine Infektion bekämpft.' },
+    { parameter: 'Thrombozyten',       description: 'Die Blutplättchen – sie sorgen dafür, dass Wunden aufhören zu bluten.', lowHint: 'Zu wenige können bedeuten, dass Wunden langsamer heilen.', highHint: 'Zu viele können das Risiko für Blutgerinnsel erhöhen.' },
+    { parameter: 'MCV',                description: 'Die durchschnittliche Größe deiner roten Blutkörperchen.', lowHint: 'Zu kleine rote Blutkörperchen können auf Eisenmangel hindeuten.', highHint: 'Zu große können auf Vitamin-B12- oder Folsäure-Mangel hinweisen.' },
+    { parameter: 'MCH',                description: 'Wie viel Farbstoff (Hämoglobin) jedes rote Blutkörperchen enthält.', lowHint: 'Zu wenig Farbstoff kann auf Eisenmangel hindeuten.', highHint: 'Zu viel kann auf Vitamin-B12-Mangel hinweisen.' },
+    { parameter: 'MCHC',               description: 'Die Konzentration des Farbstoffs in deinen roten Blutkörperchen.', lowHint: 'Ein niedriger Wert kann auf Eisenmangel hindeuten.', highHint: 'Ein hoher Wert ist selten – besprich es mit deinem Arzt.' },
+    { parameter: 'GOT (AST)',          description: 'Ein Enzym, das vor allem in Leber und Herz vorkommt – zeigt, ob diese Organe belastet sind.', lowHint: 'Niedrige Werte sind in der Regel unauffällig.', highHint: 'Erhöhte Werte können auf eine Belastung der Leber hindeuten.' },
+    { parameter: 'GPT (ALT)',          description: 'Ein Leber-Enzym – der wichtigste Marker, ob deine Leber gesund arbeitet.', lowHint: 'Niedrige Werte sind in der Regel unauffällig.', highHint: 'Erhöhte Werte können auf eine Leberbelastung hindeuten (z.B. durch Medikamente oder Alkohol).' },
+    { parameter: 'Gamma-GT',           description: 'Ein weiteres Leber-Enzym – reagiert besonders empfindlich auf Alkohol und Medikamente.', lowHint: 'Niedrige Werte sind unauffällig.', highHint: 'Erhöhte Werte können auf Leberbelastung oder erhöhten Alkoholkonsum hinweisen.' },
+    { parameter: 'Kreatinin',          description: 'Ein Abfallprodukt der Muskeln – zeigt, wie gut deine Nieren arbeiten.', lowHint: 'Niedrige Werte sind meistens unauffällig.', highHint: 'Erhöhte Werte können bedeuten, dass deine Nieren nicht optimal filtern.' },
+    { parameter: 'GFR',                description: 'Die Filtrationsrate deiner Nieren – je höher, desto besser arbeiten sie.', lowHint: 'Ein niedriger Wert kann auf eine eingeschränkte Nierenfunktion hindeuten.', highHint: 'Hohe Werte sind in der Regel ein gutes Zeichen.' },
+    { parameter: 'Harnsäure',          description: 'Entsteht beim Abbau von Purinen aus der Nahrung – zu viel kann Gicht verursachen.', lowHint: 'Niedrige Werte sind meistens unauffällig.', highHint: 'Erhöhte Werte können das Risiko für Gicht oder Nierensteine erhöhen.' },
+    { parameter: 'Gesamtcholesterin',  description: 'Die Gesamtmenge an Fetten im Blut – ein Überblickswert für dein Herz-Kreislauf-Risiko.', lowHint: 'Niedrige Werte sind in der Regel positiv.', highHint: 'Erhöhte Werte können das Risiko für Herz-Kreislauf-Erkrankungen erhöhen.' },
+    { parameter: 'LDL-Cholesterin',    description: 'Das \'schlechte\' Cholesterin – lagert sich in den Blutgefäßen ab und kann sie verengen.', lowHint: 'Niedrige LDL-Werte sind in der Regel gut für deine Gefäße.', highHint: 'Erhöhte Werte erhöhen das Risiko für Arteriosklerose und Herzinfarkt.' },
+    { parameter: 'HDL-Cholesterin',    description: 'Das \'gute\' Cholesterin – transportiert überschüssiges Fett zurück zur Leber. Mehr ist besser!', lowHint: 'Zu wenig HDL kann das Herz-Kreislauf-Risiko erhöhen. Bewegung hilft!', highHint: 'Hohe HDL-Werte sind in der Regel ein gutes Zeichen.' },
+    { parameter: 'Triglyceride',       description: 'Blutfette aus der Nahrung – dein Körper nutzt sie als Energiespeicher.', lowHint: 'Niedrige Werte sind meistens unauffällig.', highHint: 'Erhöhte Werte können auf zu fettreiche Ernährung oder Stoffwechselstörungen hinweisen.' },
+  ];
+
+  // Upsert: Falls Erklärung schon existiert → aktualisieren, sonst neu anlegen
+  for (const exp of explanations) {
+    await prisma.labExplanation.upsert({
+      where: { parameter: exp.parameter },
+      update: { description: exp.description, lowHint: exp.lowHint, highHint: exp.highHint },
+      create: exp,
+    });
+  }
+
+  console.log(`   ✅ ${explanations.length} Laborwert-Erklärungen angelegt`);
+
   console.log('🌱 Seed abgeschlossen!');
 }
 

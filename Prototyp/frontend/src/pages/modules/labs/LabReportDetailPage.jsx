@@ -26,7 +26,6 @@ import Spinner from '../../../components/ui/Spinner';
 import Button from '../../../components/ui/Button';
 import LabValueGauge from '../../../components/labs/LabValueGauge';
 import LabValueHistory from '../../../components/labs/LabValueHistory';
-import labExplanations from '../../../data/labExplanations.json';
 import '../../../styles/pages/modules/labs/LabReportDetailPage.css';
 
 // ── Datum-Formatierung ───────────────────────────────────────────────
@@ -59,6 +58,28 @@ export default function LabReportDetailPage() {
   const [error, setError] = useState(null);
   // US-23: Welche Zeilen sind aufgeklappt? (Set von LabValue-IDs)
   const [expandedIds, setExpandedIds] = useState(new Set());
+  // US-23: Erklärungstexte aus der DB (statt JSON-Datei)
+  const [explanations, setExplanations] = useState({});
+
+  // ── Erklärungstexte laden (US-23) ──────────────────────────────────
+  // Einmal beim Laden der Seite alle Erklärungen von der API holen.
+  // Das Ergebnis ist ein Objekt: { "Hämoglobin": { description, lowHint, highHint }, ... }
+  useEffect(() => {
+    async function fetchExplanations() {
+      try {
+        const res = await fetch('/api/labs/explanations', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setExplanations(data.explanations);
+        }
+      } catch {
+        // Erklärungen sind optional — wenn's nicht klappt, zeigen wir halt keine
+      }
+    }
+    fetchExplanations();
+  }, [token]);
 
   // ── Befund laden ───────────────────────────────────────────────────
   useEffect(() => {
@@ -172,7 +193,7 @@ export default function LabReportDetailPage() {
       {/* Klick auf eine Zeile klappt die Detail-Ansicht auf:           */}
       {/*   → LabValueGauge (Ampel-Skala mit Pfeil)                     */}
       {/*   → LabValueHistory (Mini-Balkendiagramm, letzte 3 Werte)     */}
-      {/*   → Erklärungstext aus labExplanations.json                   */}
+      {/*   → Erklärungstext aus der Datenbank (US-23)                  */}
       <section className="lab-detail__values-section">
         <h2 className="lab-detail__section-title">Laborwerte</h2>
         <p className="lab-detail__section-hint">
@@ -193,7 +214,7 @@ export default function LabReportDetailPage() {
               {report.values.map((val) => {
                 const status = getValueStatus(val.value, val.referenceMin, val.referenceMax);
                 const isExpanded = expandedIds.has(val.id);
-                const explanation = labExplanations[val.parameter] || null;
+                const explanation = explanations[val.parameter] || null;
 
                 return (
                   <>
