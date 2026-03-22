@@ -618,6 +618,97 @@ async function main() {
   const notifCount = await prisma.notification.count({ where: { userId: user.id } });
   console.log(`   ✅ Notifications Laura: ${notifCount} Erinnerungen erstellt`);
 
+  // ── US-22: Laborbefunde für Thomas ──────────────────────────────────
+  // Thomas (56, Bluthochdruck, nimmt Ramipril + ASS) bekommt regelmäßig
+  // Blutbilder und Leber/Nierenwerte kontrolliert.
+  //
+  // Wir erstellen 3 realistische Befunde mit echten Referenzbereichen:
+  //   1. Großes Blutbild (Januar 2026) — 8 Parameter
+  //   2. Leberwerte + Nierenwerte (Oktober 2025) — 6 Parameter
+  //   3. Cholesterin-Profil (Juni 2025) — 4 Parameter
+  //
+  // Einige Werte sind bewusst leicht erhöht (z.B. LDL-Cholesterin),
+  // damit die spätere Ampel-Komponente (US-23) verschiedene Zustände zeigt.
+
+  // Zuerst alte Lab-Daten löschen (idempotenter Seed)
+  await prisma.labValue.deleteMany({});
+  await prisma.labReport.deleteMany({});
+
+  // ── Befund 1: Großes Blutbild (Januar 2026) ────────────────────────
+  const blutbild = await prisma.labReport.create({
+    data: {
+      userId: user2.id,
+      title: 'Großes Blutbild',
+      labName: 'Labor Stuttgart Mitte',
+      doctorName: 'Dr. Sarah Müller',
+      reportDate: new Date('2026-01-15'),
+      notes: 'Routinekontrolle, alle Werte im Normbereich.',
+    },
+  });
+
+  await prisma.labValue.createMany({
+    data: [
+      { reportId: blutbild.id, parameter: 'Hämoglobin',    value: 15.1,   unit: 'g/dL',     referenceMin: 13.5, referenceMax: 17.5 },
+      { reportId: blutbild.id, parameter: 'Hämatokrit',    value: 44.8,   unit: '%',         referenceMin: 40.0, referenceMax: 52.0 },
+      { reportId: blutbild.id, parameter: 'Erythrozyten',  value: 4.9,    unit: 'Mio/µL',   referenceMin: 4.3,  referenceMax: 5.9 },
+      { reportId: blutbild.id, parameter: 'Leukozyten',    value: 7.2,    unit: 'Tsd/µL',   referenceMin: 4.0,  referenceMax: 10.0 },
+      { reportId: blutbild.id, parameter: 'Thrombozyten',  value: 245,    unit: 'Tsd/µL',   referenceMin: 150,  referenceMax: 400 },
+      { reportId: blutbild.id, parameter: 'MCV',           value: 91.4,   unit: 'fL',        referenceMin: 80.0, referenceMax: 96.0 },
+      { reportId: blutbild.id, parameter: 'MCH',           value: 30.8,   unit: 'pg',        referenceMin: 28.0, referenceMax: 33.0 },
+      { reportId: blutbild.id, parameter: 'MCHC',          value: 33.7,   unit: 'g/dL',     referenceMin: 33.0, referenceMax: 36.0 },
+    ],
+  });
+
+  console.log(`   ✅ Laborbefund 1: ${blutbild.title} (${blutbild.reportDate.toLocaleDateString('de-DE')}) → 8 Werte`);
+
+  // ── Befund 2: Leberwerte + Nierenwerte (Oktober 2025) ──────────────
+  const leber = await prisma.labReport.create({
+    data: {
+      userId: user2.id,
+      title: 'Leber- & Nierenwerte',
+      labName: 'Labor Stuttgart Mitte',
+      doctorName: 'Dr. Sarah Müller',
+      reportDate: new Date('2025-10-08'),
+      notes: 'Kontrolle wegen Ramipril. GPT leicht erhöht, Wiederholung in 3 Monaten.',
+    },
+  });
+
+  await prisma.labValue.createMany({
+    data: [
+      { reportId: leber.id, parameter: 'GOT (AST)',   value: 28,     unit: 'U/L',      referenceMin: 10,  referenceMax: 50 },
+      { reportId: leber.id, parameter: 'GPT (ALT)',   value: 52,     unit: 'U/L',      referenceMin: 10,  referenceMax: 50 },   // ⚠️ leicht erhöht
+      { reportId: leber.id, parameter: 'Gamma-GT',    value: 38,     unit: 'U/L',      referenceMin: 0,   referenceMax: 60 },
+      { reportId: leber.id, parameter: 'Kreatinin',   value: 1.05,   unit: 'mg/dL',    referenceMin: 0.7, referenceMax: 1.3 },
+      { reportId: leber.id, parameter: 'GFR',         value: 78,     unit: 'mL/min',   referenceMin: 60,  referenceMax: 120 },
+      { reportId: leber.id, parameter: 'Harnsäure',   value: 6.8,    unit: 'mg/dL',    referenceMin: 3.5, referenceMax: 7.0 },
+    ],
+  });
+
+  console.log(`   ✅ Laborbefund 2: ${leber.title} (${leber.reportDate.toLocaleDateString('de-DE')}) → 6 Werte`);
+
+  // ── Befund 3: Cholesterin-Profil (Juni 2025) ───────────────────────
+  const cholesterin = await prisma.labReport.create({
+    data: {
+      userId: user2.id,
+      title: 'Cholesterin-Profil',
+      labName: 'MVZ Labordiagnostik Stuttgart',
+      doctorName: 'Dr. Markus Weber',
+      reportDate: new Date('2025-06-20'),
+      notes: 'LDL etwas hoch — Ernährungsberatung empfohlen.',
+    },
+  });
+
+  await prisma.labValue.createMany({
+    data: [
+      { reportId: cholesterin.id, parameter: 'Gesamtcholesterin', value: 228,  unit: 'mg/dL',  referenceMin: 0,   referenceMax: 200 },  // ⚠️ erhöht
+      { reportId: cholesterin.id, parameter: 'LDL-Cholesterin',   value: 155,  unit: 'mg/dL',  referenceMin: 0,   referenceMax: 130 },  // 🔴 erhöht
+      { reportId: cholesterin.id, parameter: 'HDL-Cholesterin',   value: 48,   unit: 'mg/dL',  referenceMin: 40,  referenceMax: 200 },
+      { reportId: cholesterin.id, parameter: 'Triglyceride',      value: 168,  unit: 'mg/dL',  referenceMin: 0,   referenceMax: 150 },  // ⚠️ leicht erhöht
+    ],
+  });
+
+  console.log(`   ✅ Laborbefund 3: ${cholesterin.title} (${cholesterin.reportDate.toLocaleDateString('de-DE')}) → 4 Werte`);
+
   console.log('🌱 Seed abgeschlossen!');
 }
 

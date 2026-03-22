@@ -72,6 +72,11 @@ model User {
   // Tageszeit eingenommen oder übersprungen wurde.
   medicationLogs MedicationLog[]
 
+  // ── Relation zu LabReports (US-22) ─────────────────────────
+  // Ein User kann mehrere Laborbefunde haben (1:N).
+  // Jeder Befund enthält mehrere Messwerte (lab_values).
+  labReports   LabReport[]
+
   @@map("users")
 }
 
@@ -384,4 +389,73 @@ model MedicationLog {
   // ── Unique: Pro Medikament+Tag+Zeit nur EIN Eintrag ────────
   @@unique([medicationId, scheduledDate, scheduledTime])
   @@map("medication_logs")
+}
+
+// ─── EPIC-03 / US-22: Laborbefunde ───────────────────────────────────────
+// Tabelle: lab_reports
+// Speichert Laborbefunde eines Nutzers (z.B. großes Blutbild, Leberwerte).
+//
+// Thomas (56, Bluthochdruck) bekommt regelmäßig Blutbilder.
+// Jeder Befund hat:
+//   - Titel (z.B. "Großes Blutbild")
+//   - Labor und Arzt, der die Untersuchung angeordnet hat
+//   - Datum des Befunds
+//   - Mehrere Einzelwerte (1:N Relation zu lab_values)
+//
+// MVP: Mock-Daten per Seed, kein echtes ePA/FHIR-Interface.
+
+model LabReport {
+  id          Int       @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu User ─────────────────────────────────
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ── Befund-Daten ───────────────────────────────────────────
+  title       String                              // "Großes Blutbild"
+  labName     String    @map("lab_name")          // "Labor Stuttgart Mitte"
+  doctorName  String    @map("doctor_name")       // "Dr. Sarah Müller"
+  reportDate  DateTime  @map("report_date")       // Datum des Laborbefunds
+  notes       String?                             // Optionale Anmerkungen
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // ── Relation zu LabValues (1:N) ────────────────────────────
+  // Ein Befund enthält mehrere Messwerte (z.B. Hämoglobin, Leukozyten etc.)
+  values      LabValue[]
+
+  @@map("lab_reports")
+}
+
+// ─── EPIC-03 / US-22: Laborwerte (Einzelne Messwerte) ────────────────────
+// Tabelle: lab_values
+// Speichert die einzelnen Parameter eines Laborbefunds.
+//
+// Jeder Wert hat:
+//   - parameter: Name des Laborwerts (z.B. "Hämoglobin")
+//   - value: Gemessener Zahlenwert (z.B. 14.2)
+//   - unit: Einheit (z.B. "g/dL")
+//   - referenceMin / referenceMax: Normalbereich (für Ampel in US-23)
+//
+// Die Referenzbereiche werden mitgespeichert, weil sie je nach Labor
+// leicht unterschiedlich sein können. So ist jeder Befund selbsterklärend.
+
+model LabValue {
+  id            Int       @id @default(autoincrement())
+
+  // ── Fremdschlüssel zu LabReport ────────────────────────────
+  reportId      Int       @map("report_id")
+  report        LabReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  // ── Messwert-Daten ─────────────────────────────────────────
+  parameter     String                              // "Hämoglobin"
+  value         Float                               // 14.2
+  unit          String                              // "g/dL"
+  referenceMin  Float?    @map("reference_min")     // Unterer Normalwert (z.B. 12.0)
+  referenceMax  Float?    @map("reference_max")     // Oberer Normalwert (z.B. 16.0)
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@map("lab_values")
 }
