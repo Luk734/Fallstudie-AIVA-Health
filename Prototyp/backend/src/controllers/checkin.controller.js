@@ -192,3 +192,85 @@ export async function getStreak(req, res) {
     res.status(500).json({ error: 'Streak konnte nicht berechnet werden.' });
   }
 }
+
+// ─── GET /api/checkins?from=&to= ───────────────────────────────────
+// Gibt alle Check-ins eines Zeitraums zurück (US-25).
+//
+// Query-Parameter:
+//   from (optional): Startdatum als ISO-String, z.B. "2026-02-20"
+//   to   (optional): Enddatum als ISO-String, z.B. "2026-03-22"
+//   Ohne Parameter: letzte 30 Tage ab heute.
+//
+// Zusätzlich werden Durchschnittswerte berechnet:
+//   averages.last7:  Ø moodScore der letzten 7 Tage
+//   averages.last30: Ø moodScore der letzten 30 Tage
+// Diese Werte braucht die MoodTrend-Komponente im Frontend.
+//
+// Sortierung: aufsteigend nach Datum (älteste zuerst),
+// damit die Kalender-Ansicht chronologisch rendern kann.
+//
+// Response: { checkins: [...], averages: { last7, last30 } }
+
+export async function getCheckins(req, res) {
+  try {
+    const userId = req.user.userId;
+    const today = todayUTC();
+
+    // ── Zeitraum bestimmen ─────────────────────────────────────
+    // Falls from/to nicht angegeben: Default = letzte 30 Tage.
+    const to = req.query.to
+      ? new Date(req.query.to + 'T00:00:00.000Z')
+      : today;
+    const from = req.query.from
+      ? new Date(req.query.from + 'T00:00:00.000Z')
+      : new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - 29));
+
+    // ── Check-ins des Zeitraums laden ──────────────────────────
+    const checkins = await prisma.checkin.findMany({
+      where: {
+        userId,
+        date: { gte: from, lte: to },
+      },
+      orderBy: { date: 'asc' },
+    });
+
+    // ── Durchschnitte berechnen ────────────────────────────────
+    // Wir holen die letzten 7 und 30 Tage separat,
+    // damit die Durchschnitte unabhängig vom gewählten Zeitraum stimmen.
+    const last7Start = new Date(Date.UTC(
+      today.getFullYear(), today.getMonth(), today.getDate() - 6
+    ));
+    const last30Start = new Date(Date.UTC(
+      today.getFullYear(), today.getMonth(), today.getDate() - 29
+    ));
+
+    const [last7Checkins, last30Checkins] = await Promise.all([
+      prisma.checkin.findMany({
+        where: { userId, date: { gte: last7Start, lte: today } },
+        select: { moodScore: true },
+      }),
+      prisma.checkin.findMany({
+        where: { userId, date: { gte: last30Start, lte: today } },
+        select: { moodScore: true },
+      }),
+    ]);
+
+    // Ø berechnen: Summe / Anzahl, auf 1 Nachkommastelle gerundet.
+    // Wenn keine Einträge → null (Frontend zeigt dann "Keine Daten").
+    const avg = (arr) =>
+      arr.length > 0
+        ? Math.round((arr.reduce((sum, c) => sum + c.moodScore, 0) / arr.length) * 10) / 10
+        : null;
+
+    res.json({
+      checkins,
+      averages: {
+        last7: avg(last7Checkins),
+        last30: avg(last30Checkins),
+      },
+    });
+  } catch (err) {
+    console.error('Fehler beim Laden der Check-ins:', err);
+    res.status(500).json({ error: 'Check-ins konnten nicht geladen werden.' });
+  }
+}
