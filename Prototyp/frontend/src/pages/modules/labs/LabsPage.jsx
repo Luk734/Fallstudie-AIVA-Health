@@ -1,8 +1,9 @@
-// src/pages/modules/labs/LabsPage.jsx — AIVA Labs: Medikamente + Einnahmen (US-19, US-20)
+// src/pages/modules/labs/LabsPage.jsx — AIVA Labs: Medikamente + Einnahmen + Laborbefunde (US-19, US-20, US-22)
 //
-// Zwei Hauptbereiche:
+// Drei Hauptbereiche:
 //   1. MedicationTodaySection (US-20) — Heutige Einnahmen mit ✅/⏭️ Buttons
 //   2. Medikamenten-Liste (US-19) — CRUD-Verwaltung mit MedicationCards
+//   3. LabReportSection (US-22) — Laborbefunde mit Klick → Detail
 //
 // Datenabruf:
 //   GET /api/medications         → nur aktive (Standard)
@@ -23,6 +24,7 @@ import Alert from '../../../components/ui/Alert';
 import Spinner from '../../../components/ui/Spinner';
 import MedicationCard from '../../../components/labs/MedicationCard';
 import MedicationTodaySection from '../../../components/labs/MedicationTodaySection';
+import LabReportSection from '../../../components/labs/LabReportSection';
 import '../../../styles/pages/modules/labs/LabsPage.css';
 
 export default function LabsPage() {
@@ -157,13 +159,9 @@ export default function LabsPage() {
         </section>
       )}
 
-      {/* ── Platzhalter: Laborbefunde (US-22) ─────────────────────── */}
-      <section className="labs-page__section labs-page__placeholder">
-        <h2 className="labs-page__section-title">🔬 Laborbefunde</h2>
-        <div className="labs-page__placeholder-box">
-          <span>🚧</span>
-          <p>Kommt in einer späteren Story (US-22).</p>
-        </div>
+      {/* ── Laborbefunde (US-22) ──────────────────────────────────── */}
+      <section className="labs-page__section labs-page__section--labs">
+        <LabReportSection />
       </section>
     </PageContainer>
   );

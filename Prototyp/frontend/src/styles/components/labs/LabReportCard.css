@@ -1,0 +1,63 @@
+/* src/styles/components/labs/LabReportCard.css — Laborbefund-Karte (US-22, TASK-87)
+ *
+ * Layout einer einzelnen Laborbefund-Karte.
+ * Die Card-Basis-Styles (bg, radius, shadow, accent-Rand) kommen von <Card>.
+ * Hier regeln wir:
+ *   - Cursor (klickbar)
+ *   - Header-Layout (Titel vs. Datum)
+ *   - Info-Zeile (Labor + Arzt)
+ *   - Footer (Badge + Notiz-Hinweis)
+ */
+
+/* ── Karte: Klickbar, daher Cursor auf Pointer ─────────────────────── */
+.lab-report-card {
+  cursor: pointer;
+}
+
+/* ── Inhalt ─────────────────────────────────────────────────────────── */
+.lab-report-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ── Header: Titel links, Datum rechts ──────────────────────────────── */
+.lab-report-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.lab-report-card__title {
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-800);
+  margin: 0;
+}
+
+.lab-report-card__date {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+  white-space: nowrap;
+}
+
+/* ── Info-Zeile: Labor + Arzt ──────────────────────────────────────── */
+.lab-report-card__info {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+  margin: 0;
+}
+
+/* ── Footer: Badge + Notiz-Hinweis ─────────────────────────────────── */
+.lab-report-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.lab-report-card__notes-hint {
+  font-size: var(--font-xs);
+  color: var(--color-slate-400);
+}

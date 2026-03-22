@@ -48,6 +48,7 @@ import AppointmentEditPage from './pages/modules/care/AppointmentEditPage';
 import LabsPage from './pages/modules/labs/LabsPage';
 import MedicationCreatePage from './pages/modules/labs/MedicationCreatePage';
 import MedicationEditPage from './pages/modules/labs/MedicationEditPage';
+import LabReportDetailPage from './pages/modules/labs/LabReportDetailPage';
 import CoachPage from './pages/modules/coach/CoachPage';
 import FamilyPage from './pages/modules/family/FamilyPage';
 
@@ -206,6 +207,18 @@ export default function App() {
               <PrivateRoute>
                 <AppLayout>
                   <MedicationEditPage />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          {/* AIVA Labs — Laborbefund-Detail (US-22) */}
+          <Route
+            path="/labs/reports/:id"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <LabReportDetailPage />
                 </AppLayout>
               </PrivateRoute>
             }

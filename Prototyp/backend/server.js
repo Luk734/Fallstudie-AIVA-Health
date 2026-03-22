@@ -14,6 +14,7 @@ import doctorRoutes from './src/routes/doctor.routes.js';
 import preventionRoutes from './src/routes/prevention.routes.js';
 import notificationRoutes from './src/routes/notification.routes.js';
 import medicationRoutes from './src/routes/medication.routes.js';
+import labRoutes from './src/routes/lab.routes.js';
 import { startReminderCron } from './src/config/cron.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
@@ -92,6 +93,11 @@ app.use('/api/notifications', notificationRoutes);
 // GET / = Alle aktiven Medikamente, POST / = Neues Medikament
 // GET /:id = Detail, PUT /:id = Bearbeiten, PATCH /:id/deactivate = Absetzen
 app.use('/api/medications', medicationRoutes);
+
+// Lab-Routen: Laborbefunde unter /api/labs/* (US-22)
+// GET / = Alle Laborbefunde (neueste zuerst, mit Parameteranzahl)
+// GET /:id = Einzelner Befund mit allen Messwerten (Detail)
+app.use('/api/labs', labRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 // '0.0.0.0' = Server lauscht auf ALLEN Netzwerk-Interfaces,

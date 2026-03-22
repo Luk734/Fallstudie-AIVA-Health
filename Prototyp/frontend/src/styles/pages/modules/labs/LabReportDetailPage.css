@@ -1,0 +1,208 @@
+/* src/styles/pages/modules/labs/LabReportDetailPage.css — Laborbefund-Detail (US-22, TASK-87)
+ *
+ * Layout der Detail-Ansicht eines Laborbefunds.
+ * Nutzt Design Tokens (CSS Custom Properties) aus US-11.
+ * Bereiche:
+ *   - Zurück-Button
+ *   - Info-Card (Labor, Arzt, Datum)
+ *   - Werte-Tabelle (responsive-fähig mit horizontalem Scroll)
+ *   - Status-Farben (Normal/Erhöht/Erniedrigt)
+ *   - Legende
+ */
+
+/* ── Zurück-Button ─────────────────────────────────────────────────── */
+.lab-detail__back-btn {
+  margin-bottom: var(--space-4);
+}
+
+/* ── Spinner (zentriert) ───────────────────────────────────────────── */
+.lab-detail__spinner {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) 0;
+}
+
+/* ── Info-Card ─────────────────────────────────────────────────────── */
+.lab-detail__info-card {
+  margin-bottom: var(--space-6);
+}
+
+.lab-detail__info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.lab-detail__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.lab-detail__info-label {
+  font-size: var(--font-xs);
+  color: var(--color-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-medium);
+}
+
+.lab-detail__info-value {
+  font-size: var(--font-base);
+  color: var(--color-slate-800);
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lab-detail__abnormal-badge {
+  font-size: var(--font-xs);
+}
+
+/* ── Notizen ───────────────────────────────────────────────────────── */
+.lab-detail__notes {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-slate-200);
+}
+
+.lab-detail__notes-text {
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  margin: var(--space-1) 0 0;
+  line-height: 1.5;
+}
+
+/* ── Werte-Section ─────────────────────────────────────────────────── */
+.lab-detail__values-section {
+  margin-bottom: var(--space-6);
+}
+
+.lab-detail__section-title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-700);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Tabelle (responsive mit horizontalem Scroll) ──────────────────── */
+.lab-detail__table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-slate-200);
+}
+
+.lab-detail__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+.lab-detail__table thead {
+  background-color: var(--color-slate-50);
+}
+
+.lab-detail__table th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-slate-600);
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.lab-detail__th-right {
+  text-align: right !important;
+}
+
+.lab-detail__table td {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-slate-100);
+}
+
+/* ── Zellen-Styles ─────────────────────────────────────────────────── */
+.lab-detail__param {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-slate-800);
+}
+
+.lab-detail__value {
+  text-align: right;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.lab-detail__unit {
+  color: var(--color-slate-500);
+}
+
+.lab-detail__reference {
+  color: var(--color-slate-400);
+  font-size: var(--font-xs);
+  white-space: nowrap;
+}
+
+.lab-detail__status {
+  text-align: center;
+  width: 48px;
+}
+
+/* ── Zeilen-Highlighting bei auffälligen Werten ────────────────────── */
+.lab-detail__row--high {
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.lab-detail__row--low {
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+/* ── Status-Dots (Symbole) ─────────────────────────────────────────── */
+.lab-detail__status-dot {
+  font-weight: var(--font-weight-bold);
+}
+
+.lab-detail__status-dot--normal {
+  color: var(--color-success);
+}
+
+.lab-detail__status-dot--high {
+  color: var(--color-error);
+}
+
+.lab-detail__status-dot--low {
+  color: var(--color-warning);
+}
+
+.lab-detail__status-dot--unknown {
+  color: var(--color-slate-400);
+}
+
+/* ── Legende ───────────────────────────────────────────────────────── */
+.lab-detail__legend {
+  display: flex;
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+  font-size: var(--font-xs);
+  color: var(--color-slate-500);
+}
+
+.lab-detail__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Responsive: Mobile ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .lab-detail__info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-detail__legend {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
