@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Avatar 3: Stethoskop / Medizin -->
+  <circle cx="60" cy="60" r="58" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"/>
+  <circle cx="60" cy="42" r="14" stroke="#4F46E5" stroke-width="4" fill="none"/>
+  <path d="M46 42v20c0 12 8 20 20 20" stroke="#4F46E5" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="78" cy="72" r="8" stroke="#4F46E5" stroke-width="3" fill="#EEF2FF"/>
+  <circle cx="78" cy="72" r="3" fill="#4F46E5"/>
+  <path d="M66 82v4" stroke="#4F46E5" stroke-width="4" stroke-linecap="round"/>
+</svg>

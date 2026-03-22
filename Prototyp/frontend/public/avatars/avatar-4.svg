@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Avatar 4: Yoga / Meditation -->
+  <circle cx="60" cy="60" r="58" fill="#F0FDF4" stroke="#16A34A" stroke-width="2"/>
+  <circle cx="60" cy="35" r="9" fill="#16A34A"/>
+  <path d="M60 44v18" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M38 62c6-4 14-6 22-6s16 2 22 6" stroke="#16A34A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M42 82l18-20 18 20" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="36" cy="60" r="4" fill="#BBF7D0"/>
+  <circle cx="84" cy="60" r="4" fill="#BBF7D0"/>
+</svg>

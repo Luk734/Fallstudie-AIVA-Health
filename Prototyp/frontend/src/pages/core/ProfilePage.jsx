@@ -43,13 +43,16 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 // ── Avatar-Liste ──────────────────────────────────────────────────────────────
 // Die Bilder liegen in public/avatars/ (Vite serviert sie als statische Dateien).
+// 8 thematische SVG-Avatare passend zum Gesundheits-Thema der App.
 const AVATARS = [
-  { id: 'avatar-1', src: '/avatars/avatar-1.jpg', alt: 'Avatar 1' },
-  { id: 'avatar-2', src: '/avatars/avatar-2.jpg', alt: 'Avatar 2' },
-  { id: 'avatar-3', src: '/avatars/avatar-3.jpg', alt: 'Avatar 3' },
-  { id: 'avatar-4', src: '/avatars/avatar-4.jpg', alt: 'Avatar 4' },
-  { id: 'avatar-5', src: '/avatars/avatar-5.jpg', alt: 'Avatar 5' },
-  { id: 'avatar-6', src: '/avatars/avatar-6.webp', alt: 'Avatar 6' },
+  { id: 'avatar-1', src: '/avatars/avatar-1.svg', alt: 'Herz & Puls' },
+  { id: 'avatar-2', src: '/avatars/avatar-2.svg', alt: 'Fitness & Laufen' },
+  { id: 'avatar-3', src: '/avatars/avatar-3.svg', alt: 'Stethoskop & Medizin' },
+  { id: 'avatar-4', src: '/avatars/avatar-4.svg', alt: 'Yoga & Meditation' },
+  { id: 'avatar-5', src: '/avatars/avatar-5.svg', alt: 'Ernährung & Apfel' },
+  { id: 'avatar-6', src: '/avatars/avatar-6.svg', alt: 'Mental Health' },
+  { id: 'avatar-7', src: '/avatars/avatar-7.svg', alt: 'Vorsorge & Schutz' },
+  { id: 'avatar-8', src: '/avatars/avatar-8.svg', alt: 'Familie & Zusammen' },
 ];
 
 // ── Geschlechter-Optionen ─────────────────────────────────────────────────────
