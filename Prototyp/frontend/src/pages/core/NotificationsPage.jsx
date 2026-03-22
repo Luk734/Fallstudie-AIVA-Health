@@ -27,6 +27,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import PageContainer from '../../components/ui/PageContainer';
 import PageHeader from '../../components/ui/PageHeader';
 import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import Alert from '../../components/ui/Alert';
 import '../../styles/pages/core/NotificationsPage.css';
@@ -39,9 +40,11 @@ export default function NotificationsPage() {
   // notifications: Array aller Benachrichtigungen (vom Server)
   // loading: true während der API-Request läuft → Spinner anzeigen
   // error: Fehlermeldung falls der Request fehlschlägt
+  // takingId: ID der Notification, deren Quick-Action gerade läuft → Spinner im Button
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [takingId, setTakingId] = useState(null);
 
   // ── Benachrichtigungen laden ────────────────────────────────────────
   // useEffect mit [] → läuft nur EINMAL nach dem ersten Render.
@@ -98,9 +101,73 @@ export default function NotificationsPage() {
       }
     }
 
-    // Zum Termin navigieren (wenn Bezug vorhanden)
-    if (notification.relatedId) {
+    // Zum passenden Bereich navigieren (je nach Typ)
+    // - Termin-Erinnerungen → zur Termin-Detail-Seite
+    // - Medikamenten-Erinnerungen → zur Labs-Seite (Einnahme-Übersicht)
+    if (notification.type === 'medication_reminder') {
+      navigate('/labs');
+    } else if (notification.relatedId) {
       navigate(`/care/appointments/${notification.relatedId}`);
+    }
+  }
+
+  // ── Handler: Einnahme direkt aus Notification bestätigen (US-21, TASK-83) ──
+  // Quick-Action: Der User kann die Einnahme bestätigen ohne zur Labs-Seite
+  // zu navigieren. Das ist besonders praktisch auf dem Handy.
+  //
+  // Ablauf:
+  //   1. scheduledTime aus der Nachricht extrahieren (z.B. "morgens")
+  //   2. POST /api/medications/:relatedId/take aufrufen
+  //   3. Notification als gelesen markieren
+  //   4. State aktualisieren (UI zeigt sofort "Eingenommen")
+  //
+  // e.stopPropagation() verhindert, dass der Klick auch den Card-Click
+  // auslöst (der würde zur Labs-Seite navigieren — das wollen wir hier nicht).
+  async function handleQuickTake(e, notification) {
+    e.stopPropagation();
+    setTakingId(notification.id);
+
+    try {
+      // scheduledTime aus der message extrahieren
+      // Format der message: "🌅 Ramipril 5mg — morgens"
+      // Wir suchen nach dem letzten Wort (morgens/mittags/abends/nachts)
+      const validTimes = ['morgens', 'mittags', 'abends', 'nachts'];
+      const words = notification.message.split(/\s+/);
+      const scheduledTime = words.find((w) => validTimes.includes(w));
+
+      if (!scheduledTime) {
+        setError('Einnahmezeit konnte nicht erkannt werden.');
+        return;
+      }
+
+      // Einnahme bestätigen
+      const takeRes = await fetch(`/api/medications/${notification.relatedId}/take`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scheduledTime }),
+      });
+
+      if (!takeRes.ok) throw new Error('Einnahme fehlgeschlagen');
+
+      // Notification als gelesen markieren
+      await fetch(`/api/notifications/${notification.id}/read`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // State lokal aktualisieren → sofort sichtbar
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notification.id ? { ...n, read: true } : n
+        )
+      );
+    } catch (err) {
+      setError('Einnahme konnte nicht bestätigt werden.');
+    } finally {
+      setTakingId(null);
     }
   }
 
@@ -148,9 +215,22 @@ export default function NotificationsPage() {
   // ── Render ──────────────────────────────────────────────────────────
   return (
     <PageContainer>
+      {/* ── Zurück-Button ──────────────────────────────────────────── */}
+      {/* Konsistentes Pattern wie in AppointmentDetail (US-14).
+          navigate(-1) geht einen Schritt im Browser-Verlauf zurück,
+          egal von welcher Seite der User kam. */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate(-1)}
+        className="notifications-back"
+      >
+        ← Zurück
+      </Button>
+
       <PageHeader
         title="🔔 Benachrichtigungen"
-        subtitle="Deine Termin-Erinnerungen und Hinweise"
+        subtitle="Deine Erinnerungen und Hinweise"
       />
 
       {/* ── Fehler-Anzeige ──────────────────────────────────────── */}
@@ -190,10 +270,14 @@ export default function NotificationsPage() {
             onClick={() => handleNotificationClick(notification)}
           >
             <div className="notification-item__content">
-              {/* ── Icon: Typ-abhängig ────────────────────────────── */}
-              {/* Im MVP nur Termin-Erinnerungen → Kalender-Emoji */}
+              {/* ── Icon: Typ-abhängig (US-21: Medikamenten-Typ) ──── */}
+              {/* appointment → 📅, medication → 💊, sonstiges → 🔔 */}
               <span className="notification-item__icon">
-                {notification.type.includes('appointment') ? '📅' : '🔔'}
+                {notification.type.includes('appointment')
+                  ? '📅'
+                  : notification.type === 'medication_reminder'
+                    ? '💊'
+                    : '🔔'}
               </span>
 
               {/* ── Text-Bereich ──────────────────────────────────── */}
@@ -211,6 +295,19 @@ export default function NotificationsPage() {
                 <p className="notification-item__time">
                   {formatTimeAgo(notification.createdAt)}
                 </p>
+
+                {/* ── Quick-Action: Eingenommen-Button (US-21, TASK-83) ── */}
+                {/* Wird nur bei Medikamenten-Erinnerungen angezeigt,
+                    die noch nicht gelesen (= bestätigt) sind. */}
+                {notification.type === 'medication_reminder' && !notification.read && (
+                  <button
+                    className="notification-item__quick-take"
+                    onClick={(e) => handleQuickTake(e, notification)}
+                    disabled={takingId === notification.id}
+                  >
+                    {takingId === notification.id ? '...' : '✅ Eingenommen'}
+                  </button>
+                )}
               </div>
             </div>
           </Card>

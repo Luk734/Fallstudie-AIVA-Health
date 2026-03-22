@@ -146,3 +146,37 @@
   padding: var(--space-6) 0;
   font-size: var(--font-base);
 }
+
+/* ── Zurück-Button ────────────────────────────────────────────────────
+ * Gleiche Position wie in AppointmentDetail (über der Überschrift).
+ * margin-bottom sorgt für Abstand zum PageHeader darunter.
+ */
+.notifications-back {
+  margin-bottom: var(--space-2);
+}
+
+/* ── Quick-Action: Eingenommen-Button (US-21, TASK-83) ───────────────
+ * Kleiner grüner Button direkt in der Notification-Card.
+ * Dezent genug um nicht abzulenken, aber klar als Aktion erkennbar.
+ */
+.notification-item__quick-take {
+  display: inline-block;
+  margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  color: white;
+  background-color: var(--color-success);
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+}
+
+.notification-item__quick-take:hover {
+  background-color: var(--color-success-dark, #059669);
+}
+
+.notification-item__quick-take:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
