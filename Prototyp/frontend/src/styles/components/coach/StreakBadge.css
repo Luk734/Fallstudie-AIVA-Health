@@ -1,0 +1,50 @@
+/* src/styles/components/coach/StreakBadge.css — Streak-Anzeige (US-24)
+ *
+ * Kompakte Badge-Komponente:
+ *   - Inaktiv (streak=0): dezent grau, motivierender Text
+ *   - Aktiv (streak>0):   grüner Hintergrund, Feuer-Emoji + Zähler
+ */
+
+.streak-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-slate-50);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-xl);
+  transition: all 0.3s ease;
+}
+
+/* Aktive Streak: Grüner Hintergrund */
+.streak-badge--active {
+  background: var(--color-green-light);
+  border-color: var(--color-green-200);
+}
+
+.streak-fire {
+  font-size: 1.5rem;
+  line-height: 1;
+  animation: streak-pulse 2s ease-in-out infinite;
+}
+
+@keyframes streak-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+
+.streak-text {
+  font-size: var(--font-base);
+  color: var(--color-slate-800);
+}
+
+.streak-text strong {
+  font-size: var(--font-lg);
+  color: var(--color-coach);
+}
+
+.streak-text--empty {
+  color: var(--color-slate-500);
+  font-size: var(--font-sm);
+}

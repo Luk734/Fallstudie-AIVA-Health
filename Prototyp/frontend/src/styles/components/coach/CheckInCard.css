@@ -1,0 +1,225 @@
+/* src/styles/components/coach/CheckInCard.css — Befinden-Check-in (US-24)
+ *
+ * Drei Zustände:
+ *   1. Loading:  Spinner-Animation
+ *   2. Auswahl:  5 Emoji-Buttons + Notiz + Speichern
+ *   3. Erledigt: Gespeicherter Mood mit grünem Haken
+ *
+ * Design-Tokens aus tokens.css werden verwendet.
+ * Responsive: Emoji-Buttons flexen auf schmalen Screens.
+ */
+
+/* ── Basis-Card ────────────────────────────────────────────────────── */
+.checkin-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--color-slate-200);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Lade-Zustand ──────────────────────────────────────────────────── */
+.checkin-card--loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+}
+
+.checkin-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-slate-200);
+  border-top-color: var(--color-coach);
+  border-radius: 50%;
+  animation: checkin-spin 0.8s linear infinite;
+}
+
+@keyframes checkin-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Überschrift ───────────────────────────────────────────────────── */
+.checkin-title {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--color-slate-900);
+  margin: 0 0 var(--space-1) 0;
+  text-align: center;
+}
+
+.checkin-subtitle {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+  margin: 0 0 var(--space-4) 0;
+  text-align: center;
+}
+
+/* ── Emoji-Auswahl: 5 Buttons in einer Reihe ──────────────────────── */
+.checkin-moods {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+/* Einzelner Emoji-Button */
+.checkin-mood {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-slate-50);
+  border: 2px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 56px;
+}
+
+.checkin-mood:hover {
+  background: var(--color-coach-light);
+  border-color: var(--color-coach);
+  transform: translateY(-2px);
+}
+
+/* Ausgewählter Emoji: Grüner Rand + Hintergrund */
+.checkin-mood--selected {
+  background: var(--color-green-light);
+  border-color: var(--color-coach);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+}
+
+.checkin-mood-emoji {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.checkin-mood-label {
+  font-size: var(--font-xs);
+  color: var(--color-slate-600);
+  font-weight: 500;
+}
+
+.checkin-mood--selected .checkin-mood-label {
+  color: var(--color-coach);
+  font-weight: 600;
+}
+
+/* ── Notiz-Bereich (erscheint nach Emoji-Wahl) ────────────────────── */
+.checkin-note-section {
+  animation: checkin-fade-in 0.3s ease;
+}
+
+@keyframes checkin-fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.checkin-note-label {
+  display: block;
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  margin-bottom: var(--space-2);
+}
+
+.checkin-note-input {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-family: inherit;
+  color: var(--color-slate-800);
+  resize: vertical;
+  min-height: 72px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.checkin-note-input:focus {
+  outline: none;
+  border-color: var(--color-coach);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.checkin-note-input::placeholder {
+  color: var(--color-slate-400);
+}
+
+/* ── Speichern-Button ──────────────────────────────────────────────── */
+.checkin-submit {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-coach);
+  color: white;
+  font-size: var(--font-base);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.checkin-submit:hover:not(:disabled) {
+  background: #15803d; /* Green-700 */
+}
+
+.checkin-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Erledigt-Zustand ──────────────────────────────────────────────── */
+.checkin-card--done {
+  background: var(--color-green-light);
+  border-color: var(--color-green-200);
+  text-align: center;
+}
+
+.checkin-done-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.checkin-done-check {
+  font-size: 1.25rem;
+}
+
+.checkin-done-title {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-green-800);
+}
+
+.checkin-done-mood {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.checkin-done-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.checkin-done-label {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-slate-800);
+}
+
+.checkin-done-note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-sm);
+  color: var(--color-slate-600);
+  font-style: italic;
+}
