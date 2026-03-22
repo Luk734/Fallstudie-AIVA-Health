@@ -2,24 +2,26 @@
 //
 // Dieses Modul enthält:
 //   ✅ Befinden-Check-in (US-24) — Emoji-Auswahl + Notiz + Streak
-//   🔲 Check-in-Verlauf (US-25) — Kalender-Ansicht + Trends
+//   ✅ Check-in-Verlauf (US-25) — Kalender-Ansicht + Trends
 //   🔲 Tages-Empfehlung (US-26)
 //   🔲 Wearable-Metriken (US-27)
 //   🔲 Metriken-Dashboard (US-28)
 //
 // State-Architektur:
 //   refreshKey (number) wird bei jedem neuen Check-in hochgezählt.
-//   StreakBadge hat refreshKey als Dependency in useEffect →
-//   wird dadurch nach jedem Check-in automatisch aktualisiert.
+//   StreakBadge, MoodTrend und MoodCalendar haben refreshKey als
+//   Dependency in useEffect → werden nach Check-in automatisch aktualisiert.
 
 import { useState } from 'react';
 import CheckInCard from '../../../components/coach/CheckInCard';
 import StreakBadge from '../../../components/coach/StreakBadge';
+import MoodTrend from '../../../components/coach/MoodTrend';
+import MoodCalendar from '../../../components/coach/MoodCalendar';
 import '../../../styles/pages/modules/coach/CoachPage.css';
 
 export default function CoachPage() {
   // refreshKey wird bei jedem Check-in hochgezählt.
-  // Das triggert ein Re-Fetch der Streak in StreakBadge.
+  // Das triggert ein Re-Fetch in StreakBadge, MoodTrend und MoodCalendar.
   const [refreshKey, setRefreshKey] = useState(0);
 
   function handleCheckinDone() {
@@ -39,10 +41,14 @@ export default function CoachPage() {
         <StreakBadge refreshKey={refreshKey} />
         <CheckInCard onCheckinDone={handleCheckinDone} />
 
+        {/* ── US-25: Check-in-Verlauf ────────────────────────────── */}
+        <MoodTrend refreshKey={refreshKey} />
+        <MoodCalendar refreshKey={refreshKey} />
+
         {/* ── Platzhalter für kommende Features ──────────────────── */}
         <div className="coach-placeholder">
           <span className="coach-placeholder-icon">🚧</span>
-          <p>Weitere Features (Verlauf, Empfehlungen, Wearables) kommen in den nächsten Stories.</p>
+          <p>Weitere Features (Empfehlungen, Wearables) kommen in den nächsten Stories.</p>
         </div>
       </div>
     </div>

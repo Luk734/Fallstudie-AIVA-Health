@@ -15,6 +15,7 @@ import {
   createCheckin,
   getTodayCheckin,
   getStreak,
+  getCheckins,
 } from '../controllers/checkin.controller.js';
 
 const router = Router();
@@ -28,6 +29,12 @@ router.get('/today', authenticateToken, getTodayCheckin);
 // ── GET /api/checkins/streak ─────────────────────────────────────────
 // Aktuelle Streak berechnen (aufeinanderfolgende Tage mit Check-in).
 router.get('/streak', authenticateToken, getStreak);
+
+// ── GET /api/checkins?from=&to= ──────────────────────────────────────
+// Alle Check-ins eines Zeitraums abrufen + Durchschnitte (US-25).
+// ⚠️ MUSS nach /today und /streak stehen (sonst matcht Express
+// die spezifischen Pfade nicht mehr korrekt).
+router.get('/', authenticateToken, getCheckins);
 
 // ── POST /api/checkins ───────────────────────────────────────────────
 // Neuen Check-in für heute erstellen (max. 1 pro Tag).

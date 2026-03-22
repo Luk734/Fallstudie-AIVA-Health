@@ -1,0 +1,62 @@
+/* src/styles/components/coach/MoodTrend.css — Durchschnittswerte (US-25)
+ *
+ * Zwei Kennzahl-Karten nebeneinander:
+ *   Ø 7 Tage | Ø 30 Tage
+ */
+
+.mood-trend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.mood-trend-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-slate-200);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.mood-trend-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mood-trend-value-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.mood-trend-value {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-slate-800);
+}
+
+.mood-trend-value--empty {
+  color: var(--color-slate-300);
+}
+
+.mood-trend-value--loading {
+  color: var(--color-slate-300);
+  animation: mood-trend-pulse 1s ease-in-out infinite;
+}
+
+@keyframes mood-trend-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+
+.mood-trend-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
