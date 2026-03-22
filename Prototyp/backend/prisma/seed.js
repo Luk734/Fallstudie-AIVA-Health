@@ -746,6 +746,59 @@ async function main() {
 
   console.log(`   ✅ ${explanations.length} Laborwert-Erklärungen angelegt`);
 
+  // ─── US-27: Wearable-Mock-Daten (letzte 7 Tage) ─────────────────────
+  // Für beide Demo-User (Laura + Thomas) werden 7 Tage an simulierten
+  // Wearable-Daten erstellt, damit die Coach-Seite sofort Daten zeigt.
+  //
+  // Die Werte variieren leicht pro Tag (realistischer als statische Werte).
+  // sleepQuality wird aus den Schlaf-Stunden abgeleitet.
+  const metricsUsers = [user, user2]; // Laura + Thomas
+  let metricsCount = 0;
+
+  for (const u of metricsUsers) {
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() - i));
+
+      const steps = Math.round(5000 + Math.random() * 10000);
+      const heartRateAvg = Math.round(65 + Math.random() * 20);
+      const heartRateMin = heartRateAvg - Math.round(10 + Math.random() * 8);
+      const heartRateMax = heartRateAvg + Math.round(25 + Math.random() * 35);
+      const sleepHours = Math.round((5.5 + Math.random() * 3.5) * 10) / 10;
+
+      let sleepQuality;
+      if (sleepHours < 5) sleepQuality = 'poor';
+      else if (sleepHours < 6) sleepQuality = 'fair';
+      else if (sleepHours < 7.5) sleepQuality = 'good';
+      else sleepQuality = 'excellent';
+
+      await prisma.healthMetric.upsert({
+        where: { userId_date: { userId: u.id, date } },
+        update: {
+          steps,
+          heartRateAvg,
+          heartRateMin,
+          heartRateMax,
+          sleepHours,
+          sleepQuality,
+        },
+        create: {
+          userId: u.id,
+          date,
+          steps,
+          heartRateAvg,
+          heartRateMin,
+          heartRateMax,
+          sleepHours,
+          sleepQuality,
+        },
+      });
+      metricsCount++;
+    }
+  }
+
+  console.log(`   ✅ ${metricsCount} Wearable-Metriken angelegt (letzte 7 Tage, ${metricsUsers.length} User)`);
+
   console.log('🌱 Seed abgeschlossen!');
 }
 

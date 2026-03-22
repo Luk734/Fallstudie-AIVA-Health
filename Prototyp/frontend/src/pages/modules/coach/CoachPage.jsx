@@ -4,7 +4,7 @@
 //   ✅ Befinden-Check-in (US-24) — Emoji-Auswahl + Notiz + Streak
 //   ✅ Check-in-Verlauf (US-25) — Kalender-Ansicht + Trends
 //   🔲 Tages-Empfehlung (US-26)
-//   🔲 Wearable-Metriken (US-27)
+//   ✅ Wearable-Metriken (US-27) — Schritte, Herzfrequenz, Schlaf (Mock)
 //   🔲 Metriken-Dashboard (US-28)
 //
 // State-Architektur:
@@ -17,6 +17,7 @@ import CheckInCard from '../../../components/coach/CheckInCard';
 import StreakBadge from '../../../components/coach/StreakBadge';
 import MoodTrend from '../../../components/coach/MoodTrend';
 import MoodCalendar from '../../../components/coach/MoodCalendar';
+import WearableMetrics from '../../../components/coach/WearableMetrics';
 import '../../../styles/pages/modules/coach/CoachPage.css';
 
 export default function CoachPage() {
@@ -45,10 +46,13 @@ export default function CoachPage() {
         <MoodTrend refreshKey={refreshKey} />
         <MoodCalendar refreshKey={refreshKey} />
 
-        {/* ── Platzhalter für kommende Features ──────────────────── */}
+        {/* ── US-27: Wearable-Metriken ─────────────────────────── */}
+        <WearableMetrics refreshKey={refreshKey} />
+
+        {/* ── Platzhalter für kommende Features ────────────────── */}
         <div className="coach-placeholder">
           <span className="coach-placeholder-icon">🚧</span>
-          <p>Weitere Features (Empfehlungen, Wearables) kommen in den nächsten Stories.</p>
+          <p>Weitere Features (Empfehlungen, Metriken-Dashboard) kommen in den nächsten Stories.</p>
         </div>
       </div>
     </div>

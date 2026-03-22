@@ -1,0 +1,63 @@
+/* src/styles/components/coach/WearableMetrics.css — Wearable-Sektion (US-27)
+ *
+ * Container für die 3 MetricCards + Demo-Hinweis.
+ * Verwendet ein responsives Grid (1 Spalte auf Mobil, 3 auf Desktop).
+ */
+
+.wearable-metrics {
+  margin-top: var(--space-6);
+}
+
+.wearable-metrics__heading {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-slate-900);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.wearable-metrics__date {
+  font-size: var(--font-sm);
+  color: var(--color-slate-500);
+  margin: 0 0 var(--space-4) 0;
+}
+
+/* ── Grid: 1 Spalte mobil, 3 Spalten ab 640px ─────────────────── */
+.wearable-metrics__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .wearable-metrics__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Leer-Zustand & Loading ────────────────────────────────────── */
+.wearable-metrics__loading,
+.wearable-metrics__empty {
+  text-align: center;
+  color: var(--color-slate-500);
+  font-size: var(--font-sm);
+  padding: var(--space-6) 0;
+}
+
+/* ── Demo-Hinweis ──────────────────────────────────────────────── */
+.wearable-metrics__demo-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-blue-50);
+  border: 1px solid var(--color-blue-200);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-sm);
+  color: var(--color-blue-800);
+}
+
+.wearable-metrics__demo-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}

@@ -16,6 +16,7 @@ import notificationRoutes from './src/routes/notification.routes.js';
 import medicationRoutes from './src/routes/medication.routes.js';
 import labRoutes from './src/routes/lab.routes.js';
 import checkinRoutes from './src/routes/checkin.routes.js';
+import metricsRoutes from './src/routes/metrics.routes.js';
 import { startReminderCron } from './src/config/cron.js';
 
 // Express-App erstellen – das ist unser Webserver-Objekt
@@ -105,6 +106,12 @@ app.use('/api/labs', labRoutes);
 // GET /today = Heutigen Check-in abrufen
 // GET /streak = Aktuelle Streak berechnen
 app.use('/api/checkins', checkinRoutes);
+
+// Metrics-Routen: Wearable-Gesundheitsmetriken unter /api/metrics/* (US-27)
+// GET / = Metriken für ein Datum (?date=YYYY-MM-DD, Default: heute)
+// GET /latest = Aktuellste verfügbare Metriken
+// Im MVP: Simulierte Daten (Mock-Wearable, kein echtes SDK)
+app.use('/api/metrics', metricsRoutes);
 
 // ─── START ───────────────────────────────────────────────────────────────────
 // '0.0.0.0' = Server lauscht auf ALLEN Netzwerk-Interfaces,
