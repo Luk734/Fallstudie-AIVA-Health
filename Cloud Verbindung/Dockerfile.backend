@@ -22,8 +22,9 @@ FROM node:20-alpine
 
 # ─── OPENSSL INSTALLIEREN (Pflicht fuer Prisma auf Alpine) ───────────────────
 # Prisma benoetigt OpenSSL um die DB-Verbindung zu verschluesseln.
-# Alpine hat es nicht vorinstalliert → muss explizit nachinstalliert werden.
-RUN apk add --no-cache openssl
+# Alpine 3.23+ hat das Paket in openssl-libs-static umbenannt.
+# node:20-alpine enthaelt bereits libssl — daher reicht libssl3:
+RUN apk add --no-cache libssl3 || true
 
 # ─── ARBEITSVERZEICHNIS ──────────────────────────────────────────────────────
 # Alle folgenden Befehle (COPY, RUN, CMD) werden in /app ausgefuehrt.
@@ -58,7 +59,7 @@ RUN npm ci --omit=dev
 # Wir kopieren das Schema separat VOR dem restlichen Code,
 # damit der Cache aktiv bleibt, solange sich das Schema nicht aendert.
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 # ─── SCHRITT 3: Restlichen Quellcode kopieren ───────────────────────────────
 # Jetzt erst den gesamten Code (src/, server.js, .env, etc.) kopieren.
@@ -83,4 +84,4 @@ EXPOSE 3001
 #
 # "sh -c" wird benoetigt, damit wir zwei Befehle mit && verketten koennen.
 # && = der zweite Befehl laeuft NUR, wenn der erste erfolgreich war.
-CMD sh -c "npx prisma migrate deploy && node server.js"
+CMD sh -c "./node_modules/.bin/prisma migrate deploy && node server.js"
